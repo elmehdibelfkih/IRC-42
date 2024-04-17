@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/16 06:53:37 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/17 04:24:43 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,9 +126,9 @@ void Server::handleClientConnection()
             if (this->_fds[i].revents & POLLIN)
             {
                 Message msg;
-                int bytesReceived = 0;
-                char buffer[1024];
-                memset(buffer, 0, 1024);
+                int bytesReceived;
+                char buffer[4096];
+                memset(buffer, 0, 4096);
                 bytesReceived = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
                 if (bytesReceived == 0)
                 {
@@ -141,10 +141,8 @@ void Server::handleClientConnection()
                 }
                 if (bytesReceived < 0)
                     std::cerr << "recv() failed" << std::endl;
-                else {
-                    buffer[bytesReceived] = 0;
+                else
                     msg = msg + buffer;
-                }
                 this->_clients[this->_fds[i].fd].setMessage(msg);
                 this->handleClientMessage(this->_fds[i].fd);
             }
@@ -154,12 +152,12 @@ void Server::handleClientConnection()
 
 void Server::handleClientMessage(int i)
 {
-    if (this->_clients[i].getMessage().getIsReady())
+    if (this->_clients[i].getMessage().IsReady())
     {
         std::cout << this->_clients[i].getClientFdSocket() << " : " 
             << this->_clients[i].getMessage().getBuffer();
+        this->_clients[i].getMessage().clearBuffer();
     }
-    this->_clients[i].getMessage().clearBuffer();
 }
 
 // bool Server::authenticateUser() const
