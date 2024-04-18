@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/17 04:24:43 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/18 14:41:59 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,14 +137,15 @@ void Server::handleClientConnection()
                     this->_clients[this->_fds[i].fd].disconnect();
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
-                    break;
                 }
-                if (bytesReceived < 0)
+                else if (bytesReceived < 0)
                     std::cerr << "recv() failed" << std::endl;
                 else
+                {
                     msg = msg + buffer;
-                this->_clients[this->_fds[i].fd].setMessage(msg);
-                this->handleClientMessage(this->_fds[i].fd);
+                    this->_clients[this->_fds[i].fd].setMessage(msg);
+                    this->handleClientMessage(this->_fds[i].fd);
+                }
             }
         }
     }
