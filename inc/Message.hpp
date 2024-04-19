@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:53 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/17 04:06:45 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/19 16:28:05 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,16 @@
 #define MESSAGE_HPP
 #include <iostream>
 #include <cstring>
+#include <vector>
+
 
 class Message
 {
 private:
-    std::string _buffer;
-    int         _fdsender;
+    std::string                 _buffer;
+    int                         _fdsender;
 public:
+    std::vector<std::string>    _tokens;
     Message();
     Message& operator=(const Message& obj);
     Message(const Message& obj);
@@ -37,7 +40,8 @@ public:
     Message& operator+(const std::string& str);
     void myAppend(Message msg);
     void clearBuffer();
-    bool IsReady() const;
+    bool IsReady();
+    void parsBuffer();
 };
 
 #endif

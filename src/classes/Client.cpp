@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/16 06:51:02 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:54:33 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ Client::Client()
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
+    this->_pass = false;
 }
 
 Client::Client(const Client& obj)
@@ -145,4 +146,9 @@ void Client::disconnect()
 void  Client::sendMsg(std::string str)
 {
     send(this->_clientFdSocket, str.c_str(), str.size(), 0);
+}
+
+bool Client::getPass() const
+{
+    return this->_pass;
 }

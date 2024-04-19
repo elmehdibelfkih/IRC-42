@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/15 03:47:43 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/19 19:05:46 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include "Client.hpp"
 #include "Channel.hpp"
 #include "Message.hpp"
+#include "replies.hpp"
 
 class Server
 {
@@ -42,7 +43,7 @@ public:
 
     Server(std::string port, std::string password);
     void startServer();
-    // bool authenticateUser() const;
+    bool authenticateUser(int i);
     void handleClientConnection();
     void handleClientMessage(int i);
 

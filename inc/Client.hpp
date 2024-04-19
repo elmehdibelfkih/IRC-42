@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/16 06:51:11 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:53:45 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ class Client
 private:
     int 					_clientFdSocket;
     bool					_authenticate;
+    bool                    _pass;
     std::string				_currentChannel;
     std::string				_userName;
     std::string				_nickName;
@@ -44,6 +45,7 @@ public:
     // getters
     int getClientFdSocket() const;
     bool getAuthenticate() const;
+    bool getPass() const;
     std::string getCurrentChannel() const;
     std::string getUserName() const;
     std::string getNickName() const;

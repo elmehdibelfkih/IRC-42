@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/17 04:24:43 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/19 20:28:39 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,9 +142,11 @@ void Server::handleClientConnection()
                 if (bytesReceived < 0)
                     std::cerr << "recv() failed" << std::endl;
                 else
+                {
                     msg = msg + buffer;
-                this->_clients[this->_fds[i].fd].setMessage(msg);
-                this->handleClientMessage(this->_fds[i].fd);
+                    this->_clients[this->_fds[i].fd].setMessage(msg);
+                    this->handleClientMessage(this->_fds[i].fd);
+                }
             }
         }
     }
@@ -154,16 +156,36 @@ void Server::handleClientMessage(int i)
 {
     if (this->_clients[i].getMessage().IsReady())
     {
-        std::cout << this->_clients[i].getClientFdSocket() << " : " 
-            << this->_clients[i].getMessage().getBuffer();
+        if (this->authenticateUser(i))
+        {
+            std::cout << "mrhbabik\n";
+        }
+        // std::cout << this->_clients[i].getClientFdSocket() << " : " 
+        //     << this->_clients[i].getMessage().getBuffer();
+        // std::cout << this->_clients[i].getMessage()._tokens[0] << std::endl;
         this->_clients[i].getMessage().clearBuffer();
+        // this->_clients[i].sendMsg("464\r\n");
     }
 }
 
-// bool Server::authenticateUser() const
-// {
-    
-// }
+bool Server::authenticateUser(int i)
+{
+    if (this->_clients[i].getAuthenticate())
+        return true;
+    else if (!this->_clients[i].getPass())
+    {
+        if (this->_clients[i].getMessage()._tokens[0] == "pass" 
+                || this->_clients[i].getMessage()._tokens[0] == "PASS")
+        {
+            if (this->_clients[i].getMessage()._tokens[1] == (this->_passWord))
+                this->_clients[i].sendMsg("????\r\n");
+            else
+                this->_clients[i].sendMsg(ERR_PASSWDMISMATCH);
+                
+        }
+    }
+    return false;
+}
 
 // Channel Server::createChannel(std::string channelName)
 // {
