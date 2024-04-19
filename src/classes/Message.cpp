@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:19 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/19 20:15:58 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/19 20:52:05 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,4 @@ void Message::parsBuffer()
     if(tmp.find('\n') != std::string::npos)
             tmp.erase(tmp.find('\n'), 1);
     this->_tokens.push_back(tmp);
-    for (size_t i = 0; i < this->_tokens.size(); i++)
-        std::cout << this->_tokens[i]<< "|";
 }
