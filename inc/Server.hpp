@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/19 19:05:46 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 10:09:25 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ public:
     bool authenticateUser(int i);
     void handleClientConnection();
     void handleClientMessage(int i);
+    Client* getClientByNickName(std::string name);
 
     // Channel createChannel(std::string channelName);
 };

@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/19 18:53:45 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 08:44:30 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,8 @@ public:
     bool getAuthenticate() const;
     bool getPass() const;
     std::string getCurrentChannel() const;
-    std::string getUserName() const;
     std::string getNickName() const;
+    std::string getUserName() const;
     std::string getIP() const;
     Message& getMessage();
     
@@ -60,6 +60,7 @@ public:
     void setNickName(std::string nickName);
     void setIP(std::string IP);
     void setMessage(Message msg);
+    void setPass(bool b);
     
     // utils
     void disconnect();

@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:19 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/19 20:52:05 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 08:37:56 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ std::string Message::getBuffer()const
     return this->_buffer;
 }
 
+int Message::getCommand()const
+{
+    return this->_command;
+}
+
+std::string Message::getToken()const
+{
+    return this->_tokens;
+}
+
 void Message::myAppend(Message msg)
 {
     this->_buffer.append(msg.getBuffer());
@@ -76,6 +86,10 @@ void Message::setBuffer(std::string str)
     this->_buffer = str;
 }
 
+void Message::setCommand(int cmd)
+{
+    this->_command = cmd;
+}
 
 void Message::clearBuffer()
 {
@@ -87,18 +101,69 @@ void Message::parsBuffer()
     this->_tokens.clear();
     std::string::size_type start = 0;
     std::string::size_type end = this->_buffer.find(' ');
+    std::string cmd;
     std::string tmp;
 
-    while (end != std::string::npos) {
-        tmp = this->_buffer.substr(start, end - start);
-        // if(tmp.find('\n') == std::string::npos)
-        //     tmp.erase(tmp.find('\n'), 1);
-        this->_tokens.push_back(tmp);
+    if (end != std::string::npos)
+    {
+        cmd = this->_buffer.substr(start, end - start);
         start = end + 1;
-        end = this->_buffer.find(' ', start);
+        tmp = this->_buffer.substr(start);
+        if(tmp.find('\n') != std::string::npos)
+                tmp.erase(tmp.find('\n'), 1);
+        if(tmp.find('\r') != std::string::npos)
+                tmp.erase(tmp.find('\r'), 1);
+        this->_tokens = tmp;
     }
-    tmp = this->_buffer.substr(start);
-    if(tmp.find('\n') != std::string::npos)
-            tmp.erase(tmp.find('\n'), 1);
-    this->_tokens.push_back(tmp);
+    else
+    {
+        tmp = this->_buffer;
+        if(tmp.find('\n') != std::string::npos)
+                tmp.erase(tmp.find('\n'), 1);
+        if(tmp.find('\r') != std::string::npos)
+                tmp.erase(tmp.find('\r'), 1);
+        cmd = tmp;
+    }
+    if (cmd == "PASS" || cmd == "pass")
+        this->_command = PASS;
+    else if (cmd == "NICK" || cmd == "nick")
+        this->_command = NICK;
+    else if (cmd == "USER" || cmd == "user")
+        this->_command = USER;
+    else if (cmd == "JOIN" || cmd == "join")
+        this->_command = JOIN;
+    else if (cmd == "PART" || cmd == "part")
+        this->_command = PART;
+    else if (cmd == "PRIVMSG" || cmd == "privmsg")
+        this->_command = PRIVMSG;
+    else if (cmd == "NOTICE" || cmd == "notice")
+        this->_command = NOTICE;
+    else if (cmd == "MODE" || cmd == "mode")
+        this->_command = MODE;
+    else if (cmd == "TOPIC" || cmd == "topic")
+        this->_command = TOPIC;
+    else if (cmd == "QUIT" || cmd == "quit")
+        this->_command = QUIT;
+    else if (cmd == "WHO" || cmd == "who")
+        this->_command = WHO;
+    else if (cmd == "NAMES" || cmd == "names")
+        this->_command = NAMES;
+    else if (cmd == "LIST" || cmd == "list")
+        this->_command = LIST;
+    else if (cmd == "INVITE" || cmd == "invite")
+        this->_command = INVITE;
+    else if (cmd == "KICK" || cmd == "kick")
+        this->_command = KICK;
+    else if (cmd == "OPER" || cmd == "oper")
+        this->_command = OPER;
+    else if (cmd == "KILL" || cmd == "kill")
+        this->_command = KILL;
+    else if (cmd == "AWAY" || cmd == "away")
+        this->_command = AWAY;
+    else if (cmd == "PING" || cmd == "ping")
+        this->_command = PING;
+    else if (cmd == "PONG" || cmd == "pong")
+        this->_command = PONG;
+    else
+        this->_command = UNKNOWN;
 }

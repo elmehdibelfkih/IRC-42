@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/19 20:28:39 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 10:19:08 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,15 +156,13 @@ void Server::handleClientMessage(int i)
 {
     if (this->_clients[i].getMessage().IsReady())
     {
+        std::cout << this->_clients[i].getMessage().getBuffer();
+        // exit(0);
         if (this->authenticateUser(i))
         {
             std::cout << "mrhbabik\n";
         }
-        // std::cout << this->_clients[i].getClientFdSocket() << " : " 
-        //     << this->_clients[i].getMessage().getBuffer();
-        // std::cout << this->_clients[i].getMessage()._tokens[0] << std::endl;
         this->_clients[i].getMessage().clearBuffer();
-        // this->_clients[i].sendMsg("464\r\n");
     }
 }
 
@@ -174,20 +172,42 @@ bool Server::authenticateUser(int i)
         return true;
     else if (!this->_clients[i].getPass())
     {
-        if (this->_clients[i].getMessage()._tokens[0] == "pass" 
-                || this->_clients[i].getMessage()._tokens[0] == "PASS")
+        if (this->_clients[i].getMessage().getCommand() == PASS)
         {
-            if (this->_clients[i].getMessage()._tokens[1] == (this->_passWord))
-                this->_clients[i].sendMsg("????\r\n");
+            if (this->_clients[i].getMessage().getToken().size() == 0)
+                this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
+            else if (this->_clients[i].getPass() == true)
+                this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+            else if (this->_clients[i].getMessage().getToken() == this->_passWord)
+                this->_clients[i].setPass(true);
             else
-                this->_clients[i].sendMsg(ERR_PASSWDMISMATCH);
-                
+                this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
+        }
+        else
+             this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+    }
+    else if (this->_clients[i].getNickName().size() == 0)
+    {
+        if (this->_clients[i].getMessage().getCommand() == NICK)
+        {
+            if (this->_clients[i].getMessage().getToken().size() == 0)
+                this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
+            else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
+                this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
+            else if (this->_clients[i].getMessage().getToken().size())
+            
         }
     }
     return false;
 }
 
-// Channel Server::createChannel(std::string channelName)
-// {
-    
-// }
+Client* Server::getClientByNickName(std::string name)
+{
+    std::map<int, Client>::iterator it = this->_clients.begin();
+    for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+    {
+        if (it->second.getNickName() == name)
+            return &it->second;
+    }
+    return NULL;
+}

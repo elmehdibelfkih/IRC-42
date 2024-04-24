@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/19 18:54:33 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/23 12:42:22 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ Client& Client::operator=(const Client& obj)
         this->_IP = obj._IP;
         this->_channels = obj._channels;
         this->_msg = obj._msg;
+        this->_pass = obj._pass;
     }
     return *this;
 }
@@ -58,8 +59,13 @@ Client::~Client()
 
 
 
-Client::Client(int clientFdSocket, bool authenticate) : _authenticate(authenticate)
+Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authenticate)
 {
+    this->_currentChannel = "";
+    this->_userName = "";
+    this->_nickName = "";
+    this->_IP = "";
+    this->_pass = false;
     this->_clientFdSocket = clientFdSocket;
 }
 
@@ -132,6 +138,11 @@ void Client::setIP(std::string IP)
 void Client::setMessage(Message msg)
 {
     this->_msg.myAppend(msg);
+}
+
+void Client::setPass(bool b)
+{
+    this->_pass = b;
 }
 
 void Client::disconnect()
