@@ -10,6 +10,9 @@
 #define ERR_NEEDMOREPARAMS(client,command) "461 " + client + " " + command + " :Not enough parameters\r\n"
 #define ERR_NICKNAMEINUSE(client,nick) "433 " + client + " " + nick + " :Nickname is already in use\r\n"
 #define ERR_NONICKNAMEGIVEN(client) "431 " + client +  " :No nickname given\r\n"
+#define ERR_ERRONEUSNICKNAME(client,nick) "432 " + client + " " + nick + " :Erroneus nickname\r\n"
+
+
 
 
 #endif

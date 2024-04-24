@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 10:19:08 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 17:01:33 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,11 +156,10 @@ void Server::handleClientMessage(int i)
 {
     if (this->_clients[i].getMessage().IsReady())
     {
-        std::cout << this->_clients[i].getMessage().getBuffer();
-        // exit(0);
         if (this->authenticateUser(i))
         {
             std::cout << "mrhbabik\n";
+            // (.............) << youssef
         }
         this->_clients[i].getMessage().clearBuffer();
     }
@@ -194,20 +193,34 @@ bool Server::authenticateUser(int i)
                 this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
             else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
                 this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
-            else if (this->_clients[i].getMessage().getToken().size())
-            
+            else if (!this->checkNickName(i))
+                this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
         }
+        else
+             this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
     }
     return false;
 }
 
-Client* Server::getClientByNickName(std::string name)
+Client* Server::getClientByNickName(std::string nick)
 {
-    std::map<int, Client>::iterator it = this->_clients.begin();
     for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
     {
-        if (it->second.getNickName() == name)
+        if (it->second.getNickName() == nick)
             return &it->second;
     }
     return NULL;
+}
+
+bool Server::checkNickName(int i)
+{
+    if (this->_clients[i].getMessage().getToken().find(' ') != std::string::npos || this->_clients[i].getMessage().getToken().find(',') != std::string::npos 
+            || this->_clients[i].getMessage().getToken().find('*') != std::string::npos ||  this->_clients[i].getMessage().getToken().find('!') != std::string::npos 
+            || this->_clients[i].getMessage().getToken().find('?') != std::string::npos || this->_clients[i].getMessage().getToken().find('@') != std::string::npos 
+            || this->_clients[i].getMessage().getToken().find('.') != std::string::npos)
+        return false;
+    if (*this->_clients[i].getMessage().getToken().begin() == ':' || *this->_clients[i].getMessage().getToken().begin() == '$')
+        return false;
+        this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+    return true;
 }

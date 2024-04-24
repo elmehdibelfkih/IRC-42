@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 10:09:25 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 17:11:31 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,11 @@
 class Server
 {
 private:
-    uint16_t                        _port;
-    std::string                     _passWord;
-    std::vector<pollfd>             _fds;
-    std::map<int, Client>           _clients;
-    std::map<std::string, Channel>  _channels;
+    uint16_t                        _port; // mehdi
+    std::string                     _passWord; // mehdi
+    std::vector<pollfd>             _fds; // mehdi
+    std::map<int, Client>           _clients; // <==
+    std::map<std::string, Channel>  _channels; // <== ++++++ 
     
 public:
     Server();
@@ -42,13 +42,15 @@ public:
     ~Server();
 
     Server(std::string port, std::string password);
-    void startServer();
-    bool authenticateUser(int i);
-    void handleClientConnection();
-    void handleClientMessage(int i);
-    Client* getClientByNickName(std::string name);
+    void startServer(); // mehdi
+    bool authenticateUser(int i); // mehdi
+    void handleClientConnection(); // mehdi
+    void handleClientMessage(int i); // <==
+    Client* getClientByNickName(std::string nick); // <==
+    bool checkNickName(int i);
 
     // Channel createChannel(std::string channelName);
+
 };
 
 #endif

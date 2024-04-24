@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/04/24 08:17:46 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/24 16:41:08 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,11 @@ enum commands
 
 #define ES_GREEN "\033[32m"
 #define ES_RESET "\033[0m"
+
+#define TOPICLEN 390
+#define USERLEN 17
+#define NICKLEN 17
+
 
 void		printHeader();
 void		printUsage();
