@@ -1,2 +1,1 @@
-obj/utils/helpers.o: src/utils/helpers.cpp inc/IRC.hpp inc/errors.hpp \
- inc/IRC.hpp
+obj/utils/helpers.o: src/utils/helpers.cpp inc/IRC.hpp inc/errors.hpp

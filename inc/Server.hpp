@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 17:11:31 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/11 21:15:53 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,18 @@ public:
     void handleClientMessage(int i); // <==
     Client* getClientByNickName(std::string nick); // <==
     bool checkNickName(int i);
-
-    // Channel createChannel(std::string channelName);
+    ////ussef
+    Channel findChannel(std::string channelName);
+    Channel createChannel(std::string channelName);
+    void  joinCommand();
+    void  partCommand();
+    void  kickCommand();
+    void  privmsgCommand();
+    void  noticeCommand();
+    void  topicCommand();
+    void  inviteCommand();
+    void  quitCommand();
+    void  modeCommand();
 
 };
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/10 11:51:11 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/11 21:16:27 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,10 +156,39 @@ void Server::handleClientMessage(int i)
 {
     if (this->_clients[i].getMessage().IsReady())
     {
+        std::cout << "---"<< this->authenticateUser(i) << std::endl ;
         if (this->authenticateUser(i))
-        {
-            std::cout << "mrhbabik\n";
-            // (.............) << youssef
+        {   
+            switch (this->_clients[i].getMessage().getCommand())
+                {
+                    case(JOIN):
+                        joinCommand();
+                        break;
+                    case(PART):
+                        partCommand();
+                        break;
+                    case(KICK):
+                        kickCommand();
+                        break;
+                    case(PRIVMSG):
+                        privmsgCommand();
+                        break;
+                    case(NOTICE):
+                        noticeCommand();
+                        break;     
+                    case(TOPIC):
+                        topicCommand();
+                        break;
+                    case(INVITE):
+                        inviteCommand();
+                        break;
+                    case(QUIT):
+                        quitCommand();
+                        break;
+                    case(MODE):
+                        modeCommand();
+                        break;
+                }
            
         }
         this->_clients[i].getMessage().clearBuffer();
@@ -233,3 +262,11 @@ bool Server::checkNickName(int i)
     this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
     return true;
 }
+//ussef 
+void Server:: joinCommand()
+{
+
+    
+}
+
+
