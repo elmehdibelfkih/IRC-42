@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 08:44:30 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/04/30 14:52:11 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ public:
     
     // utils
     void disconnect();
-    void sendMsg(std::string str);
+    void sendMsg(std::string str);                                    
 };
 
 #endif

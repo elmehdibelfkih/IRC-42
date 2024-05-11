@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 17:01:33 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/10 11:51:11 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,6 +160,7 @@ void Server::handleClientMessage(int i)
         {
             std::cout << "mrhbabik\n";
             // (.............) << youssef
+           
         }
         this->_clients[i].getMessage().clearBuffer();
     }
@@ -169,7 +170,7 @@ bool Server::authenticateUser(int i)
 {
     if (this->_clients[i].getAuthenticate())
         return true;
-    else if (!this->_clients[i].getPass())
+    else if (!this->_clients[i].getPass() || this->_clients[i].getMessage().getCommand() == PASS)
     {
         if (this->_clients[i].getMessage().getCommand() == PASS)
         {
@@ -185,7 +186,7 @@ bool Server::authenticateUser(int i)
         else
              this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
     }
-    else if (this->_clients[i].getNickName().size() == 0)
+    else if (this->_clients[i].getNickName().size() == 0 || this->_clients[i].getMessage().getCommand() == NICK)
     {
         if (this->_clients[i].getMessage().getCommand() == NICK)
         {
@@ -198,6 +199,13 @@ bool Server::authenticateUser(int i)
         }
         else
              this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+    }
+    else if (this->_clients[i].getUserName().size() == 0)
+    {
+        if (this->_clients[i].getMessage().getCommand() == USER)
+        {
+        
+        }
     }
     return false;
 }
@@ -219,8 +227,9 @@ bool Server::checkNickName(int i)
             || this->_clients[i].getMessage().getToken().find('?') != std::string::npos || this->_clients[i].getMessage().getToken().find('@') != std::string::npos 
             || this->_clients[i].getMessage().getToken().find('.') != std::string::npos)
         return false;
-    if (*this->_clients[i].getMessage().getToken().begin() == ':' || *this->_clients[i].getMessage().getToken().begin() == '$')
+    if (*(this->_clients[i].getMessage().getToken().begin()) == ':' || *(this->_clients[i].getMessage().getToken().begin()) == '$')
         return false;
-        this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+        // this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+    this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
     return true;
 }

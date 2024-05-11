@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:53 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 16:53:23 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/10 11:52:38 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ private:
     std::string     _buffer; // mehdi
     std::string     _tokens; // <==
     int             _fdsender;
-    int             _command; // <==
+    int             _command; // <== getcommand == NICK
 public:
     Message();
     Message& operator=(const Message& obj);

@@ -1,3 +1,5 @@
 obj/classes/Server.o: src/classes/Server.cpp \
-  src/classes/../../inc/Server.hpp inc/Client.hpp inc/Message.hpp \
-  inc/IRC.hpp inc/errors.hpp inc/Channel.hpp inc/replies.hpp
+ src/classes/../../inc/Server.hpp src/classes/../../inc/Client.hpp \
+ src/classes/../../inc/Message.hpp src/classes/../../inc/IRC.hpp \
+ src/classes/../../inc/errors.hpp src/classes/../../inc/Channel.hpp \
+ src/classes/../../inc/replies.hpp
