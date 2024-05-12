@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/11 16:44:05 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/12 03:37:11 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,11 @@ public:
     bool checkUserName(int i);
 
     // Channel createChannel(std::string channelName);
-    /// command 
+    /// command hado khdam bihom khdamin
     void passCommand(int i);
     void nickCommand(int i);
     void userCommand(int i);
+    void joinCommand(int i);
 
 };
 
