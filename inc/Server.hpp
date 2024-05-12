@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 17:11:31 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/11 16:44:05 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,9 +47,15 @@ public:
     void handleClientConnection(); // mehdi
     void handleClientMessage(int i); // <==
     Client* getClientByNickName(std::string nick); // <==
+    // check user and nick tokens
     bool checkNickName(int i);
+    bool checkUserName(int i);
 
     // Channel createChannel(std::string channelName);
+    /// command 
+    void passCommand(int i);
+    void nickCommand(int i);
+    void userCommand(int i);
 
 };
 

@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/10 11:51:11 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/11 19:14:45 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,42 +171,11 @@ bool Server::authenticateUser(int i)
     if (this->_clients[i].getAuthenticate())
         return true;
     else if (!this->_clients[i].getPass() || this->_clients[i].getMessage().getCommand() == PASS)
-    {
-        if (this->_clients[i].getMessage().getCommand() == PASS)
-        {
-            if (this->_clients[i].getMessage().getToken().size() == 0)
-                this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
-            else if (this->_clients[i].getPass() == true)
-                this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-            else if (this->_clients[i].getMessage().getToken() == this->_passWord)
-                this->_clients[i].setPass(true);
-            else
-                this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
-        }
-        else
-             this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
-    }
+        this->passCommand(i);
     else if (this->_clients[i].getNickName().size() == 0 || this->_clients[i].getMessage().getCommand() == NICK)
-    {
-        if (this->_clients[i].getMessage().getCommand() == NICK)
-        {
-            if (this->_clients[i].getMessage().getToken().size() == 0)
-                this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
-            else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
-                this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
-            else if (!this->checkNickName(i))
-                this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
-        }
-        else
-             this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
-    }
-    else if (this->_clients[i].getUserName().size() == 0)
-    {
-        if (this->_clients[i].getMessage().getCommand() == USER)
-        {
-        
-        }
-    }
+        this->nickCommand(i);
+    else if (this->_clients[i].getUserName().size() == 0 || this->_clients[i].getMessage().getCommand() == USER)
+        this->userCommand(i);
     return false;
 }
 
@@ -229,7 +198,67 @@ bool Server::checkNickName(int i)
         return false;
     if (*(this->_clients[i].getMessage().getToken().begin()) == ':' || *(this->_clients[i].getMessage().getToken().begin()) == '$')
         return false;
-        // this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
     this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
     return true;
 }
+
+bool Server::checkUserName(int i)
+{
+    (void)i;
+    return true;
+}
+
+void Server::passCommand(int i)
+{
+    if (this->_clients[i].getMessage().getCommand() == PASS)
+    {
+        if (this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
+        else if (this->_clients[i].getPass() == true)
+            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+        else if (this->_clients[i].getMessage().getToken() == this->_passWord)
+            this->_clients[i].setPass(true);
+        else
+            this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
+    }
+    else
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+}
+
+void Server::nickCommand(int i)
+{
+    if (this->_clients[i].getMessage().getCommand() == NICK)
+    {
+        if (this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
+        else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
+            this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
+        else if (!this->checkNickName(i))
+            this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
+    }
+    else
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));    
+}
+
+void Server::userCommand(int i)
+{
+    if (this->_clients[i].getMessage().getCommand() == USER)
+    {
+        std::cout << "mehdi" << std::endl;
+        if (this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user"));
+        // else if (this->_clients[i].getUserName().size() == 0)
+        //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+        else
+        {
+            this->_clients[i].setUserName("mehdi");
+            this->_clients[i].setAuthenticate(true);
+        }
+            
+        // else if ()
+            
+    }
+    else
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+}
+
