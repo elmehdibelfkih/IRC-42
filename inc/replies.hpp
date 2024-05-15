@@ -12,6 +12,7 @@
 #define ERR_NONICKNAMEGIVEN(client) "431 " + client +  " :No nickname given\r\n"
 #define ERR_ERRONEUSNICKNAME(client,nick) "432 " + client + " " + nick + " :Erroneus nickname\r\n"
 
+#define ERR_BADCHANMASK(channel) "476 " + channel + ":Bad Channel Mask\r\n"
 
 
 

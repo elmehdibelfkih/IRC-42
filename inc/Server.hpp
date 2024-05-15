@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/11 21:15:53 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/15 16:47:57 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,10 @@
 #define SERVER_HPP
 
 #include <iostream>
+#include <algorithm>
 #include <vector>
-#include <poll.h>
 #include <map>
+#include <poll.h>
 #include <netinet/in.h>
 #include <cstring>
 #include <cstdlib>
@@ -47,20 +48,31 @@ public:
     void handleClientConnection(); // mehdi
     void handleClientMessage(int i); // <==
     Client* getClientByNickName(std::string nick); // <==
+    // check user and nick tokens
     bool checkNickName(int i);
-    ////ussef
-    Channel findChannel(std::string channelName);
-    Channel createChannel(std::string channelName);
-    void  joinCommand();
-    void  partCommand();
-    void  kickCommand();
-    void  privmsgCommand();
-    void  noticeCommand();
-    void  topicCommand();
-    void  inviteCommand();
-    void  quitCommand();
-    void  modeCommand();
+    bool checkUserName(int i);
 
+
+
+
+    void createChannel(std::string channelName);
+    Channel findChannel(std::string channelName); /// lowerbound
+    bool    is_existChannel(std::string ch);
+    bool    is_memberInChannel(std::string channelName,int i);
+    // void    print_channels();
+    void    passCommand(int i);
+    void    nickCommand(int i);
+    void    userCommand(int i);
+
+    void    joinCommand(int i);
+    // void  partCommand(int i);
+    // void  kickCommand(int i);
+    // void  privmsgCommand(int i);
+    // void  noticeCommand(int i);
+    // void  topicCommand(int i);
+    // void  inviteCommand(int i);
+    // void  quitCommand(int i);
+    // void  modeCommand(int i);
 };
 
 #endif

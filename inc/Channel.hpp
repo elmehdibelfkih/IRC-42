@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/15 01:20:57 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/13 18:30:39 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ class Client;
 
 class Channel
 {
+friend class Server;
 private:
     int						_userLimit;
     std::string				_channelName;
@@ -45,7 +46,7 @@ public:
     std::string getMode() const;
     
     // setters
-    void setChannelName(std::string newName, Client setter);
+    void setChannelName(std::string newName);
     void setpassWord(std::string newpassWord, Client setter);
     void setTopic(std::string newTopic, Client setter);
     void setMode(std::string newMode, Client setter);
@@ -53,7 +54,7 @@ public:
     // add
     void addClient(Client cli);
     void addOperators(Client ope);
-    void addInvited(Client inv);
+    void addInvited(Client inv); // ??
 
     // utils
     void brodcastMessage(std::string message, Client sender);

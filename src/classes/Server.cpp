@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/11 21:16:27 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/15 18:33:42 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,38 +156,37 @@ void Server::handleClientMessage(int i)
 {
     if (this->_clients[i].getMessage().IsReady())
     {
-        std::cout << "---"<< this->authenticateUser(i) << std::endl ;
         if (this->authenticateUser(i))
         {   
             switch (this->_clients[i].getMessage().getCommand())
                 {
                     case(JOIN):
-                        joinCommand();
+                        joinCommand(i);
                         break;
-                    case(PART):
-                        partCommand();
-                        break;
-                    case(KICK):
-                        kickCommand();
-                        break;
-                    case(PRIVMSG):
-                        privmsgCommand();
-                        break;
-                    case(NOTICE):
-                        noticeCommand();
-                        break;     
-                    case(TOPIC):
-                        topicCommand();
-                        break;
-                    case(INVITE):
-                        inviteCommand();
-                        break;
-                    case(QUIT):
-                        quitCommand();
-                        break;
-                    case(MODE):
-                        modeCommand();
-                        break;
+                    // case(PART):
+                    //     partCommand(i);
+                    //     break;
+                    // case(KICK):
+                    //     kickCommand(i);
+                    //     break;
+                    // case(PRIVMSG):
+                    //     privmsgCommand(i);
+                    //     break;
+                    // case(NOTICE):
+                    //     noticeCommand(i);
+                    //     break;     
+                    // case(TOPIC):
+                    //     topicCommand(i);
+                    //     break;
+                    // case(INVITE):
+                    //     inviteCommand(i);
+                    //     break;
+                    // case(QUIT):
+                    //     quitCommand(i);
+                    //     break;
+                    // case(MODE):
+                    //     modeCommand(i);
+                    //     break;
                 }
            
         }
@@ -200,42 +199,11 @@ bool Server::authenticateUser(int i)
     if (this->_clients[i].getAuthenticate())
         return true;
     else if (!this->_clients[i].getPass() || this->_clients[i].getMessage().getCommand() == PASS)
-    {
-        if (this->_clients[i].getMessage().getCommand() == PASS)
-        {
-            if (this->_clients[i].getMessage().getToken().size() == 0)
-                this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
-            else if (this->_clients[i].getPass() == true)
-                this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-            else if (this->_clients[i].getMessage().getToken() == this->_passWord)
-                this->_clients[i].setPass(true);
-            else
-                this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
-        }
-        else
-             this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
-    }
+        this->passCommand(i);
     else if (this->_clients[i].getNickName().size() == 0 || this->_clients[i].getMessage().getCommand() == NICK)
-    {
-        if (this->_clients[i].getMessage().getCommand() == NICK)
-        {
-            if (this->_clients[i].getMessage().getToken().size() == 0)
-                this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
-            else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
-                this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
-            else if (!this->checkNickName(i))
-                this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
-        }
-        else
-             this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
-    }
-    else if (this->_clients[i].getUserName().size() == 0)
-    {
-        if (this->_clients[i].getMessage().getCommand() == USER)
-        {
-        
-        }
-    }
+        this->nickCommand(i);
+    else if (this->_clients[i].getUserName().size() == 0 || this->_clients[i].getMessage().getCommand() == USER)
+        this->userCommand(i);
     return false;
 }
 
@@ -258,15 +226,151 @@ bool Server::checkNickName(int i)
         return false;
     if (*(this->_clients[i].getMessage().getToken().begin()) == ':' || *(this->_clients[i].getMessage().getToken().begin()) == '$')
         return false;
-        // this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
     this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
     return true;
 }
-//ussef 
-void Server:: joinCommand()
+
+bool Server::checkUserName(int i)
 {
+    (void)i;
+    return true;
+}
+
+void Server::passCommand(int i)
+{
+    if (this->_clients[i].getMessage().getCommand() == PASS)
+    {
+        if (this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
+        else if (this->_clients[i].getPass() == true)
+            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+        else if (this->_clients[i].getMessage().getToken() == this->_passWord)
+            this->_clients[i].setPass(true);
+        else
+            this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
+    }
+    else
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+}
+
+void Server::nickCommand(int i)
+{
+    if (this->_clients[i].getMessage().getCommand() == NICK)
+    {
+        if (this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
+        else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
+            this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
+        else if (!this->checkNickName(i))
+            this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
+    }
+    else
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));    
+}
+
+void Server::userCommand(int i)
+{
+    if (this->_clients[i].getMessage().getCommand() == USER)
+    {
+        if (this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user"));
+        // else if (this->_clients[i].getUserName().size() == 0)
+        //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+        else
+        {
+            this->_clients[i].setUserName("*****");
+            this->_clients[i].setAuthenticate(true);
+        }
+            
+        // else if ()
+            
+    }
+    else
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+}
+
+
+
+
+// void Server::print_channels()
+// {
+//     std::map<std::string,Channel>::iterator it = this._channels.begin()
+//     for(it, it != this->_channels.end(), it++)
+//     {
+//         std::cout << "****" << *it.second << std::endl;
+//     }
+    
+// }
+void Server::createChannel(std::string ch)
+{
+    Channel tmp_ch;       
+    this->_channels.insert(std::pair< std::string, Channel>(ch, tmp_ch));
+            this->_channels[ch].setChannelName(ch);
+            // this->_channels[ch].set(ch);
+            // this->_channels[ch].set(ch);
 
     
 }
 
+bool Server::is_existChannel(std::string ch)
+{
+    if(this->_channels.empty() || ch.empty())
+        return(0);
+    std::map<std::string, Channel> ::iterator it = this->_channels.find(ch);
+    if(it != this->_channels.end())
+        return 1;
+    return(0);
+}
 
+bool Server::is_memberInChannel(std::string channelName,int i)
+{
+        std::map<int ,Client>::iterator it = this->_channels[channelName]._clients.find(i);
+        if(it != _channels[channelName]._clients.end())
+            return(true);
+        return(false);
+}
+void Server::joinCommand(int i)
+{
+    std::string ch;
+    std::vector<std::string>argsVec;
+    std::stringstream iss(this->_clients[i].getMessage().getToken());
+    
+    while(std::getline(iss, ch, ' '))
+        argsVec.push_back(ch);
+
+    if(argsVec.size() == 0 || this->_clients[i].getMessage().getToken().size() == 0)
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user")); 
+        
+    for(size_t y = 0; y < argsVec.size(); y++)
+    {
+        if(argsVec[y].empty() || argsVec[y].at(0) != '#')
+        {
+            this->_clients[i].sendMsg(ERR_BADCHANMASK(argsVec[y])); //channel name is not a valid.
+            continue; 
+        }
+        else
+        {
+            if(is_existChannel(argsVec[y]))
+            {
+                if(is_memberInChannel(argsVec[y], i))
+                    std::cout << "you have allready joined the channel\n";
+                else
+                {
+                    this->_channels[argsVec[y]].addClient(this->_clients[i]);
+                    std::cout << "you have joined the channel\n";   
+                }
+            }
+            else
+            {   
+                this->createChannel(argsVec[y]);
+                this->_channels[argsVec[y]].addClient(this->_clients[i]);
+                std::cout << " the channel " << ch << " was created and you are joined to the channel\n";
+            }
+        }
+        
+        
+    }
+ 
+   
+    
+}

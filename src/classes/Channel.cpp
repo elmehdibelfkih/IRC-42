@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/15 04:03:18 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/05/13 13:56:55 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,9 @@ std::string Channel::getMode() const
     return this->_mode;
 }
 
-void Channel::setChannelName(std::string newName, Client setter)
+void Channel::setChannelName(std::string newName)
 {
-    (void)newName;
-    (void)setter;
+    this->_channelName = newName;
 }
 
 void Channel::setpassWord(std::string newpassWord, Client setter)
@@ -100,7 +99,8 @@ void Channel::setMode(std::string newMode, Client setter)
 
 void Channel::addClient(Client cli)
 {
-    (void)cli;
+    this->_clients.insert(std::pair<int ,Client>(cli.getClientFdSocket(), cli));
+    
 }
 
 void Channel::addOperators(Client ope)
