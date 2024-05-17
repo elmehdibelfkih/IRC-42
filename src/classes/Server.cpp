@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/15 18:33:42 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/17 03:06:35 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -341,35 +341,79 @@ void Server::joinCommand(int i)
     if(argsVec.size() == 0 || this->_clients[i].getMessage().getToken().size() == 0)
             this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user")); 
         
-    for(size_t y = 0; y < argsVec.size(); y++)
-    {
-        if(argsVec[y].empty() || argsVec[y].at(0) != '#')
-        {
-            this->_clients[i].sendMsg(ERR_BADCHANMASK(argsVec[y])); //channel name is not a valid.
-            continue; 
-        }
-        else
-        {
-            if(is_existChannel(argsVec[y]))
-            {
-                if(is_memberInChannel(argsVec[y], i))
-                    std::cout << "you have allready joined the channel\n";
-                else
+        if(argsVec.size() > 2 || argsVec[0].empty())
+            std::cerr << "Format ERROR\n";
+
+            ch.clear();
+            iss.clear();
+            std::stringstream iss(argsVec[0]);
+            while(std::getline(iss, ch, ','))
                 {
-                    this->_channels[argsVec[y]].addClient(this->_clients[i]);
-                    std::cout << "you have joined the channel\n";   
+                    if(!ch.empty() && (ch.at(0) == '#' || ch.at(0) == '&'))
+                    {
+                        if(is_existChannel(ch))
+                            {
+                                if(is_memberInChannel(ch, i))
+                                    std::cout << "you have allready joined the channel\n";
+                                else
+                                {
+                                    this->_channels[ch].addClient(this->_clients[i]);
+                                    std::cout << "you have joined the channel\n";   
+                                }
+                            }
+                        else
+                        {   
+                            this->createChannel(ch);
+                            this->_channels[ch].addClient(this->_clients[i]);
+                            std::cout << " the channel " << ch << " was created and you are joined to the channel\n";
+                        }
+                    } 
+                    else
+                    {
+                        this->_clients[i].sendMsg(ERR_BADCHANMASK(ch)); //channel name is not a valid.
+                        continue; 
+                    }
+                     
+                    
                 }
-            }
-            else
-            {   
-                this->createChannel(argsVec[y]);
-                this->_channels[argsVec[y]].addClient(this->_clients[i]);
-                std::cout << " the channel " << ch << " was created and you are joined to the channel\n";
-            }
-        }
+            // if(!argsVec[1].empty())
+            // {
+                
+            // }
+            // ch.clear();
+            // iss.clear();
+            // std::stringstream iss(argsVec[0]);
+            // while(std::getline(iss, ch, ','))
+            //     {
+                
+
+        // if(argsVec[y].empty() || argsVec[y].at(0) != '#')
+        // {
+        //     this->_clients[i].sendMsg(ERR_BADCHANMASK(argsVec[y])); //channel name is not a valid.
+        //     continue; 
+        // }
+        // else
+        // {
+        //     if(is_existChannel(argsVec[y]))
+        //     {
+        //         if(is_memberInChannel(argsVec[y], i))
+        //             std::cout << "you have allready joined the channel\n";
+        //         else
+        //         {
+        //             this->_channels[argsVec[y]].addClient(this->_clients[i]);
+        //             std::cout << "you have joined the channel\n";   
+        //         }
+        //     }
+        //     else
+        //     {   
+        //         this->createChannel(argsVec[y]);
+        //         this->_channels[argsVec[y]].addClient(this->_clients[i]);
+        //         std::cout << " the channel " << ch << " was created and you are joined to the channel\n";
+        //     }
+        // }
         
         
-    }
+ 
  
    
     
