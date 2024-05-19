@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/13 18:30:39 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/19 03:53:53 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ public:
     
     // setters
     void setChannelName(std::string newName);
-    void setpassWord(std::string newpassWord, Client setter);
+    void setpassWord(std::string newpassWord);
     void setTopic(std::string newTopic, Client setter);
     void setMode(std::string newMode, Client setter);
 

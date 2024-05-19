@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/13 13:56:55 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/19 04:04:24 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void Channel::setChannelName(std::string newName)
     this->_channelName = newName;
 }
 
-void Channel::setpassWord(std::string newpassWord, Client setter)
+void Channel::setpassWord(std::string newpassWord)
 {
     (void)newpassWord;
     (void)setter;

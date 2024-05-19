@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/17 03:06:35 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/19 04:03:50 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -346,8 +346,8 @@ void Server::joinCommand(int i)
 
             ch.clear();
             iss.clear();
-            std::stringstream iss(argsVec[0]);
-            while(std::getline(iss, ch, ','))
+            std::stringstream iss1(argsVec[0]);
+            while(std::getline(iss1, ch, ','))
                 {
                     if(!ch.empty() && (ch.at(0) == '#' || ch.at(0) == '&'))
                     {
