@@ -14,6 +14,7 @@
 
 #define ERR_BADCHANMASK(channel) "476 " + channel + ":Bad Channel Mask\r\n"
 
-
+#define ERR_TOOMANYCHANNELS(client,channel) "405" + client + " " + channel + ":You have joined too many channels\r\n"
+#define ERR_BADCHANNELKEY(client,channel) "475" + client + " "  + channel + " : Key incorrect, Cannot join channel (+k)\r\n"
 
 #endif

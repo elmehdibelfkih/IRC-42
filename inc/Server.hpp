@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/15 16:47:57 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/20 09:16:29 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,10 +55,10 @@ public:
 
 
 
-    void createChannel(std::string channelName);
+    void createChannel(std::string channelName, std::string key);
     Channel findChannel(std::string channelName); /// lowerbound
     bool    is_existChannel(std::string ch);
-    bool    is_memberInChannel(std::string channelName,int i);
+    bool    is_memberInChannel(std::string channelName, Client cl);
     // void    print_channels();
     void    passCommand(int i);
     void    nickCommand(int i);

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/19 03:53:53 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/20 02:02:19 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,14 @@ class Channel
 {
 friend class Server;
 private:
-    int						_userLimit;
-    std::string				_channelName;
-    std::string				_passWord;
-    std::string				_topic;
-    std::string				_mode;
-    std::map<int, Client>	_clients;
-    std::map<int, Client>	_operators;
-    std::map<int, Client>	_invitees;
+    int						        _userLimit;
+    std::string				        _channelName;
+    std::string				        _passWord;
+    std::string				        _topic;
+    std::string				        _mode;
+    std::map<std::string, Client>	_clients;
+    std::map<std::string, Client>	_operators;
+    std::map<std::string, Client>	_invitees;
     
 public:
     Channel();

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+         #
+#    By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/07 01:27:20 by ebelfkih          #+#    #+#              #
-#    Updated: 2024/04/15 04:19:29 by ebelfkih         ###   ########.fr        #
+#    Updated: 2024/05/19 05:46:17 by ybouchra         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ DIR_SRC		= src/
 DIR_OBJ		= obj/
 DIR_INC		= inc/
 OBJ			= ${SRC:%.cpp=${DIR_OBJ}%.o}
-CXX			= c++
+CXX			= c++ 
 DEP			= ${OBJ:%.o=%.d}
 CPPFLAGS	= -Wall -Wextra -Werror -MMD -g3 -D_GLIBCXX_DEBUG -std=c++98 -c -I ${DIR_INC} 
 RM 			= rm -f

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/19 04:04:24 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/20 06:48:56 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,8 +78,7 @@ void Channel::setChannelName(std::string newName)
 
 void Channel::setpassWord(std::string newpassWord)
 {
-    (void)newpassWord;
-    (void)setter;
+    this->_passWord = newpassWord;
     
 }
 
@@ -99,7 +98,7 @@ void Channel::setMode(std::string newMode, Client setter)
 
 void Channel::addClient(Client cli)
 {
-    this->_clients.insert(std::pair<int ,Client>(cli.getClientFdSocket(), cli));
+    this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
     
 }
 
