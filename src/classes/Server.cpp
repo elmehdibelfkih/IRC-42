@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/20 09:18:33 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/21 00:55:08 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,7 +303,7 @@ void Server::createChannel(std::string ch, std::string key)
     
 }
 
-bool Server::is_existChannel(std::string channelName)
+bool Server::existChannel(std::string channelName)
 {
     if(this->_channels.empty() || channelName.empty())
         return(0);
@@ -369,35 +369,29 @@ void Server::joinCommand(int i)
                     {
                         this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(),ch)); 
                         return;
-                    }  
+                    } 
                     if(!ch.empty() && (ch.at(0) == '#' || ch.at(0) == '&'))
                     {
                         
-                        if(is_existChannel(ch))
+                        if(existChannel(ch))
                             {
                                 if(is_memberInChannel(ch, this->_clients[i]))
                                     std::cout << "you have allready joined the channel\n";
                                 else
-                                {
                                         this->_channels[ch].addClient(this->_clients[i]);
-                                    std::cout << "you have joined the channel\n";   
-                                }
-                            }
-                        else
-                        {   
+                          
+                        }else
+                        {
+
                             this->createChannel(ch, getChannelkey(keysVec, indexkey));
                             this->_channels[ch].addClient(this->_clients[i]);
-                            std::cout << " the channel " << ch << " was created and you are joined to the channel\n";
-                        // sendmsg(":" + _client.getNickname() + "!" + _client.getUsername() + "@" + xxxxxxxxip + " JOIN " + channelName + "\r\n");
-                        // sendmsg(":" + xxxxxxxxip + " MODE " + channelName + " " + this->_channelObj.getModes() + "\r\n");
-                        // sendmsg(":" + xxxxxxxxip + " 353 " + _client.getNickname() + " = " + channelName + " :@" + this->_client.getNickname() + "\r\n");
-                        // sendmsg(":" + xxxxxxxxip + " 366 " + _client.getNickname() + " " + channelName + " :End of /NAMES list.\r\n");
-                       indexkey++;
+                            
+                            indexkey++; 
                        }
                     } 
                     else
                     {
-                        this->_clients[i].sendMsg(ERR_BADCHANMASK(ch)); //channel name is not a valid.
+                        this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), ch)); //channel name is not a valid.
                         continue; 
                     }
                    

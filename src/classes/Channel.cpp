@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/20 06:48:56 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/21 01:01:53 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,12 @@ void Channel::setMode(std::string newMode, Client setter)
 void Channel::addClient(Client cli)
 {
     this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
+
+        cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
+        cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),(std::string)"@@IP", (std::string)"time"));
+        cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), this->getMode(), this->getChannelName(), cli.getNickName()));
+        cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
+        
     
 }
 
