@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/21 01:01:53 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/24 03:15:44 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 Channel::Channel()
 {
-    this->_userLimit = 1;
+    this->_userLimit = 100;
     this->_channelName = "";
     this->_passWord = "";
     this->_topic = "";
@@ -70,6 +70,11 @@ std::string Channel::getMode() const
 {
     return this->_mode;
 }
+
+ int Channel::getUserlimit() const
+ {
+    return(this->_userLimit);
+ }
 
 void Channel::setChannelName(std::string newName)
 {
@@ -134,3 +139,18 @@ void Channel::removeClient(int fd)
 {
     (void)fd;
 }
+bool Channel::isBannedFromChannel(Channel ch, Client cl)
+{
+
+    std::string mask =  cl.getNickName() + "!" + cl.getUserName() + "@" + cl.getIP();
+    
+    if(ch._bannedClient.empty())
+        return false;
+
+        std::map<std::string, Client>::iterator it = this->_bannedClient.lower_bound(mask);
+        if(it != this->_bannedClient.end() && it->first == mask)
+            return(true);
+        return(false);
+
+}
+

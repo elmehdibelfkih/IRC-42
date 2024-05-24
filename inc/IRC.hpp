@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/05/20 00:50:06 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/23 21:32:07 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ enum commands
 #define NICKLEN 17
 #define CHANNELNAMELEN 18
 #define LIMITCHANNELS  11
+
 
 
 void		printHeader();
