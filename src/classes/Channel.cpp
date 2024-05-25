@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/24 03:15:44 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/25 13:21:58 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,8 @@ Channel& Channel::operator=(const Channel& obj)
         this->_clients = obj._clients;
         this->_operators = obj._operators;
         this->_invitees = obj._invitees;
+        this->_setterCl.nickName = obj._setterCl.nickName;
+        this->_setterCl.time = obj._setterCl.time;
     }
     return *this;
 }
@@ -89,39 +91,27 @@ void Channel::setpassWord(std::string newpassWord)
 
 void Channel::setTopic(std::string newTopic, Client setter)
 {
-    (void)newTopic;
-    (void)setter;
+    this->_topic = newTopic;
+    this->_setterCl.nickName = setter.getNickName();
+    this->_setterCl.time = this->getTime();
     
 }
 
-void Channel::setMode(std::string newMode, Client setter)
+void Channel::setMode(std::string newMode)
 {
-    (void)newMode;
-    (void)setter;
+    this->_mode = newMode;
+
     
 }
 
-void Channel::addClient(Client cli)
-{
-    this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
 
-        cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
-        cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),(std::string)"@@IP", (std::string)"time"));
-        cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), this->getMode(), this->getChannelName(), cli.getNickName()));
-        cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
-        
-    
-}
 
 void Channel::addOperators(Client ope)
 {
     (void)ope;
 }
 
-void Channel::addInvited(Client inv)
-{
-    (void)inv;
-}
+
 
 void Channel::brodcastMessage(std::string message, Client sender)
 {
@@ -129,16 +119,9 @@ void Channel::brodcastMessage(std::string message, Client sender)
     (void)sender;
 }
 
-bool Channel::joinChannel(Client cli)
-{
-    (void)cli;
-    return false;
-}
 
-void Channel::removeClient(int fd)
-{
-    (void)fd;
-}
+
+
 bool Channel::isBannedFromChannel(Channel ch, Client cl)
 {
 
@@ -152,5 +135,35 @@ bool Channel::isBannedFromChannel(Channel ch, Client cl)
             return(true);
         return(false);
 
+}
+std::string Channel::getTime() const
+{
+    std::time_t currentTime = std::time(0);
+    std::tm* localTime = std::localtime(&currentTime);
+    char buffer[80];
+        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
+    return(std::string(buffer));
+}
+void Channel::addClient(Client cli)
+{
+    this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
+
+        cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
+        cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
+        cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), this->getMode(), this->getChannelName(), cli.getNickName()));
+        cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
+        
+    
+}
+void Channel::removeClient(Client cli)
+{
+    // std::map<std::string, Client> ::iterator it = this->_clients.begin();
+    // std::map<std::string, Client> ::iterator it1 = this->_clients.begin();
+    // for(; it != this->_clients.end(); it++)
+    //         std::cout << "---->  :" << it->first << "\n";
+    this->_clients.erase(cli.getNickName());
+    
+    // for(; it1 != this->_clients.end(); it1++)
+    //         std::cout << "++++>  :" << it1->first << "\n";
 }
 

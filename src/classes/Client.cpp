@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/20 01:10:34 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/25 02:51:34 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,11 +147,11 @@ void Client::setPass(bool b)
 
 void Client::disconnect()
 {
-    if (this->_authenticate)
-    {
-        for (std::vector<Channel>::iterator it = this->_channels.begin(); it < this->_channels.end(); it++)
-            (*it).removeClient(this->_clientFdSocket);        
-    }
+    // if (this->_authenticate)
+    // {
+    //     for (std::vector<Channel>::iterator it = this->_channels.begin(); it < this->_channels.end(); it++)
+    //         (*it).removeClient(this->_clientFdSocket);        
+    // }
 }
 
 void  Client::sendMsg(std::string str)

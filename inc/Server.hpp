@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/24 01:27:09 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/25 13:26:06 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,6 @@ public:
     void handleClientConnection(); // mehdi
     void handleClientMessage(int i); // <==
     Client* getClientByNickName(std::string nick); // <==
-    // check user and nick tokens
     bool checkNickName(int i);
     bool checkUserName(int i);
 
@@ -60,16 +59,20 @@ public:
     bool    is_memberInChannel(std::string channelName, Client cl);
     bool    isValidChannelName(std::string channelName);
     bool    isValidChannelKey(std::vector<std::string> keys, int index);
+    
+    std::string     findOpional(std::vector<std::string>&vec,int index);
+    std::vector<std::string>    splitString(const std::string& str, char delimiter);
+
+    
     void    passCommand(int i);
     void    nickCommand(int i);
     void    userCommand(int i);
-
     void    joinCommand(int i);
-    // void  partCommand(int i);
+    void    partCommand(int i);
+    void    topicCommand(int i);
     // void  kickCommand(int i);
     // void  privmsgCommand(int i);
     // void  noticeCommand(int i);
-    // void  topicCommand(int i);
     // void  inviteCommand(int i);
     // void  quitCommand(int i);
     // void  modeCommand(int i);
