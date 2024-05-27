@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/25 13:21:58 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/26 23:49:09 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,12 +88,21 @@ void Channel::setpassWord(std::string newpassWord)
     this->_passWord = newpassWord;
     
 }
+void Channel::clearTopic(Client setter)
+{
+    this->_topic.clear();
+    this->_setterCl.nickName = setter.getNickName();
+    this->_setterCl.time = this->getTime();
+}
 
 void Channel::setTopic(std::string newTopic, Client setter)
 {
     this->_topic = newTopic;
     this->_setterCl.nickName = setter.getNickName();
     this->_setterCl.time = this->getTime();
+    setter.sendMsg(RPL_TOPIC(setter.getNickName(),this->getChannelName(), this->getTopic()));
+    setter.sendMsg(RPL_TOPICWHOTIME(setter.getNickName(),this->getChannelName(), setter.getNickName(),this->getTime()));
+    
     
 }
 

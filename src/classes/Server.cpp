@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/25 14:29:27 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/27 12:31:11 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -513,7 +513,7 @@ void Server::topicCommand(int i)
     std::string params = this->_clients[i].getMessage().getToken();
   
     argsVec = splitString(params, ' ');
-    if(argsVec.size() == 0 || this->_clients[i].getMessage().getToken().size() == 0)
+    if(params.empty() || argsVec.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
         return;
@@ -531,11 +531,15 @@ void Server::topicCommand(int i)
         this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
         return;
     }
-    if(argsVec[1].empty())
-        this->_clients[i].sendMsg(this->_channels[argsVec[0]].getTopic() + "\r\n");
-    else if(!argsVec[1].empty() && argsVec[1] == ":" )
-            this->_channels[argsVec[0]].setTopic("", this->_clients[i]);
-            // this->_channels[argsVec[0]]._topic.clear();
+        // if (!_clients[i].hasPermission(argsVec)) {
+    //     client.sendError(ERR_CHANOPRIVSNEEDED(client.getName(), channelName));
+    //     return;
+    // }
+    
+    if(argsVec.size() == 1)
+        this->_clients[i].sendMsg( "[ " + this->_channels[argsVec[0]].getTopic() + " ]\r\n");
+    else if(argsVec[1] == ":" )
+        this->_channels[argsVec[0]].clearTopic(this->_clients[i]);
     else if( argsVec[1].at(0) == ':' && argsVec[1].size() > 2)
         this->_channels[argsVec[0]].setTopic(argsVec[1].substr(1), this->_clients[i]);
     else

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/25 06:01:01 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/05/26 23:49:53 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ public:
 
     void addClient(Client cli);
     void removeClient(Client cli);
+    void clearTopic(Client cli);
     void addOperators(Client ope);
 
     void brodcastMessage(std::string message, Client sender);
