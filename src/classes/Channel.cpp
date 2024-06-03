@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/26 23:49:09 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/06/03 02:37:04 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,23 +88,7 @@ void Channel::setpassWord(std::string newpassWord)
     this->_passWord = newpassWord;
     
 }
-void Channel::clearTopic(Client setter)
-{
-    this->_topic.clear();
-    this->_setterCl.nickName = setter.getNickName();
-    this->_setterCl.time = this->getTime();
-}
 
-void Channel::setTopic(std::string newTopic, Client setter)
-{
-    this->_topic = newTopic;
-    this->_setterCl.nickName = setter.getNickName();
-    this->_setterCl.time = this->getTime();
-    setter.sendMsg(RPL_TOPIC(setter.getNickName(),this->getChannelName(), this->getTopic()));
-    setter.sendMsg(RPL_TOPICWHOTIME(setter.getNickName(),this->getChannelName(), setter.getNickName(),this->getTime()));
-    
-    
-}
 
 void Channel::setMode(std::string newMode)
 {
@@ -122,11 +106,7 @@ void Channel::addOperators(Client ope)
 
 
 
-void Channel::brodcastMessage(std::string message, Client sender)
-{
-    (void)message;
-    (void)sender;
-}
+
 
 
 
@@ -161,6 +141,9 @@ void Channel::addClient(Client cli)
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
         cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), this->getMode(), this->getChannelName(), cli.getNickName()));
         cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
+    if(this->getTopic().empty())
+        cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
+    
         
     
 }
@@ -176,3 +159,36 @@ void Channel::removeClient(Client cli)
     //         std::cout << "++++>  :" << it1->first << "\n";
 }
 
+void Channel::setTopic(std::string newTopic, Client setter)
+{
+    this->_topic = newTopic;
+    this->_setterCl.nickName = setter.getNickName();
+    this->_setterCl.time = this->getTime();
+
+    brodcastMessage(setter);
+
+    
+}
+
+bool Channel::hasPermission(Client cli)
+{
+    if (this->getMode() == "+t")
+    {
+        if (cli.isOperator() || cli.isHalfOperator())
+            return true; 
+        return false; 
+    }
+        return true;
+}
+
+
+void Channel::brodcastMessage(Client sender)
+{
+    std::map<std::string, Client> ::iterator it = this->_clients.begin();
+        for(; it != this->_clients.end(); it++)
+            {
+                sender.sendMsg(RPL_TOPIC(it->second.getNickName(),this->getChannelName(), this->getTopic()));
+                sender.sendMsg(RPL_TOPICWHOTIME(it->first, this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
+            }
+            
+}

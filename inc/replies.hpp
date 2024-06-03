@@ -21,17 +21,19 @@
 #define ERR_INVITEONLYCHAN(client, channel) ("473 " + client + " " + channel + " :Cannot join channel (+i)\r\n")
 #define ERR_BADCHANMASK(client, channel) ("476 " + client + " " + channel + " :Bad Channel Name\r\n")
 #define ERR_USERONCHANNEL(client, channel) ("443 " + client + " " + channel + " :is already on channel\r\n")
-#define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " :Syntax error\r\n")
+#define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : SyntaxErr \r\n")
+#define ERR_NOTONCHANNEL(client, channel) ("442 " + client + " " + channel + " :You're not on that channel.\r\n")
+#define ERR_CHANOPRIVSNEEDED(client, channel) ("482 " + client + " " + channel + " :You're not channel operator\r\n")
 
-// Successful join
+
 #define RPL_TOPIC(client, channel, topic) ("332 " + client + " " + channel + " :" + topic + "\r\n")
-#define RPL_TOPICWHOTIME(client, channel, nick, time) ("333 " + client + " " + channel + " " + nick + " " + time + "\r\n")
+#define RPL_TOPICWHOTIME(client, channel, nick, time) ("333 " + client + " " + channel + " " + nick + " " +time + "\r\n")
+#define RPL_NOTOPIC(client, channel) ("331 " + client + " " + channel + " :No topic to set.\r\n")
 #define RPL_ENDOFNAMES(client, channel) ("366 " + client + " " + channel + " :End of /NAMES list.\r\n")
+#define RPL_SUCCESS(nick, user, host, channel, raison) ( nick + "!" + user + "@" + host + " PART " + channel + " :" + nick + " is leaving the channel " + channel+ " : " + raison + ".\r\n")
 //.....
 #define RPL_NAMREPLY(client, symbol, channel, nick) ("353 " + client + " " + symbol + " " + channel + " :@" + nick + "\r\n")
 
 
-#define ERR_NOTONCHANNEL(client, channel) ("442 " + client + " " + channel + " :You're not on that channel.\r\n")
-#define RPL_SUCCESS(nick, user, host, channel, raison) ( nick + "!" + user + "@" + host + " PART " + channel + " :" + nick + " is leaving the channel " + channel+ " : " + raison + ".\r\n")
 
 #endif

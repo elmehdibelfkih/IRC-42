@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/25 02:51:34 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/06/03 01:50:23 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ Client::Client()
 {
     this->_clientFdSocket = -1;
     this->_authenticate = false;
+    this->_operatorStatus = false;
+    this->_halfOperatorStatus = false;
     this->_currentChannel = "";
     this->_userName = "";
     this->_nickName = "";
@@ -167,4 +169,14 @@ bool Client::getPass() const
  size_t Client::getChannelsize()
  {
     return(this->_channels.size());
+ }
+ 
+ bool Client::isOperator() const
+ {
+    return(this->_operatorStatus);
+ }
+ 
+ bool Client::isHalfOperator() const
+ {
+    return(this->_halfOperatorStatus);
  }

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/25 03:45:51 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/06/03 01:46:57 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@ private:
     int 					_clientFdSocket;
     bool					_authenticate;
     bool                    _pass;
+    bool                    _operatorStatus;
+    bool                    _halfOperatorStatus;
     std::string				_currentChannel;
     std::string				_userName;
     std::string				_nickName;
@@ -62,10 +64,14 @@ public:
     void setIP(std::string IP);
     void setMessage(Message msg);
     void setPass(bool b);
+    // void setOperatorStatus(bool b);
+    // void setHalfOperatorStatus(bool b);
     
     // utils
     void disconnect();
-    void sendMsg(std::string str);                                    
+    void sendMsg(std::string str);    
+    bool isOperator() const;
+    bool isHalfOperator() const ;                                
 };
 
 #endif
