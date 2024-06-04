@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/06/03 02:29:16 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/06/04 04:57:39 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,9 +172,9 @@ void Server::handleClientMessage(int i)
                     // case(KICK):
                     //     kickCommand(i);
                     //     break;
-                    // case(PRIVMSG):
-                    //     privmsgCommand(i);
-                    //     break;
+                    case(PRIVMSG):
+                        privmsgCommand(i);
+                        break;
                     // case(NOTICE):
                     //     noticeCommand(i);
                     //     break;     
@@ -548,4 +548,70 @@ void Server::topicCommand(int i)
     }    
     argsVec.clear();
  
+}
+// bool Server:: findClientNick(std::string nickname)
+// {
+//      std::map<std::string ,Client>::iterator it = this->_clients.lower_bound(nickname);
+//         if(it != this->_clients.end() && it->first == nickname)
+//             return(true);
+//         return(false);
+// }
+ Client* Server::getClientByNickName(std::string nick)
+ {
+        std::map<int ,Client>::iterator it = this->_clients.begin();
+        for(it ; it != this->_clients.end(); it++)
+        {
+            if(it->second.getNickName() == nick)
+                return &(it->second);   
+        }
+        return(NULL);
+ }
+
+
+void Server::privmsgCommand(int i)
+{
+    std::vector<std::string>argsVec;
+    std::string params = this->_clients[i].getMessage().getToken();
+  
+    argsVec = splitString(params, ' ');
+    if(params.empty() || argsVec.empty())
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
+        return;
+    }    
+    if( argsVec[0].empty() || argsVec[1].empty())
+    {
+      this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
+        return;
+    }
+    if (findChannelName(argsVec[0]) == true) {
+        this->_channels[argsVec[0]].brodcastMessage(this->_clients[i]);
+        
+        this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+        return;
+    }
+    else
+        {
+            Client *cl = getClientByNickName(argsVec[0]);
+            if(cl != NULL)
+            {
+                cl->sendMsg(argsVec[1]);
+                //here ........
+            }
+        }
+    }
+    
+    if(argsVec.size() == 1)
+        this->_clients[i].sendMsg( "[ " + this->_channels[argsVec[0]].getTopic() + " ]\r\n");
+    else if(argsVec[1] == ":" )
+     this->_channels[argsVec[0]].setTopic("", this->_clients[i]);
+    else if( argsVec[1].at(0) == ':' && argsVec[1].size() > 2)
+        this->_channels[argsVec[0]].setTopic(argsVec[1].substr(1), this->_clients[i]);
+    else
+    {
+        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"TOPIC"));
+            return;
+            
+    }    
+    argsVec.clear();
 }

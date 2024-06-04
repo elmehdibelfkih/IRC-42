@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/06/03 02:29:22 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/06/04 04:21:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ public:
     void addOperators(Client ope);
 
     bool hasPermission (Client cli);  
-    void brodcastMessage(Client sender);
+    void brodcastMessage(Client sender, std::string msg);
     bool isBannedFromChannel(Channel ch, Client cl);
 };
 

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/06/03 02:37:04 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/06/04 04:22:08 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,8 +165,12 @@ void Channel::setTopic(std::string newTopic, Client setter)
     this->_setterCl.nickName = setter.getNickName();
     this->_setterCl.time = this->getTime();
 
-    brodcastMessage(setter);
-
+    std::map<std::string, Client> ::iterator it = this->_clients.begin();
+    for(; it != this->_clients.end(); it++)
+        {
+            it->second.sendMsg(RPL_TOPIC(it->second.getNickName(),this->getChannelName(), this->getTopic()));
+            it->second.sendMsg(RPL_TOPICWHOTIME(it->first, this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
+        }
     
 }
 
@@ -182,13 +186,13 @@ bool Channel::hasPermission(Client cli)
 }
 
 
-void Channel::brodcastMessage(Client sender)
+void Channel::brodcastMessage(Client sender, std::string msg)
 {
+    (void)sender;
     std::map<std::string, Client> ::iterator it = this->_clients.begin();
         for(; it != this->_clients.end(); it++)
             {
-                sender.sendMsg(RPL_TOPIC(it->second.getNickName(),this->getChannelName(), this->getTopic()));
-                sender.sendMsg(RPL_TOPICWHOTIME(it->first, this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
+                it->second.sendMsg(msg);
             }
             
 }
