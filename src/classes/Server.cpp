@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/06/04 04:57:39 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/11 07:22:31 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,14 +311,27 @@ void Server::createChannel(std::string ch, std::string key)
     
 }
 
+bool Server::findClientByNick(std::string nickname)
+{
+      if(this->_clients.empty() || nickname.empty())
+        return(false);
+    for(std::map<int, Client> ::iterator it = this->_clients.begin() ; it != this->_clients.end(); it++ )
+    {
+        if( it->second.getNickName() == nickname)
+            return true;
+    }
+    return false; 
+  
+}
+
 bool Server::findChannelName(std::string channelName)
 {
     if(this->_channels.empty() || channelName.empty())
-        return(0);
+        return(false);
     std::map<std::string, Channel> ::iterator it = this->_channels.lower_bound(channelName);
     if(it != this->_channels.end() &&  it->first == channelName)
-        return 1;
-    return(0);
+        return true;
+    return(false);
 }
 
 bool Server::is_memberInChannel(std::string channelName, Client cl)
@@ -516,7 +529,7 @@ void Server::topicCommand(int i)
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
         return;
     }    
-    if(argsVec.size() > 2  || argsVec[0].empty())
+    if(argsVec.size() > 2)
     {
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"TOPIC")); 
         return;
@@ -556,16 +569,17 @@ void Server::topicCommand(int i)
 //             return(true);
 //         return(false);
 // }
- Client* Server::getClientByNickName(std::string nick)
- {
-        std::map<int ,Client>::iterator it = this->_clients.begin();
-        for(it ; it != this->_clients.end(); it++)
-        {
-            if(it->second.getNickName() == nick)
-                return &(it->second);   
-        }
-        return(NULL);
- }
+//  Client* Server::getClientByNickName(std::string nick)
+//  {
+//         std::map<int ,Client>::iterator it = this->_clients.begin();
+//         for(it ; it != this->_clients.end(); it++)
+//         {
+//             if(it->second.getNickName() == nick)
+//                 return &(it->second);   
+//         }
+//         return(NULL);
+//  }
+
 
 
 void Server::privmsgCommand(int i)
@@ -584,34 +598,29 @@ void Server::privmsgCommand(int i)
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
         return;
     }
-    if (findChannelName(argsVec[0]) == true) {
-        this->_channels[argsVec[0]].brodcastMessage(this->_clients[i]);
+        this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]); 
+    
+    // if (argsVec[0].at(0) == '#' ) 
+    // {
+    //     if(findChannelName(argsVec[0]) == false)
+    //     {
+    //            this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName(), argsVec[0]));
+    //              return;
+    //     }
+    //     if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
+    //         return;
+            
+    //     this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]);
+    // }
+    // else
+    // {
+    //     if(findClientByNick(argsVec[0]) == false)
+    //         this->_clients[i].sendMsg(ERR_NOSUCHNICK(this->_clients[i].getNickName(), argsVec[0]));
+    //         return;
+    // }
         
-        this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
-        return;
-    }
-    else
-        {
-            Client *cl = getClientByNickName(argsVec[0]);
-            if(cl != NULL)
-            {
-                cl->sendMsg(argsVec[1]);
-                //here ........
-            }
-        }
+
+
+        
     }
     
-    if(argsVec.size() == 1)
-        this->_clients[i].sendMsg( "[ " + this->_channels[argsVec[0]].getTopic() + " ]\r\n");
-    else if(argsVec[1] == ":" )
-     this->_channels[argsVec[0]].setTopic("", this->_clients[i]);
-    else if( argsVec[1].at(0) == ':' && argsVec[1].size() > 2)
-        this->_channels[argsVec[0]].setTopic(argsVec[1].substr(1), this->_clients[i]);
-    else
-    {
-        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"TOPIC"));
-            return;
-            
-    }    
-    argsVec.clear();
-}

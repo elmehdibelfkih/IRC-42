@@ -34,6 +34,8 @@
 //.....
 #define RPL_NAMREPLY(client, symbol, channel, nick) ("353 " + client + " " + symbol + " " + channel + " :@" + nick + "\r\n")
 
-
+//prvmsg
+#define ERR_NOSUCHNICK (client, nick) ("401 " + client + " " + nick  + " :No such nick\r\n")
+#define ERR_NOSUCHSERVER (client, server) ("402 " + client + " " + server  + " :No such server\r\n")
 
 #endif

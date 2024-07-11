@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/06/04 03:52:29 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/11 06:31:44 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ public:
 
     void    createChannel(std::string channelName, std::string key);
     bool    findChannelName(std::string channelName);
+    bool    findClientByNick(std::string nickname);
     bool    is_memberInChannel(std::string channelName, Client cl);
     bool    isValidChannelName(std::string channelName);
     bool    isValidChannelKey(std::vector<std::string> keys, int index);
