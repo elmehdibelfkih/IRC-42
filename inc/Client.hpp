@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/06/03 01:46:57 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/13 06:43:26 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,8 @@ public:
     
     // utils
     void disconnect();
-    void sendMsg(std::string str);    
+    void sendMsg(std::string str);
+    void sending(Client reciever, std::string msg);  
     bool isOperator() const;
     bool isHalfOperator() const ;                                
 };

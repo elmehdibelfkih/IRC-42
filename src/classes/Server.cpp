@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/11 07:22:31 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/13 06:41:34 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,16 +311,16 @@ void Server::createChannel(std::string ch, std::string key)
     
 }
 
-bool Server::findClientByNick(std::string nickname)
+Client* Server::findClientByNick(std::string nickname)
 {
       if(this->_clients.empty() || nickname.empty())
-        return(false);
+        return(NULL);
     for(std::map<int, Client> ::iterator it = this->_clients.begin() ; it != this->_clients.end(); it++ )
     {
         if( it->second.getNickName() == nickname)
-            return true;
+            return(&it->second);
     }
-    return false; 
+    return NULL; 
   
 }
 
@@ -598,29 +598,35 @@ void Server::privmsgCommand(int i)
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
         return;
     }
-        this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]); 
-    
-    // if (argsVec[0].at(0) == '#' ) 
-    // {
-    //     if(findChannelName(argsVec[0]) == false)
-    //     {
-    //            this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName(), argsVec[0]));
-    //              return;
-    //     }
-    //     if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
-    //         return;
+
+    if (argsVec[0].at(0) == '#' ) 
+        {
+            if(findChannelName(argsVec[0]) == false)
+            {
+                this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName(), argsVec[0]));
+                    return;
+            }
+            if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
+                return;
             
-    //     this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]);
-    // }
-    // else
-    // {
-    //     if(findClientByNick(argsVec[0]) == false)
-    //         this->_clients[i].sendMsg(ERR_NOSUCHNICK(this->_clients[i].getNickName(), argsVec[0]));
-    //         return;
-    // }
-        
+                this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]);
 
-
-        
+        }    
+    else if(argsVec[0].at(0) != '#')
+        {
+                Client *cl; 
+                cl = getClientByNickName(argsVec[0]);
+            if(cl != NULL )
+            {
+                this->_clients[i].sending(argsVec[0],cl , argsVec[1]);
+                this->_clients[i].sendMsg(RPL_AWAY(this->_clients[i].getNickName(), argsVec[0]));
+                return;
+            }
+            else
+            {
+                this->_clients[i].sendMsg(ERR_NOSUCHNICK(this->_clients[i].getNickName(), argsVec[0]));
+                return;
+            }
+        }
     }
     
