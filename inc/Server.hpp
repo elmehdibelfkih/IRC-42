@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/13 06:36:24 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/14 02:02:10 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@
 
 class Server
 {
+
 private:
     uint16_t                        _port; // mehdi
     std::string                     _passWord; // mehdi
@@ -56,10 +57,11 @@ public:
 
     void    createChannel(std::string channelName, std::string key);
     bool    findChannelName(std::string channelName);
-    bool    findClientByNick(std::string nickname);
+    // bool    findClientByNick(std::string nickname);
     bool    is_memberInChannel(std::string channelName, Client cl);
     bool    isValidChannelName(std::string channelName);
     bool    isValidChannelKey(std::vector<std::string> keys, int index);
+    void    sendingOper(Client sender, Client receiver, std::string msg);
     
     std::string     findOpional(std::vector<std::string>&vec,int index);
     std::vector<std::string>    splitString(const std::string& str, char delimiter);

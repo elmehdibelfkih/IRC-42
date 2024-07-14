@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/13 06:41:34 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/14 02:36:30 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,18 +311,18 @@ void Server::createChannel(std::string ch, std::string key)
     
 }
 
-Client* Server::findClientByNick(std::string nickname)
-{
-      if(this->_clients.empty() || nickname.empty())
-        return(NULL);
-    for(std::map<int, Client> ::iterator it = this->_clients.begin() ; it != this->_clients.end(); it++ )
-    {
-        if( it->second.getNickName() == nickname)
-            return(&it->second);
-    }
-    return NULL; 
+// Client* Server::findClientByNick(std::string nickname)
+// {
+//       if(this->_clients.empty() || nickname.empty())
+//         return(NULL);
+//     for(std::map<int, Client> ::iterator it = this->_clients.begin() ; it != this->_clients.end(); it++ )
+//     {
+//         if( it->second.getNickName() == nickname)
+//             return(&it->second);
+//     }
+//     return NULL; 
   
-}
+// }
 
 bool Server::findChannelName(std::string channelName)
 {
@@ -562,25 +562,13 @@ void Server::topicCommand(int i)
     argsVec.clear();
  
 }
-// bool Server:: findClientNick(std::string nickname)
-// {
-//      std::map<std::string ,Client>::iterator it = this->_clients.lower_bound(nickname);
-//         if(it != this->_clients.end() && it->first == nickname)
-//             return(true);
-//         return(false);
-// }
-//  Client* Server::getClientByNickName(std::string nick)
-//  {
-//         std::map<int ,Client>::iterator it = this->_clients.begin();
-//         for(it ; it != this->_clients.end(); it++)
-//         {
-//             if(it->second.getNickName() == nick)
-//                 return &(it->second);   
-//         }
-//         return(NULL);
-//  }
 
 
+ void Server::sendingOper(Client sender, Client receiver, std::string msg)
+{
+    if(sender.getNickName() != receiver.getNickName())
+        receiver.sendMsg( sender.getNickName() + ": " + msg + " " + sender.getTime());
+} 
 
 void Server::privmsgCommand(int i)
 {
@@ -614,11 +602,11 @@ void Server::privmsgCommand(int i)
         }    
     else if(argsVec[0].at(0) != '#')
         {
-                Client *cl; 
-                cl = getClientByNickName(argsVec[0]);
+            Client *cl; 
+            cl = getClientByNickName(argsVec[0]);
             if(cl != NULL )
             {
-                this->_clients[i].sending(argsVec[0],cl , argsVec[1]);
+                this->sendingOper( this->_clients[i], *cl, argsVec[1]);
                 this->_clients[i].sendMsg(RPL_AWAY(this->_clients[i].getNickName(), argsVec[0]));
                 return;
             }

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/13 06:42:29 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/14 02:21:49 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,14 +180,13 @@ bool Client::getPass() const
  {
     return(this->_halfOperatorStatus);
  }
+    
 
- void Client::sending( client reciver, std::string msg)
+std::string Client::getTime() const
 {
-    std::map<std::string, Client> ::iterator it = this->_clients.begin();
-        for(; it != this->_clients.end(); it++)
-            {
-                if(sender.getNickName() == it->second.getNickName())
-                    continue;
-                it->second.sendMsg( sender.getNickName() + ": " + msg + " " + this->getTime());
-            }      
+    std::time_t currentTime = std::time(0);
+    std::tm* localTime = std::localtime(&currentTime);
+    char buffer[80];
+        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
+    return(std::string(buffer));
 }

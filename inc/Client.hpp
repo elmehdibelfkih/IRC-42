@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/13 06:43:26 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/14 02:08:45 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,15 +45,16 @@ public:
     Client(int clientFdSocket, bool authenticate);
     
     // getters
-    int getClientFdSocket() const;
-    bool getAuthenticate() const;
-    bool getPass() const;
+    int         getClientFdSocket() const;
+    bool        getAuthenticate() const;
+    bool        getPass() const;
     std::string getCurrentChannel() const;
     std::string getNickName() const;
     std::string getUserName() const;
     std::string getIP() const;
-    Message& getMessage();
-    size_t getChannelsize();
+    Message&    getMessage();
+    size_t      getChannelsize();
+    std::string getTime() const;
     
     // setters
     void setClientFdSocket(int fd);
@@ -70,7 +71,6 @@ public:
     // utils
     void disconnect();
     void sendMsg(std::string str);
-    void sending(Client reciever, std::string msg);  
     bool isOperator() const;
     bool isHalfOperator() const ;                                
 };

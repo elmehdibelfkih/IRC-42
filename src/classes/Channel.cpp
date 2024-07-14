@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/13 06:14:21 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/14 02:25:45 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,11 +104,14 @@ void Channel::addOperators(Client ope)
     (void)ope;
 }
 
-
-
-
-
-
+std::string Channel::getTime() const
+{
+    std::time_t currentTime = std::time(0);
+    std::tm* localTime = std::localtime(&currentTime);
+    char buffer[80];
+        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
+    return(std::string(buffer));
+}
 
 
 bool Channel::isBannedFromChannel(Channel ch, Client cl)
@@ -125,14 +128,7 @@ bool Channel::isBannedFromChannel(Channel ch, Client cl)
         return(false);
 
 }
-std::string Channel::getTime() const
-{
-    std::time_t currentTime = std::time(0);
-    std::tm* localTime = std::localtime(&currentTime);
-    char buffer[80];
-        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
-    return(std::string(buffer));
-}
+
 void Channel::addClient(Client cli)
 {
     this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
