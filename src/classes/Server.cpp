@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/17 07:52:06 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 12:37:39 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,9 @@ void Server::handleClientMessage(int i)
                     case(NOTICE):
                         noticeCommand(i);
                         break;     
+                    case(PING):
+                        pingCommand(i);
+                        break;     
                     // case(KICK):
                     //     kickCommand(i);
                     //     break;
@@ -187,6 +190,11 @@ void Server::handleClientMessage(int i)
                     // case(MODE):
                     //     modeCommand(i);
                     //     break;
+                    default :
+                        unknownCommand(i);
+                        break;
+                        
+                    
                 }
            
         }
@@ -484,13 +492,13 @@ void Server::partCommand(int i)
     std::vector<std::string>reasonVec;
     std::string params = this->_clients[i].getMessage().getToken();
   
-    argsVec = splitString(params, ' ');
-    if(argsVec.size() == 0 || this->_clients[i].getMessage().getToken().size() == 0)
+    if(params.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PART")); 
         return;
     }    
-    if(argsVec.size() > 2 || argsVec[0].empty())
+    argsVec = splitString(params, ' ');
+    if( argsVec.empty() || argsVec.size() > 2 )
     {
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PART")); 
         return;
@@ -523,13 +531,13 @@ void Server::topicCommand(int i)
     std::vector<std::string>argsVec;
     std::string params = this->_clients[i].getMessage().getToken();
   
-    argsVec = splitString(params, ' ');
-    if(params.empty() || argsVec.empty())
+    if(params.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
         return;
     }    
-    if(argsVec.size() > 2)
+    argsVec = splitString(params, ' ');
+    if(argsVec.empty() || argsVec.size() > 2)
     {
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"TOPIC")); 
         return;
@@ -584,20 +592,15 @@ void Server::privmsgCommand(int i)
 {
     std::vector<std::string>argsVec;
     std::string params = this->_clients[i].getMessage().getToken();
-  
-    argsVec = splitString(params, ':');
-    if(params.empty() || argsVec.empty())
+    if(params.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
         return;
     }    
-    if( argsVec.size() < 2)
+
+    argsVec = splitString(params, ':');
+    if(argsVec.empty() || argsVec.size() < 2)
     {
-        if( argsVec.size() == 1)
-        {
-            this->_clients[i].sendMsg(ERR_NOTEXTTOSEND(this->_clients[i].getNickName())); 
-            return;
-        }
         this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
             return;
     }
@@ -654,19 +657,14 @@ void Server::noticeCommand(int i)
     std::vector<std::string>argsVec;
     std::string params = this->_clients[i].getMessage().getToken();
   
-    argsVec = splitString(params, ':');
-    if(params.empty() || argsVec.empty())
+    if(params.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"NOTICE")); 
         return;
     }    
-    if( argsVec.size() < 2)
+    argsVec = splitString(params, ':');
+    if(argsVec.empty() || argsVec.size() < 2 )
     {
-        if( argsVec.size() == 1)
-        {
-            this->_clients[i].sendMsg(ERR_NOTEXTTOSEND(this->_clients[i].getNickName())); 
-            return;
-        }
         this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"NOTICE")); 
             return;
     }
@@ -699,3 +697,28 @@ void Server::noticeCommand(int i)
         }
     }
     
+void Server::pingCommand(int i)
+{
+    std::vector<std::string>argsVec;
+    std::string params = this->_clients[i].getMessage().getToken();
+    if(params.empty())
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PING")); 
+        return;
+    }
+    argsVec = splitString(params, ':');
+    if(argsVec.empty() ||  argsVec.size() != 2 )
+    {
+        this->_clients[i].sendMsg(ERR_NOORIGIN(this->_clients[i].getNickName())); 
+            return;
+    }
+        this->_clients[i].sendMsg("PONG " +  argsVec[1]);
+
+    }
+    
+ void    Server::unknownCommand(int i)
+ {
+    std::string params = this->_clients[i].getMessage().getToken();
+    this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(this->_clients[i].getNickName(), params)); 
+        return;
+ }

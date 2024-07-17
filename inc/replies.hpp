@@ -42,4 +42,9 @@
 #define ERR_NOTEXTTOSEND(client) ("412 " + client +  " :No text to send\r\n")
 #define ERR_CANNOTSENDTOCHAN(client, channel) ("404 " + client + " " + channel + " :Cannot send to channel\r\n")
 
+//ping | pong
+#define ERR_NOORIGIN(client) ("409 " + client + " " + " No origin specified\r\n")
+
+#define ERR_UNKNOWNCOMMAND(client, command) ("421 " + client + " " + command+ " :Unknown command\r\n")
+
 #endif

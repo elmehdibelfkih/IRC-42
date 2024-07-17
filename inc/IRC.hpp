@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/05/23 21:32:07 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 09:21:24 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,9 @@ enum commands
     PART, // Leaves a channel or channels.
     PRIVMSG, // Sends a message to a user or channel.
     NOTICE, // Sends a notice to a user or channel.
-    MODE, // Sets channel modes or user modes.
     TOPIC, // Sets the topic for a channel.
+    AWAY, // Sets or unsets the user's away status.
+    MODE, // Sets channel modes or user modes.
     QUIT, // Disconnects from the server.
     WHO, // Retrieves information about users matching a given mask.
     NAMES, // Retrieves a list of users in a channel.
@@ -37,7 +38,6 @@ enum commands
     KICK, // Kicks a user from a channel.
     OPER, // Authenticates as an IRC operator.
     KILL, // Disconnects a user from the server.
-    AWAY, // Sets or unsets the user's away status.
     PING, // Checks if the server is still alive.
     PONG, // Responds to a PING message from the server.
     UNKNOWN // unknown command.
