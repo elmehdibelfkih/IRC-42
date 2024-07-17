@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/14 02:08:45 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 05:26:42 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,16 @@
 #include "Channel.hpp"
 #include <sys/types.h>
 #include <sys/socket.h>
-class Channel;
 
+
+typedef struct s_userAway
+{
+    bool status;
+    std::string away_msg;
+} t_userAway;
+
+
+class Channel;
 class Client
 {
 private:
@@ -35,6 +43,8 @@ private:
     std::string				_IP;
     std::vector<Channel>	_channels;
     Message					_msg;
+    t_userAway              _userAway;
+    
 public:
     Client();
     Client(const Client& obj);
@@ -48,6 +58,7 @@ public:
     int         getClientFdSocket() const;
     bool        getAuthenticate() const;
     bool        getPass() const;
+    bool        getStatus() const;
     std::string getCurrentChannel() const;
     std::string getNickName() const;
     std::string getUserName() const;
@@ -65,6 +76,8 @@ public:
     void setIP(std::string IP);
     void setMessage(Message msg);
     void setPass(bool b);
+    void setStatus(std::string msg);
+
     // void setOperatorStatus(bool b);
     // void setHalfOperatorStatus(bool b);
     

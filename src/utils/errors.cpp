@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   errors.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:59:12 by slaanani          #+#    #+#             */
-/*   Updated: 2024/04/30 13:45:41 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/07/17 05:34:33 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void printErrorAndExit(int errorCode)
 	
 	errorMessage = getErrorString(errorCode);
 	std::cerr << "Error: Code " << errorCode << " - " << errorMessage << std::endl;
-	// exit(errorCode);
+	exit(errorCode);
 }
 
 std::string getErrorString(int errorCode)

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/14 02:21:49 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 05:12:46 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authentic
     this->_IP = "";
     this->_pass = false;
     this->_clientFdSocket = clientFdSocket;
+    this->_userAway.status = false;
 }
 
 int Client::getClientFdSocket() const
@@ -189,4 +190,23 @@ std::string Client::getTime() const
     char buffer[80];
         std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
     return(std::string(buffer));
+}
+
+bool Client::getStatus() const
+{
+    return this->_userAway.status;
+}
+
+void Client::setStatus( std::string msg)
+{
+    if(this->_userAway.status == false)
+        {
+            this->_userAway.status = true;
+            this->_userAway.away_msg = msg;
+        }
+    else{
+        this->_userAway.status = false;
+            this->_userAway.away_msg.empty();    
+    }
+        
 }

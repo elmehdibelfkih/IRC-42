@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/14 02:25:45 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 04:44:09 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,13 +172,9 @@ void Channel::setTopic(std::string newTopic, Client setter)
 
 bool Channel::hasPermission(Client cli)
 {
-    if (this->getMode() == "+t")
-    {
         if (cli.isOperator() || cli.isHalfOperator())
             return true; 
         return false; 
-    }
-        return true;
 }
 
 

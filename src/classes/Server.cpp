@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/14 02:36:30 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 05:54:31 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -542,11 +542,15 @@ void Server::topicCommand(int i)
         this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
         return;
     }
-    if(!this->_channels[argsVec[0]].hasPermission(_clients[i])){
-        this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), argsVec[0]));
-        return;
+    if(this->_channels[argsVec[0]].getMode() == "+t")
+    {
+        if(!this->_channels[argsVec[0]].hasPermission(_clients[i]))
+        {
+            this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
     }
-    
+
     if(argsVec.size() == 1)
         this->_clients[i].sendMsg( "[ " + this->_channels[argsVec[0]].getTopic() + " ]\r\n");
     else if(argsVec[1] == ":" )
@@ -567,7 +571,13 @@ void Server::topicCommand(int i)
  void Server::sendingOper(Client sender, Client receiver, std::string msg)
 {
     if(sender.getNickName() != receiver.getNickName())
-        receiver.sendMsg( sender.getNickName() + ": " + msg + " " + sender.getTime());
+{
+        if (receiver.getStatus() == true)
+           sender.sendMsg(RPL_AWAY(sender.getNickName(), msg));
+        else
+        receiver.sendMsg( sender.getNickName() + ": [" + msg + "] " + sender.getTime());
+}
+        
 } 
 
 void Server::privmsgCommand(int i)
@@ -575,18 +585,19 @@ void Server::privmsgCommand(int i)
     std::vector<std::string>argsVec;
     std::string params = this->_clients[i].getMessage().getToken();
   
-    argsVec = splitString(params, ' ');
+    argsVec = splitString(params, ':');
     if(params.empty() || argsVec.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
         return;
     }    
-    if( argsVec[0].empty() || argsVec[1].empty())
+    if( argsVec.size() < 2)
     {
-      this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
-        return;
+        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
+            return;
     }
-
+    if(!argsVec[0].empty())
+        argsVec[0].erase( argsVec[0].size() - 1);
     if (argsVec[0].at(0) == '#' ) 
         {
             if(findChannelName(argsVec[0]) == false)
@@ -594,9 +605,27 @@ void Server::privmsgCommand(int i)
                 this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName(), argsVec[0]));
                     return;
             }
-            if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
+            if (!is_memberInChannel(argsVec[0], this->_clients[i]))
+            {
+                this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
                 return;
-            
+            }
+            if(this->_channels[argsVec[0]].getMode() == "+b")
+            {
+                if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
+                    {
+                        this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),argsVec[0])); 
+                        return;
+                    }
+            }
+            if(this->_channels[argsVec[0]].getMode() == "+m")
+            {
+                if(!this->_channels[argsVec[0]].hasPermission(_clients[i]))
+                {
+                    this->_clients[i].sendMsg(ERR_CANNOTSENDTOCHAN(this->_clients[i].getNickName(), argsVec[0]));
+                    return;
+                }
+            }
                 this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]);
 
         }    
@@ -607,7 +636,6 @@ void Server::privmsgCommand(int i)
             if(cl != NULL )
             {
                 this->sendingOper( this->_clients[i], *cl, argsVec[1]);
-                this->_clients[i].sendMsg(RPL_AWAY(this->_clients[i].getNickName(), argsVec[0]));
                 return;
             }
             else
