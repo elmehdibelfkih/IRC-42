@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/17 06:53:08 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 07:52:06 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -588,7 +588,7 @@ void Server::privmsgCommand(int i)
     argsVec = splitString(params, ':');
     if(params.empty() || argsVec.empty())
     {
-        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
         return;
     }    
     if( argsVec.size() < 2)
@@ -649,73 +649,53 @@ void Server::privmsgCommand(int i)
             }
         }
     }
-// void Server::noticeCommand(int i)
-// {
-//     std::vector<std::string>argsVec;
-//     std::string params = this->_clients[i].getMessage().getToken();
+void Server::noticeCommand(int i)
+{
+    std::vector<std::string>argsVec;
+    std::string params = this->_clients[i].getMessage().getToken();
   
-//     argsVec = splitString(params, ':');
-//     if(params.empty() || argsVec.empty())
-//     {
-//         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
-//         return;
-//     }    
-//     if( argsVec.size() < 2)
-//     {
-//         if( argsVec.size() == 1)
-//         {
-//             this->_clients[i].sendMsg(ERR_NOTEXTTOSEND(this->_clients[i].getNickName())); 
-//             return;
-//         }
-//         this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
-//             return;
-//     }
-//     if(!argsVec[0].empty())
-//         argsVec[0].erase( argsVec[0].size() - 1);
-//     if (argsVec[0].at(0) == '#' ) 
-//         {
-//             if(findChannelName(argsVec[0]) == false)
-//             {
-//                 this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName(), argsVec[0]));
-//                     return;
-//             }
-//             if (!is_memberInChannel(argsVec[0], this->_clients[i]))
-//             {
-//                 this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
-//                 return;
-//             }
-//             if(this->_channels[argsVec[0]].getMode() == "+b")
-//             {
-//                 if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
-//                     {
-//                         this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),argsVec[0])); 
-//                         return;
-//                     }
-//             }
-//             if(this->_channels[argsVec[0]].getMode() == "+m")
-//             {
-//                 if(!this->_channels[argsVec[0]].hasPermission(_clients[i]))
-//                 {
-//                     this->_clients[i].sendMsg(ERR_CANNOTSENDTOCHAN(this->_clients[i].getNickName(), argsVec[0]));
-//                     return;
-//                 }
-//             }
-//                 this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]);
-//         }    
-//     else if(argsVec[0].at(0) != '#')
-//         {
-//             Client *cl; 
-//             cl = getClientByNickName(argsVec[0]);
-//             if(cl != NULL )
-//             {
-//                 this->sendingOper( this->_clients[i], *cl, argsVec[1]);
-//                 return;
-//             }
-//             else
-//             {
-//                 this->_clients[i].sendMsg(ERR_NOSUCHNICK(this->_clients[i].getNickName(), argsVec[0]));
-//                 return;
-//             }
-//         }
-//     }
+    argsVec = splitString(params, ':');
+    if(params.empty() || argsVec.empty())
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"NOTICE")); 
+        return;
+    }    
+    if( argsVec.size() < 2)
+    {
+        if( argsVec.size() == 1)
+        {
+            this->_clients[i].sendMsg(ERR_NOTEXTTOSEND(this->_clients[i].getNickName())); 
+            return;
+        }
+        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"NOTICE")); 
+            return;
+    }
+    if(!argsVec[0].empty())
+        argsVec[0].erase( argsVec[0].size() - 1);
+    if (argsVec[0].at(0) == '#' ) 
+        {
+            if(findChannelName(argsVec[0]) == false)
+                    return;
+            if (!is_memberInChannel(argsVec[0], this->_clients[i]))
+                return;
+            if(this->_channels[argsVec[0]].getMode() == "+b" || this->_channels[argsVec[0]].getMode() == "+m" )
+            {
+                if(this->_channels[argsVec[0]].isBannedFromChannel(this->_channels[argsVec[0]], this->_clients[i]) == true)
+                    return;
+                 if(!this->_channels[argsVec[0]].hasPermission(_clients[i]))
+                    return;
+            }
+            this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], argsVec[1]);
+        }    
+    else if(argsVec[0].at(0) != '#')
+        {
+            Client *cl; 
+            cl = getClientByNickName(argsVec[0]);
+            if(cl != NULL )
+            {
+                this->sendingOper( this->_clients[i], *cl, argsVec[1]);
+                return;
+            }
+        }
+    }
     
