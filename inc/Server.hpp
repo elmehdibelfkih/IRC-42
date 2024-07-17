@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/14 02:02:10 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/17 06:53:28 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,8 @@ public:
     void    partCommand(int i);
     void    topicCommand(int i);
     void    privmsgCommand(int i);
+    void    noticeCommand(int i);
     // void  kickCommand(int i);
-    // void  noticeCommand(int i);
     // void  inviteCommand(int i);
     // void  quitCommand(int i);
     // void  modeCommand(int i);
