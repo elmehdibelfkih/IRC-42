@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/14 02:25:18 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/28 18:39:09 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ private:
     std::map<std::string, Client>	_bannedClient;
 public:
     Channel();
+    Channel(std::string channelName, std::string key);
     Channel& operator=(const Channel& obj);
     Channel(const Channel& obj);
     ~Channel();
@@ -52,7 +53,7 @@ public:
     std::string getpassWord() const;
     std::string getTopic() const;
     std::string getMode() const;
-    int getUserlimit() const;
+    int         getUserlimit() const;
     std::string getTime() const;
     
     // setters
@@ -65,10 +66,10 @@ public:
     void addClient(Client cli);
     void removeClient(Client cli);
     void addOperators(Client ope);
-
     bool hasPermission (Client cli);  
     void brodcastMessage(Client sender, std::string msg);
     bool isBannedFromChannel(Channel ch, Client cl);
+    // applyMode();
 };
 
 #endif

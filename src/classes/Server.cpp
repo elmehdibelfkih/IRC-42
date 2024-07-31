@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/17 12:37:39 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/31 23:48:04 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,9 @@ void Server::handleClientMessage(int i)
                     case(JOIN):
                         joinCommand(i);
                         break;
+                    case(LIST):
+                        listCommand(i);
+                        break;
                     case(PART):
                         partCommand(i);
                         break;
@@ -178,22 +181,19 @@ void Server::handleClientMessage(int i)
                     case(PING):
                         pingCommand(i);
                         break;     
-                    // case(KICK):
-                    //     kickCommand(i);
-                    //     break;
-                    // case(INVITE):
-                    //     inviteCommand(i);
-                    //     break;
+                    case(INVITE):
+                        inviteCommand(i);
+                        break;
+                    case(KICK):
+                        kickCommand(i);
+                        break;
+                    case(MODE):
+                        modeCommand(i);
+                        break;
                     // case(QUIT):
                     //     quitCommand(i);
                     //     break;
-                    // case(MODE):
-                    //     modeCommand(i);
-                    //     break;
-                    default :
-                        unknownCommand(i);
-                        break;
-                        
+
                     
                 }
            
@@ -248,17 +248,17 @@ void Server::passCommand(int i)
 {
     if (this->_clients[i].getMessage().getCommand() == PASS)
     {
-        if (this->_clients[i].getMessage().getToken().size() == 0)
-            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
+        if (this->_clients[i].getMessage().getToken().empty())
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PASS"));
         else if (this->_clients[i].getPass() == true)
-            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
         else if (this->_clients[i].getMessage().getToken() == this->_passWord)
             this->_clients[i].setPass(true);
         else
-            this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
+            this->_clients[i].sendMsg(ERR_PASSWDMISMATCH(this->_clients[i].getNickName()));
     }
     else
-         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+         this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
 }
 
 void Server::nickCommand(int i)
@@ -276,62 +276,73 @@ void Server::nickCommand(int i)
          this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));    
 }
 
+// void Server::userCommand(int i)
+// {
+//     if (this->_clients[i].getMessage().getCommand() == USER) 
+//     {
+//         if (this->_clients[i].getMessage().getToken().size() == 0)
+//             this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user"));
+//         // else if (this->_clients[i].getUserName().size() == 0)
+//         //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+//         else
+//         {
+//             this->_clients[i].setUserName("*****");
+//             this->_clients[i].setAuthenticate(true);
+//         }
+            
+//         // else if ()
+            
+//     }
+//     else
+//          this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
+// }
 void Server::userCommand(int i)
 {
-    if (this->_clients[i].getMessage().getCommand() == USER)
+    std::string params;
+    if (this->_clients[i].getMessage().getCommand() == USER) 
     {
-        if (this->_clients[i].getMessage().getToken().size() == 0)
-            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user"));
-        // else if (this->_clients[i].getUserName().size() == 0)
-        //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-        else
+        params =  this->_clients[i].getMessage().getToken();
+        if (params.empty())
         {
-            this->_clients[i].setUserName("*****");
-            this->_clients[i].setAuthenticate(true);
+            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"USER"));
+            return;
         }
-            
-        // else if ()
-            
+        // if (this->_clients[i].getUserName().size() == 0)
+        // {
+        //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
+        //     return;
+        // }
+        if (this->_clients[i].getAuthenticate())
+        {
+            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
+            return;
+        }
+        // if(params.size() < 2 || params.size() > 12)
+        // {
+        //     this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "USER")); 
+        //         return;
+        // }
+
+            this->_clients[i].setUserName(params);
+            this->_clients[i].setAuthenticate(true);
     }
-    else
-         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
 }
-
-
-
 
 
 
 void Server::createChannel(std::string ch, std::string key)
 {
     
-    Channel tmp_ch;       
+    Channel tmp_ch;
     this->_channels.insert(std::pair< std::string, Channel>(ch, tmp_ch));
             this->_channels[ch].setChannelName(ch);
             this->_channels[ch].setpassWord(key);
             this->_channels[ch].setMode("=");
-            this->_channels[ch]._topic = "Welcome To day";
-            this->_channels[ch]._setterCl.nickName = "DefaultTopic";
+            this->_channels[ch]._topic = "";
+            this->_channels[ch]._setterCl.nickName = "";
             this->_channels[ch]._setterCl.time = this->_channels[ch].getTime();
-            
-
-
     
 }
-
-// Client* Server::findClientByNick(std::string nickname)
-// {
-//       if(this->_clients.empty() || nickname.empty())
-//         return(NULL);
-//     for(std::map<int, Client> ::iterator it = this->_clients.begin() ; it != this->_clients.end(); it++ )
-//     {
-//         if( it->second.getNickName() == nickname)
-//             return(&it->second);
-//     }
-//     return NULL; 
-  
-// }
-
 bool Server::findChannelName(std::string channelName)
 {
     if(this->_channels.empty() || channelName.empty())
@@ -351,26 +362,11 @@ bool Server::is_memberInChannel(std::string channelName, Client cl)
 }
 
 
-std::string Server::findOpional(std::vector<std::string>& vec, int index)
+bool Server::isValidChannelKey( std::string key)
 {
-     std::string res = "";
-    if (vec.size() > 0 && !vec[index].empty())
-        return(vec[index]);
-        
-    return(res);
-    
-}
-
-bool Server::isValidChannelKey( std::vector<std::string> keysVec,int index)
-{
-        if( keysVec.empty())
+        if( key.empty())
                 return(true);
-        std::string key = keysVec[index];
-        if((size_t)index >= keysVec.size())
-            return(false);
-        if(key.empty())
-            return(true);
-        if(!(key.size() >= 4 && key.size() <= 32))
+        if(key.size() < 4 || key.size() >= 32)
             return(false);
         for(size_t i = 0; key.size() > i ;i++)
         {
@@ -403,127 +399,115 @@ std::vector<std::string> Server::splitString(const std::string& str, char delimi
 }
 void Server::joinCommand(int i)
 {
-    int indexkey = 0;
-    std::string ch;
     std::vector<std::string>argsVec;
-    std::vector<std::string>keysVec;
     std::string params = this->_clients[i].getMessage().getToken();
     
   
-    argsVec = splitString(params, ' ');
-    if(argsVec.size() == 0 || this->_clients[i].getMessage().getToken().size() == 0)
+    if(params.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"JOIN")); 
         return;
     }    
-    if(argsVec.size() > 2 || argsVec[0].empty())
+    argsVec = splitString(params, ' ');  
+    if(argsVec.empty() || argsVec.size() > 2)
     {
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"JOIN")); 
         return;
     }
-    if(argsVec.size() > 1)   
-        keysVec = splitString(argsVec[1], ',');
         
-    ch.clear();
-    std::stringstream iss1(argsVec[0]);
-    while(std::getline(iss1, ch, ','))
-        {
-            if(!isValidChannelName(ch))
+            if(!isValidChannelName(argsVec[0]))
             {
-                this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), ch)); //channel name is not a valid.
+                this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), argsVec[0])); //channel name is not a valid.
                 return;
             }      
             if(this->_clients[i].getChannelsize() >= LIMITCHANNELS) // the client has joined their maximum number of channels.
             {
-                this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(),ch)); 
+                this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(), argsVec[0])); 
                 return;
             }
-            if(findChannelName(ch) == true)
+            if(findChannelName(argsVec[0]) == true)
                 {
-                    if(is_memberInChannel(ch, this->_clients[i]))
+                    if(is_memberInChannel(argsVec[0], this->_clients[i]))
                     {
-                            this->_clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(),ch)); 
+                            this->_clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), _clients[i].getNickName())); 
                             return;
                     }
-                    if(this->_channels[ch]._clients.size() >= (size_t)this->_channels[ch].getUserlimit())  //Channel is FULL
+                    if(this->_channels[argsVec[0]]._clients.size() >= (size_t)this->_channels[argsVec[0]].getUserlimit())  //Channel is FULL
                     {
-                        this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(),ch)); 
+                        this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(),argsVec[0])); 
                         return;   
                     }
-                    if(this->_channels[ch].getMode() == "+b")
+                    if(this->_channels[argsVec[0]].getMode() == "+b")
                     {
-                        if(this->_channels[ch].isBannedFromChannel(_channels[ch], _clients[i]))
+                        if(this->_channels[argsVec[0]].isBannedFromChannel(_channels[argsVec[0]], _clients[i]))
                         {
-                            this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),ch)); 
+                            this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),argsVec[0])); 
                             return;
                         }
                     }
-                    if(this->_channels[ch].getMode() == "+i")
+                    if(this->_channels[argsVec[0]].getMode() == "+i")
                     {
-                        this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),ch)); 
+                        this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),argsVec[0])); 
                         return;
                     }
                         
-                        this->_channels[ch].addClient(this->_clients[i]);
+                        this->_channels[argsVec[0]].addClient(this->_clients[i]);
                 }
             else
             {
-                // this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(),ch)); 
-                
-                if(!isValidChannelKey(keysVec, indexkey))
+                if(argsVec.size() == 2)
                 {
-                    this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), ch)); //channel key is not a valid.
-                        return;
+                    if(!isValidChannelKey(argsVec[1]))
+                    {
+                        this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), argsVec[1])); //channel key is not a valid.
+                            return;
+                    }
+                    this->createChannel(argsVec[0], argsVec[1]);
                 }
-                this->createChannel(ch, findOpional(keysVec, indexkey));
-                this->_channels[ch].addClient(this->_clients[i]);
-                indexkey++; 
+                else
+                    this->createChannel(argsVec[0], "");
+                this->_channels[argsVec[0]].addClient(this->_clients[i]);
             }
-        }
-        keysVec.clear();
         argsVec.clear();          
 }
 
 void Server::partCommand(int i)
 {
-    int indexkey = 0;
-    std::string ch;
     std::vector<std::string>argsVec;
-    std::vector<std::string>reasonVec;
+    std::string reason;
     std::string params = this->_clients[i].getMessage().getToken();
   
     if(params.empty())
     {
         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PART")); 
         return;
-    }    
+    }  
     argsVec = splitString(params, ' ');
-    if( argsVec.empty() || argsVec.size() > 2 )
+    if( argsVec.empty())
     {
       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PART")); 
         return;
     }
-    if(argsVec.size() > 1)   
-        reasonVec = splitString(argsVec[1], ',');
-    ch.clear();
-    std::stringstream iss1(argsVec[0]);
-    while(std::getline(iss1, ch, ','))
+    
+        if (!findChannelName(argsVec[0])) {
+            this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
+        if (!is_memberInChannel(argsVec[0], this->_clients[i]))
         {
-             if (!findChannelName(ch)) {
-                this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), ch));
-                return;
-             }
-            if (!is_memberInChannel(ch, this->_clients[i])) {
-                this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), ch));
-                return;
-            }
-
-        this->_channels[ch].removeClient(this->_clients[i]);
-        this->_clients[i].sendMsg(RPL_SUCCESS(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP() , ch, findOpional(reasonVec, indexkey)));
-        indexkey++;
-    }
-        reasonVec.clear();
+            this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
+        this->_channels[argsVec[0]].removeClient(this->_clients[i]);
+        if(argsVec[1].empty())
+            this->_clients[i].sendMsg(RPL_SUCCESS(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP() , "" ));
+        else
+        {
+            reason = params.substr(argsVec[0].size());
+            this->_clients[i].sendMsg(RPL_SUCCESS(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP() , reason ));
+        }
         argsVec.clear();
+        reason.clear();
         
     }
 void Server::topicCommand(int i)
@@ -558,9 +542,8 @@ void Server::topicCommand(int i)
             return;
         }
     }
-
     if(argsVec.size() == 1)
-        this->_clients[i].sendMsg( "[ " + this->_channels[argsVec[0]].getTopic() + " ]\r\n");
+        this->_clients[i].sendMsg( this->_channels[argsVec[0]].getTopic() + "\r\n");
     else if(argsVec[1] == ":" )
      this->_channels[argsVec[0]].setTopic("", this->_clients[i]);
     else if( argsVec[1].at(0) == ':' && argsVec[1].size() > 2)
@@ -610,7 +593,7 @@ void Server::privmsgCommand(int i)
         {
             if(findChannelName(argsVec[0]) == false)
             {
-                this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName(), argsVec[0]));
+                this->_clients[i].sendMsg(ERR_NOSUCHSERVER(this->_clients[i].getNickName()));
                     return;
             }
             if (!is_memberInChannel(argsVec[0], this->_clients[i]))
@@ -647,7 +630,7 @@ void Server::privmsgCommand(int i)
             }
             else
             {
-                this->_clients[i].sendMsg(ERR_NOSUCHNICK(this->_clients[i].getNickName(), argsVec[0]));
+                this->_clients[i].sendMsg(ERR_NOSUCHNICK( argsVec[0]));
                 return;
             }
         }
@@ -696,7 +679,7 @@ void Server::noticeCommand(int i)
             }
         }
     }
-    
+
 void Server::pingCommand(int i)
 {
     std::vector<std::string>argsVec;
@@ -707,18 +690,214 @@ void Server::pingCommand(int i)
         return;
     }
     argsVec = splitString(params, ':');
-    if(argsVec.empty() ||  argsVec.size() != 2 )
+    if(argsVec.empty() ||  argsVec.size() != 2)
     {
-        this->_clients[i].sendMsg(ERR_NOORIGIN(this->_clients[i].getNickName())); 
+        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "PING")); 
             return;
     }
-        this->_clients[i].sendMsg("PONG " +  argsVec[1]);
-
+    if( argsVec[1].empty())
+    {
+        this->_clients[i].sendMsg(ERR_NOORIGIN(this->_clients[i].getNickName()));
+        return ;
     }
     
- void    Server::unknownCommand(int i)
- {
+        this->_clients[i].sendMsg("PONG :" +  argsVec[1] );
+
+    }
+
+void Server::listCommand(int i)
+{
+    std::vector<std::string>argsVec;
     std::string params = this->_clients[i].getMessage().getToken();
-    this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(this->_clients[i].getNickName(), params)); 
+    if(params.empty())
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"LIST")); 
         return;
- }
+    }
+    argsVec = splitString(params, ' ');
+    if(argsVec.empty() ||  argsVec.size() != 1)
+    {
+        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "LIST")); 
+            return;
+    }
+     if(!findChannelName(argsVec[0]))
+     {
+        this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+                    return;
+     }
+    if (!is_memberInChannel(argsVec[0], this->_clients[i]))
+    {
+        this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+        return;
+    }
+
+
+    std::map<std::string, Client>::iterator it = this->_channels[argsVec[0]]._clients.begin(); 
+    for( ; it != this->_channels[argsVec[0]]._clients.end(); ++it)
+    this->_clients[i].sendMsg(it->second.getNickName() + "\n");
+}
+
+
+
+void Server::inviteCommand(int i)
+{
+    std::vector<std::string>argsVec;
+    std::string params = this->_clients[i].getMessage().getToken();
+    if(params.empty())
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "INVITE")); 
+        return;
+    }
+    argsVec = splitString(params, ' ');
+    if(argsVec.empty() ||  argsVec.size() != 2)
+    {
+        this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "INVITE")); 
+            return;
+    }
+    if (!findChannelName(argsVec[1])) {
+        this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+        return;
+    }
+    if (!is_memberInChannel(argsVec[1], this->_clients[i]))
+    {
+        this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+        return;
+    }
+    if(this->_channels[argsVec[1]].getMode() == "+t")
+    {
+        if(!this->_channels[argsVec[1]].hasPermission(_clients[i]))
+        {
+            this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
+    }
+      Client *cl = getClientByNickName(argsVec[0]); 
+            if(cl == NULL )
+            {
+                this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
+                return;
+            }
+    if (is_memberInChannel(argsVec[1], *cl))
+    {
+        this->_clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+        return;
+    }
+    
+    this->_channels[argsVec[1]].addClient(*cl);
+    this->_clients[i].sendMsg(RPL_INVITING(this->_clients[i].getNickName(), argsVec[0], argsVec[1]));
+    }
+
+void Server::kickCommand(int i)
+{
+  std::vector<std::string>argsVec;
+    std::string reason;
+    std::string params = this->_clients[i].getMessage().getToken();
+  
+    if(params.empty())
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"KICK")); 
+        return;
+    }  
+    argsVec = splitString(params, ' ');
+    if( argsVec.empty() || argsVec.size() < 2)
+    {
+      this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"KICK")); 
+        return;
+    }
+    
+        if (!findChannelName(argsVec[0])) {
+            this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
+        if(!this->_channels[argsVec[0]].hasPermission(_clients[i]))
+        {
+            this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
+
+        Client *cl = getClientByNickName(argsVec[1]); 
+        if(cl == NULL )
+        {
+            this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
+            return;
+        }
+        if (is_memberInChannel(argsVec[0], *cl))
+        {
+            this->_clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+            return;
+        }
+        if(argsVec.size() == 2)
+        {
+            
+            cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
+            this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+            this->_channels[argsVec[0]].removeClient(*cl);
+        }
+        else
+        {
+            reason = params.substr(argsVec[0].size() + argsVec[1].size());
+            cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+            this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+
+        }
+        argsVec.clear();
+        reason.clear();
+    
+}
+void Server::modeCommand(int i)
+{
+  std::vector<std::string>argsVec;
+    std::string reason;
+    std::string params = this->_clients[i].getMessage().getToken();
+  
+    if(params.empty())
+    {
+      this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
+        return;
+    }  
+    argsVec = splitString(params, ' ');
+    if( argsVec.empty() || argsVec.size() < 2  || argsVec.size() > 3)
+    {
+        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"MODE")); 
+        return;
+    }
+      if (argsVec[0].at(0) == '#' ) 
+        {
+
+            if (!findChannelName(argsVec[0])) {
+                this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+                return;
+            }
+
+                // applyMode();
+                
+  
+            if(argsVec[1] == "+b" || argsVec[1] == "+t" || argsVec[1] == "+i" || argsVec[1] == "+k" || argsVec[1] == "+o")
+                    this->_channels[argsVec[0]].setMode(argsVec[1]);
+   
+             this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
+
+        }
+        else
+        {
+            Client *cl = getClientByNickName(argsVec[1]); 
+            if(cl == NULL )
+            {
+                this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
+                return;
+            }
+        if(argsVec.size() == 2)
+        {
+            
+            cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
+            this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+            this->_channels[argsVec[0]].removeClient(*cl);
+        }
+              // else
+                // replie   ....
+                
+        argsVec.clear();
+        reason.clear();
+    
+}
+}

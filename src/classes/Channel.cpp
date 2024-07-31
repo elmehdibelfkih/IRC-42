@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/17 04:44:09 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/07/28 19:42:28 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,8 @@ bool Channel::isBannedFromChannel(Channel ch, Client cl)
 
 }
 
+
+
 void Channel::addClient(Client cli)
 {
     this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
@@ -181,6 +183,7 @@ bool Channel::hasPermission(Client cli)
 void Channel::brodcastMessage(Client sender, std::string msg)
 {
     (void)sender;
+
 
     std::map<std::string, Client> ::iterator it = this->_clients.begin();
         for(; it != this->_clients.end(); it++)
