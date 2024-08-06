@@ -2,6 +2,7 @@
 #include <vector>
 #include <unistd.h>
 #include <sys/socket.h>
+
 #include <netinet/in.h>
 #include <poll.h>
 #include <stdexcept>
@@ -104,20 +105,15 @@
 
 int main()
 {
-//     std::vector<std::string> args{ "user1", "user2", "user3"};
+    //     std::vector<std::string> args{ "user1", "user2", "user3"};
 
+    //  args.erase(args.begin());
 
-//  args.erase(args.begin());
+    //  std::vector<std::string> ::iterator it = args.begin();
+    //  for (; it != args.end(); it++)
+    //          std::cout  <<  *it << std::endl;
 
-
-//  std::vector<std::string> ::iterator it = args.begin();
-//  for (; it != args.end(); it++)
-//          std::cout  <<  *it << std::endl;
-
-
-
-std::string params = "user1,  user2 , user3";
-std::string reason = params.substr(6);
-std::cout << reason << "\n";
-
+    std::string params = "user1,  user2 , user3";
+    std::string reason = params.substr(6);
+    std::cout << reason << "\n";
 }

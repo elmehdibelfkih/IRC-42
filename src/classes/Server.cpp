@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/31 23:48:04 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/06 11:02:40 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -307,21 +307,21 @@ void Server::userCommand(int i)
             this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"USER"));
             return;
         }
-        // if (this->_clients[i].getUserName().size() == 0)
-        // {
-        //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-        //     return;
-        // }
-        if (this->_clients[i].getAuthenticate())
+        if (this->_clients[i].getUserName().size() != 0)
         {
             this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
             return;
         }
-        // if(params.size() < 2 || params.size() > 12)
+        // if (this->_clients[i].getAuthenticate())
         // {
-        //     this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "USER")); 
-        //         return;
+        //     this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
+        //     return;
         // }
+        if(params.size() < 2 || params.size() > 12)
+        {
+            this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "USER")); 
+                return;
+        }
 
             this->_clients[i].setUserName(params);
             this->_clients[i].setAuthenticate(true);
@@ -844,60 +844,187 @@ void Server::kickCommand(int i)
         reason.clear();
     
 }
+// void Server::modeCommand(int i)
+// {
+//     std::string params = this->_clients[i].getMessage().getToken();
+//     std::vector<std::string>argsVec;
+  
+//     if(params.empty())
+//     {
+//       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
+//         return;
+//     }  
+//     argsVec = splitString(params, ' ');
+//     if( argsVec.empty() || argsVec.size() < 2  || argsVec.size() > 3)
+//     {
+//         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"MODE")); 
+//         return;
+//     }
+//       if (argsVec[0].at(0) == '#' ) 
+//         {
+//             if (!findChannelName(argsVec[0])) {
+//                 this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+//                 return;
+//             }
+//             if(argsVec[1] == "+b" || argsVec[1] == "+t" || argsVec[1] == "+i" || argsVec[1] == "+k" || argsVec[1] == "+o")
+//                     applyMode(argsVec);
+//                     this->_channels[argsVec[0]].setMode(argsVec[1]);
+   
+//              this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
+
+//         }
+//         else
+//         {
+//             Client *cl = getClientByNickName(argsVec[1]); 
+//             if(cl == NULL )
+//             {
+//                 this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
+//                 return;
+//             }
+//         if(argsVec.size() == 2)
+//         {
+            
+//             cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
+//             this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+//             this->_channels[argsVec[0]].removeClient(*cl);
+//         }
+//               // else
+//                 // replie   ....
+                
+//         argsVec.clear(); 
+    
+// }
+// }
+
+void Server::applyMode(const std::vector<std::string>& argsVec, int i) {
+   std::string channelName = argsVec[0];
+   std::string mode = argsVec[1];
+   Channel& channel = this->_channels[channelName];
+
+
+   Client& client = this->_clients[i];
+
+
+   if (!channel.hasPermission(client)) {
+       client.sendMsg(ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
+       return;
+   }
+
+
+   bool addMode = (mode[0] == '+');
+   char modeType = mode[1];
+
+
+   switch (modeType) {
+       case 'i':
+           channel.setInviteOnly(addMode);
+           channel.broadcastMessage(client, "MODE " + channelName + " " + mode + " :Invite-only mode " + (addMode ? "enabled" : "disabled"));
+           break;
+       case 't':
+           channel.setTopicRestricted(addMode);
+           channel.broadcastMessage(client, "MODE " + channelName + " " + mode + " :Topic restriction " + (addMode ? "enabled" : "disabled"));
+           break;
+       case 'k':
+           if (addMode) {
+               if (argsVec.size() < 3) {
+                   client.sendMsg(ERR_NEEDMOREPARAMS(client.getNickName(), "MODE +k"));
+                   return;
+               }
+               std::string key = argsVec[2];
+               channel.setKey(key);
+               channel.broadcastMessage(client, "MODE " + channelName + " +k :Channel key set");
+           } else {
+               channel.removeKey();
+               channel.broadcastMessage(client, "MODE " + channelName + " -k :Channel key removed");
+           }
+           break;
+       case 'l':
+           if (addMode) {
+               if (argsVec.size() < 3) {
+                   client.sendMsg(ERR_NEEDMOREPARAMS(client.getNickName(), "MODE +l"));
+                   return;
+               }
+               int limit = std::stoi(argsVec[2]);
+               channel.setUserLimit(limit);
+               channel.broadcastMessage(client, "MODE " + channelName + " +l :User limit set to " + std::to_string(limit));
+           } else {
+               channel.removeUserLimit();
+               channel.broadcastMessage(client, "MODE " + channelName + " -l :User limit removed");
+           }
+           break;
+       case 'o':
+           if (argsVec.size() < 3) {
+               client.sendMsg(ERR_NEEDMOREPARAMS(client.getNickName(), "MODE +o/-o"));
+               return;
+           }
+           std::string targetNick = argsVec[2];
+           Client* targetClient = getClientByNickName(targetNick);
+           if (targetClient == nullptr) {
+               client.sendMsg(ERR_NOSUCHNICK(client.getNickName(), targetNick));
+               return;
+           }
+           channel.setOperator(*targetClient, addMode);
+           channel.broadcastMessage(client, "MODE " + channelName + " " + mode + " :Operator privileges " + (addMode ? "granted to " : "removed from ") + targetNick);
+           break;
+       default:
+           client.sendMsg(ERR_UNKNOWNMODE(client.getNickName(), mode, channelName));
+           break;
+   }
+}
 void Server::modeCommand(int i)
 {
-  std::vector<std::string>argsVec;
-    std::string reason;
-    std::string params = this->_clients[i].getMessage().getToken();
-  
+   std::vector<std::string>argsVec;
+   std::string params = this->_clients[i].getMessage().getToken();
     if(params.empty())
-    {
-      this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
-        return;
-    }  
-    argsVec = splitString(params, ' ');
-    if( argsVec.empty() || argsVec.size() < 2  || argsVec.size() > 3)
-    {
-        this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"MODE")); 
-        return;
-    }
-      if (argsVec[0].at(0) == '#' ) 
-        {
+   {
+     this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE"));
+       return;
+   } 
+   argsVec = splitString(params, ' ');
+   if( argsVec.empty() || argsVec.size() < 2  || argsVec.size() > 3)
+   {
+       this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"MODE"));
+       return;
+   }
+     if (argsVec[0].at(0) == '#' )
+       {
 
-            if (!findChannelName(argsVec[0])) {
-                this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
-                return;
-            }
 
-                // applyMode();
-                
-  
-            if(argsVec[1] == "+b" || argsVec[1] == "+t" || argsVec[1] == "+i" || argsVec[1] == "+k" || argsVec[1] == "+o")
-                    this->_channels[argsVec[0]].setMode(argsVec[1]);
-   
-             this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
+           if (!findChannelName(argsVec[0])) {
+               this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
+               return;
+           }
+       if (argsVec[1][0] == '+' || argsVec[1][0] == '-')
+       {
+           char modeType = argsVec[1][1];
+           if (modeType == 'i' || modeType == 't' || modeType == 'k' || modeType == 'o' || modeType == 'l')
+               applyMode(argsVec, i);
+                   // this->_channels[argsVec[0]].setMode(argsVec[1]);
+       }
+       else
+           this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE"));
 
-        }
-        else
-        {
-            Client *cl = getClientByNickName(argsVec[1]); 
-            if(cl == NULL )
-            {
-                this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
-                return;
-            }
-        if(argsVec.size() == 2)
-        {
-            
-            cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
-            this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
-            this->_channels[argsVec[0]].removeClient(*cl);
-        }
-              // else
-                // replie   ....
-                
-        argsVec.clear();
-        reason.clear();
-    
+
+       }
+       else
+       {
+           Client *cl = getClientByNickName(argsVec[1]);
+           if(cl == NULL )
+           {
+               this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
+               return;
+           }
+       if(argsVec.size() == 2)
+       {
+          
+           cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
+           this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+           this->_channels[argsVec[0]].removeClient(*cl);
+       }
+             // else
+               // replie   ....
+              
+       argsVec.clear();   
+   }
 }
-}
+
