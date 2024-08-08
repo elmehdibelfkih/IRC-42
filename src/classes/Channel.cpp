@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/28 19:42:28 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/08 14:23:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 
 Channel::Channel()
 {
-    this->_userLimit = 100;
+    this->_userLimit = 0;
     this->_channelName = "";
     this->_passWord = "";
     this->_topic = "";
-    this->_mode = "";
+    this->_mode.inviteOnly = false; // any one can join to the channel ;
+    this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
 }
 
 Channel& Channel::operator=(const Channel& obj)
@@ -68,9 +69,12 @@ std::string Channel::getTopic() const
     return this->_topic;
 }
 
-std::string Channel::getMode() const
+bool Channel::getMode(char token) const
 {
-    return this->_mode;
+    if(token == 'i')
+       return this->_mode.inviteOnly;
+    if(token == 't')
+        return this->_mode.topicRestricted
 }
 
  int Channel::getUserlimit() const
@@ -90,18 +94,12 @@ void Channel::setpassWord(std::string newpassWord)
 }
 
 
-void Channel::setMode(std::string newMode)
-{
-    this->_mode = newMode;
-
-    
-}
 
 
 
 void Channel::addOperators(Client ope)
 {
-    (void)ope;
+    this->_operators.insert(std::pair<std::string, Client>(ope.getNickName(), ope));
 }
 
 std::string Channel::getTime() const
@@ -174,7 +172,7 @@ void Channel::setTopic(std::string newTopic, Client setter)
 
 bool Channel::hasPermission(Client cli)
 {
-        if (cli.isOperator() || cli.isHalfOperator())
+        if (cli.getOperatorMode() || cli.isHalfOperator())
             return true; 
         return false; 
 }
@@ -194,3 +192,21 @@ void Channel::brodcastMessage(Client sender, std::string msg)
             }
             
 }
+
+void Channel::setInviteOnly(bool mode)
+    {
+        this->_mode.inviteOnly = mode;
+    }
+
+void Channel::setTopicRestricted(bool mode)
+    {
+        this->_mode.topicRestricted = mode;
+    }
+void  Channel::setUserLimit(int limit)
+    {
+        this->_userLimit = limit ;
+    }
+void Channel::setOperator(Client &cl, bool mode)
+    {
+       cl.setOperatorStatus(mode);
+    }

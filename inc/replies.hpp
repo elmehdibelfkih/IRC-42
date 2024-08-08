@@ -24,6 +24,7 @@
 #define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : SyntaxErr \r\n")
 #define ERR_NOTONCHANNEL(client, channel) ("442 " + client + " " + channel + " :You're not on that channel.\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) ("482 " + client + " " + channel + " :You're not channel operator\r\n")
+#define ERR_UNKNOWNMODE(client, modechar) ("472 " + client + " " + modechar  + " :is unknown mode char to me\r\n")
 
 
 #define RPL_TOPIC(client, channel, topic) ("332 " + client + " " + channel + " :" + topic + "\r\n")

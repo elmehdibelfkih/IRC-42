@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/24 11:52:39 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/08 11:08:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ public:
     void    inviteCommand(int i);
     void    kickCommand(int i);
     void    modeCommand(int i);
+    void    applyMode(const std::vector<std::string>& argsVec, int i);
 
 };
 

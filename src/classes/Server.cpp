@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/06 11:02:40 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/08 14:24:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,7 +337,8 @@ void Server::createChannel(std::string ch, std::string key)
     this->_channels.insert(std::pair< std::string, Channel>(ch, tmp_ch));
             this->_channels[ch].setChannelName(ch);
             this->_channels[ch].setpassWord(key);
-            this->_channels[ch].setMode("=");
+            this->_channels[ch]._mode.inviteOnly = false;
+            this->_channels[ch]._mode.topicRestricted = false;
             this->_channels[ch]._topic = "";
             this->_channels[ch]._setterCl.nickName = "";
             this->_channels[ch]._setterCl.time = this->_channels[ch].getTime();
@@ -432,10 +433,10 @@ void Server::joinCommand(int i)
                             this->_clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), _clients[i].getNickName())); 
                             return;
                     }
-                    if(this->_channels[argsVec[0]]._clients.size() >= (size_t)this->_channels[argsVec[0]].getUserlimit())  //Channel is FULL
+                    if(this->_channels[argsVec[0]].getUserlimit() > 0)
                     {
-                        this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(),argsVec[0])); 
-                        return;   
+                        if(this->_channels[argsVec[0]]._clients.size() >= (size_t)this->_channels[argsVec[0]].getUserlimit())  //Channel is FULL
+                            return(this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(),argsVec[0])));
                     }
                     if(this->_channels[argsVec[0]].getMode() == "+b")
                     {
@@ -445,9 +446,9 @@ void Server::joinCommand(int i)
                             return;
                         }
                     }
-                    if(this->_channels[argsVec[0]].getMode() == "+i")
+                    if(this->_channels[argsVec[0]].getMode('i') == true)
                     {
-                        this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),argsVec[0])); 
+                        this->_clients[i].sendMsg(ERR_BANNEDFROMCHAN(this->_clients[i].getNickName(),argsVec[0])); //////////
                         return;
                     }
                         
@@ -763,7 +764,7 @@ void Server::inviteCommand(int i)
         this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
         return;
     }
-    if(this->_channels[argsVec[1]].getMode() == "+t")
+    if(this->_channels[argsVec[1]].getMode('i') == true)
     {
         if(!this->_channels[argsVec[1]].hasPermission(_clients[i]))
         {
@@ -844,76 +845,20 @@ void Server::kickCommand(int i)
         reason.clear();
     
 }
-// void Server::modeCommand(int i)
-// {
-//     std::string params = this->_clients[i].getMessage().getToken();
-//     std::vector<std::string>argsVec;
-  
-//     if(params.empty())
-//     {
-//       this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
-//         return;
-//     }  
-//     argsVec = splitString(params, ' ');
-//     if( argsVec.empty() || argsVec.size() < 2  || argsVec.size() > 3)
-//     {
-//         this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"MODE")); 
-//         return;
-//     }
-//       if (argsVec[0].at(0) == '#' ) 
-//         {
-//             if (!findChannelName(argsVec[0])) {
-//                 this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
-//                 return;
-//             }
-//             if(argsVec[1] == "+b" || argsVec[1] == "+t" || argsVec[1] == "+i" || argsVec[1] == "+k" || argsVec[1] == "+o")
-//                     applyMode(argsVec);
-//                     this->_channels[argsVec[0]].setMode(argsVec[1]);
+
+void Server::applyMode(const std::vector<std::string>& argsVec, int i)
+{
+   std::string  channelName = argsVec[0];
+   std::string  mode = argsVec[1];
+   Channel&     channel = this->_channels[channelName];
+   Client&      client = this->_clients[i];  
    
-//              this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE")); 
-
-//         }
-//         else
-//         {
-//             Client *cl = getClientByNickName(argsVec[1]); 
-//             if(cl == NULL )
-//             {
-//                 this->_clients[i].sendMsg(ERR_NOSUCHNICK(argsVec[0]));
-//                 return;
-//             }
-//         if(argsVec.size() == 2)
-//         {
-            
-//             cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
-//             this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
-//             this->_channels[argsVec[0]].removeClient(*cl);
-//         }
-//               // else
-//                 // replie   ....
-                
-//         argsVec.clear(); 
-    
-// }
-// }
-
-void Server::applyMode(const std::vector<std::string>& argsVec, int i) {
-   std::string channelName = argsVec[0];
-   std::string mode = argsVec[1];
-   Channel& channel = this->_channels[channelName];
-
-
-   Client& client = this->_clients[i];
-
-
    if (!channel.hasPermission(client)) {
        client.sendMsg(ERR_CHANOPRIVSNEEDED(client.getNickName(), channelName));
        return;
    }
-
-
    bool addMode = (mode[0] == '+');
    char modeType = mode[1];
-
 
    switch (modeType) {
        case 'i':
@@ -925,16 +870,17 @@ void Server::applyMode(const std::vector<std::string>& argsVec, int i) {
            channel.broadcastMessage(client, "MODE " + channelName + " " + mode + " :Topic restriction " + (addMode ? "enabled" : "disabled"));
            break;
        case 'k':
-           if (addMode) {
+           if (addMode) 
+           {
                if (argsVec.size() < 3) {
                    client.sendMsg(ERR_NEEDMOREPARAMS(client.getNickName(), "MODE +k"));
                    return;
                }
                std::string key = argsVec[2];
-               channel.setKey(key);
+               channel.setpassWord(key);
                channel.broadcastMessage(client, "MODE " + channelName + " +k :Channel key set");
            } else {
-               channel.removeKey();
+               channel._passWord.clear();
                channel.broadcastMessage(client, "MODE " + channelName + " -k :Channel key removed");
            }
            break;
@@ -945,10 +891,10 @@ void Server::applyMode(const std::vector<std::string>& argsVec, int i) {
                    return;
                }
                int limit = std::stoi(argsVec[2]);
-               channel.setUserLimit(limit);
+               channel.setUserLimit(limit > 0);
                channel.broadcastMessage(client, "MODE " + channelName + " +l :User limit set to " + std::to_string(limit));
            } else {
-               channel.removeUserLimit();
+               channel._userLimit = 0;
                channel.broadcastMessage(client, "MODE " + channelName + " -l :User limit removed");
            }
            break;
@@ -957,18 +903,24 @@ void Server::applyMode(const std::vector<std::string>& argsVec, int i) {
                client.sendMsg(ERR_NEEDMOREPARAMS(client.getNickName(), "MODE +o/-o"));
                return;
            }
-           std::string targetNick = argsVec[2];
-           Client* targetClient = getClientByNickName(targetNick);
-           if (targetClient == nullptr) {
-               client.sendMsg(ERR_NOSUCHNICK(client.getNickName(), targetNick));
+           Client* targetClient = getClientByNickName(argsVec[2]);
+           if (targetClient == NULL) {
+              return(client.sendMsg(ERR_NOSUCHNICK(argsVec[2])));
                return;
            }
-           channel.setOperator(*targetClient, addMode);
-           channel.broadcastMessage(client, "MODE " + channelName + " " + mode + " :Operator privileges " + (addMode ? "granted to " : "removed from ") + targetNick);
+             if (addMode) {
+                channel.addOperators(*targetClient);
+                channel.setOperator(*targetClient, addMode);
+                channel.broadcastMessage(client, "MODE " + channelName + " " + mode + " :Operator privileges " + (addMode ? "granted to " : "removed from ") + argsVec[2]);
+                }
+            else
+              channel.setOperator(*targetClient, addMode);
+              
            break;
        default:
-           client.sendMsg(ERR_UNKNOWNMODE(client.getNickName(), mode, channelName));
+           client.sendMsg(ERR_UNKNOWNMODE(client.getNickName(), mode));
            break;
+
    }
 }
 void Server::modeCommand(int i)
@@ -995,12 +947,7 @@ void Server::modeCommand(int i)
                return;
            }
        if (argsVec[1][0] == '+' || argsVec[1][0] == '-')
-       {
-           char modeType = argsVec[1][1];
-           if (modeType == 'i' || modeType == 't' || modeType == 'k' || modeType == 'o' || modeType == 'l')
-               applyMode(argsVec, i);
-                   // this->_channels[argsVec[0]].setMode(argsVec[1]);
-       }
+            applyMode(argsVec, i);
        else
            this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"MODE"));
 
@@ -1018,7 +965,7 @@ void Server::modeCommand(int i)
        {
           
            cl->sendMsg(RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], ""));
-           this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1], reason));
+           this->_channels[argsVec[0]].brodcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), argsVec[0], argsVec[1]));
            this->_channels[argsVec[0]].removeClient(*cl);
        }
              // else

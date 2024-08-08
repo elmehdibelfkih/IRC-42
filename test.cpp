@@ -105,6 +105,8 @@
 
 int main()
 {
+    int x;
+
     //     std::vector<std::string> args{ "user1", "user2", "user3"};
 
     //  args.erase(args.begin());
@@ -115,5 +117,5 @@ int main()
 
     std::string params = "user1,  user2 , user3";
     std::string reason = params.substr(6);
-    std::cout << reason << "\n";
+    std::cout << x << "\n";
 }

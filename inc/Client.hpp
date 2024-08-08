@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/17 05:26:42 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/08 14:20:46 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,8 @@ public:
     std::string getUserName() const;
     std::string getIP() const;
     Message&    getMessage();
+    bool        getOperatorMode() const;
+    bool        getHalfOperatorMode() const ;                                
     size_t      getChannelsize();
     std::string getTime() const;
     
@@ -75,17 +77,15 @@ public:
     void setNickName(std::string nickName);
     void setIP(std::string IP);
     void setMessage(Message msg);
-    void setPass(bool b);
+    void setPass(bool newPass);
     void setStatus(std::string msg);
-
-    // void setOperatorStatus(bool b);
-    // void setHalfOperatorStatus(bool b);
+    void setOperatorStatus(bool mode);
+    void setHalfOperatorStatus(bool mode);
     
     // utils
     void disconnect();
     void sendMsg(std::string str);
-    bool isOperator() const;
-    bool isHalfOperator() const ;                                
+                           
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/07/17 05:12:46 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/08 13:43:23 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,21 +167,28 @@ bool Client::getPass() const
     return this->_pass;
 }
 
- size_t Client::getChannelsize()
- {
+size_t Client::getChannelsize()
+{
     return(this->_channels.size());
- }
+}
  
- bool Client::isOperator() const
- {
+bool    Client::getOperatorMode() const
+{
     return(this->_operatorStatus);
- }
- 
- bool Client::isHalfOperator() const
- {
+}
+bool    Client::getHalfOperatorMode() const 
+{
     return(this->_halfOperatorStatus);
- }
+}
     
+void Client::setOperatorStatus(bool mode)
+{
+    this->_operatorStatus == mode;
+}
+void Client::setHalfOperatorStatus(bool mode)
+{
+    this->_halfOperatorStatus = mode;
+}
 
 std::string Client::getTime() const
 {
