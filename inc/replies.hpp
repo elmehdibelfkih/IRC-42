@@ -15,12 +15,12 @@
 #define ERR_NEEDMOREPARAMS(client, command) ("461 " + client + " " + command + " :Not enough parameters\r\n")
 #define ERR_NOSUCHCHANNEL(client, channel) ("403 " + client + " " + channel + " :No such channel " + " \r\n")
 #define ERR_TOOMANYCHANNELS(client, channel) ("405 " + client + " " + channel + " :You have joined too many channels\r\n")
-#define ERR_BADCHANNELKEY(client, channel) ("475 " + client + " " + channel + " :Key incorrect, Cannot join the channel (+k)\r\n")
 #define ERR_BANNEDFROMCHAN(client, channel) ("474 " + client + " " + channel + " :Cannot join channel (+b)\r\n")
+#define ERR_BADCHANNELKEY(client, channel) ("475 " + client + " " + channel + " :Key incorrect, Cannot join the channel (+k)\r\n")
 #define ERR_CHANNELISFULL(client, channel) ("471 " + client + " " + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_INVITEONLYCHAN(client, channel) ("473 " + client + " " + channel + " :Cannot join channel (+i)\r\n")
 #define ERR_BADCHANMASK(client, channel) ("476 " + client + " " + channel + " :Bad Channel Name\r\n")
-#define ERR_USERONCHANNEL(client, nick) ("443 " + client + " :" + nick + " is already on channel\r\n")
+#define ERR_USERONCHANNEL(client ) ("443 " + client + " :" + " is already on channel\r\n")
 #define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : SyntaxErr \r\n")
 #define ERR_NOTONCHANNEL(client, channel) ("442 " + client + " " + channel + " :You're not on that channel.\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) ("482 " + client + " " + channel + " :You're not channel operator\r\n")
@@ -47,7 +47,11 @@
 #define ERR_NOORIGIN(client) ("409 " + client + " " + " :No origin specified\r\n")
  
  // invite
-#define RPL_INVITING(client, nick, channel) ("341 " + client + " :" + nick + " has been invited to " + channel + ".\r\n")
+#define RPL_INVITING(client, nick, channel) ("341 " + client + " :" + nick + " has been invited to " + channel + "\r\n")
 
 #define RPL_KICKEDUSER(nick, user, host, channel, kickeduser, raison) ( nick + "!" + user + "@" + host  + "KICK  from the " + channel + " " + kickeduser  + " " + raison + "\r\n")
+
+//mode
+#define RPL_CHANNELMODEIS(client, channel, modestring, key) ("324 "  + client + " " + channel  + ": " + modestring + " " + key  + "\r\n")
+
 #endif

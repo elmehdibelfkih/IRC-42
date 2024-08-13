@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/08 14:02:27 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/13 19:18:03 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ typedef struct s_Mode
 {
     bool inviteOnly;
     bool topicRestricted;
+    bool userLimit;
+    bool requiredKey;
 }t_Mode;
 
 class Channel
@@ -45,7 +47,7 @@ private:
     std::map<std::string, Client>	_clients;
     std::map<std::string, Client>	_operators;
     std::map<std::string, Client>	_invitees;
-    std::map<std::string, Client>	_bannedClient;
+
 
 public:
     Channel();
@@ -62,10 +64,8 @@ public:
     std::string getTopic() const;
     bool        getMode(char token) const;
     int         getUserlimit() const;
+    std::string getModes() const;
     std::string getTime() const;
-    
-
-    
     
     // setters
     void setChannelName(std::string newName);
@@ -74,14 +74,14 @@ public:
     void setUserLimit(int limit);
     void setInviteOnly(bool mode);
     void setTopicRestricted(bool mode);
-    void setOperator(Client &cl, bool mode);
 
     void addClient(Client cli);
     void removeClient(Client cli);
     void addOperators(Client ope);
+    void removeOperators(Client ope);
     bool hasPermission (Client cli);  
-    void brodcastMessage(Client sender, std::string msg);
-    bool isBannedFromChannel(Channel ch, Client cl);
+    void broadcastMessage(Client sender, std::string msg);
+
     // applyMode();
 };
 

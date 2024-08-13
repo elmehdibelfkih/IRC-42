@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/08 11:08:21 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/13 20:26:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,12 @@ public:
     Client*                     getClientByNickName(std::string nick); // <==
     void                        createChannel(std::string channelName, std::string key);
     bool                        findChannelName(std::string channelName);
-    // bool                     findClientByNick(std::string nickname);
     bool                        is_memberInChannel(std::string channelName, Client cl);
     bool                        isValidChannelName(std::string channelName);
     bool                        isValidChannelKey( std::string keys);
     void                        sendingOper(Client sender, Client receiver, std::string msg);
     std::vector<std::string>    splitString(const std::string& str, char delimiter);
+    void                        applyMode(const std::vector<std::string>& argsVec, int i);
 
     
     void    passCommand(int i);
@@ -72,13 +72,12 @@ public:
     void    partCommand(int i);
     void    topicCommand(int i);
     void    privmsgCommand(int i);
-    void    noticeCommand(int i);
+    // void    noticeCommand(int i);
     void    pingCommand(int i);
     void    listCommand(int i);
     void    inviteCommand(int i);
     void    kickCommand(int i);
     void    modeCommand(int i);
-    void    applyMode(const std::vector<std::string>& argsVec, int i);
 
 };
 

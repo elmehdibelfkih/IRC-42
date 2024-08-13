@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/08 14:23:21 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/13 20:25:56 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,15 @@
 
 Channel::Channel()
 {
-    this->_userLimit = 0;
     this->_channelName = "";
     this->_passWord = "";
     this->_topic = "";
+    this->_userLimit = -1; //default value . No limit on the number of users who can join the channel
     this->_mode.inviteOnly = false; // any one can join to the channel ;
     this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
+    this->_mode.userLimit = false; // No limit on the number of users who can join the channel.
+    this->_mode.requiredKey = false; // the key of channel required .
+    
 }
 
 Channel& Channel::operator=(const Channel& obj)
@@ -68,13 +71,32 @@ std::string Channel::getTopic() const
 {
     return this->_topic;
 }
+std::string Channel::getModes() const
+{
+    std::string modes;
+    
+    if(this->getMode('i'))
+        modes+= 'i';
+    if(this->getMode('t'))
+        modes+= 't';
+    if(this->getMode('l'))
+        modes+= 'l';
+    if(this->getMode('k'))
+        modes+= 'k';
+    return(modes);
+}
 
 bool Channel::getMode(char token) const
 {
     if(token == 'i')
        return this->_mode.inviteOnly;
     if(token == 't')
-        return this->_mode.topicRestricted
+        return this->_mode.topicRestricted;
+    if(token == 'l')
+        return this->_mode.userLimit;
+    if(token == 'k')
+        return this->_mode.requiredKey;
+    return false;
 }
 
  int Channel::getUserlimit() const
@@ -93,15 +115,6 @@ void Channel::setpassWord(std::string newpassWord)
     
 }
 
-
-
-
-
-void Channel::addOperators(Client ope)
-{
-    this->_operators.insert(std::pair<std::string, Client>(ope.getNickName(), ope));
-}
-
 std::string Channel::getTime() const
 {
     std::time_t currentTime = std::time(0);
@@ -112,20 +125,6 @@ std::string Channel::getTime() const
 }
 
 
-bool Channel::isBannedFromChannel(Channel ch, Client cl)
-{
-
-    std::string mask =  cl.getNickName() + "!" + cl.getUserName() + "@" + cl.getIP();
-    
-    if(ch._bannedClient.empty())
-        return false;
-
-        std::map<std::string, Client>::iterator it = this->_bannedClient.lower_bound(mask);
-        if(it != this->_bannedClient.end() && it->first == mask)
-            return(true);
-        return(false);
-
-}
 
 
 
@@ -135,24 +134,14 @@ void Channel::addClient(Client cli)
 
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
-        cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), this->getMode(), this->getChannelName(), cli.getNickName()));
         cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
     if(this->getTopic().empty())
         cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
-        
-    
 }
 void Channel::removeClient(Client cli)
 {
-    // std::map<std::string, Client> ::iterator it = this->_clients.begin();
-    // std::map<std::string, Client> ::iterator it1 = this->_clients.begin();
-    // for(; it != this->_clients.end(); it++)
-    //         std::cout << "---->  :" << it->first << "\n";
     this->_clients.erase(cli.getNickName());
-    
-    // for(; it1 != this->_clients.end(); it1++)
-    //         std::cout << "++++>  :" << it1->first << "\n";
 }
 
 void Channel::setTopic(std::string newTopic, Client setter)
@@ -172,25 +161,40 @@ void Channel::setTopic(std::string newTopic, Client setter)
 
 bool Channel::hasPermission(Client cli)
 {
-        if (cli.getOperatorMode() || cli.isHalfOperator())
-            return true; 
-        return false; 
+    if(this->_operators.empty())
+        return false;
+
+    std::map <std::string, Client > ::iterator it = this->_operators.lower_bound(cli.getNickName());
+    if( it != this->_operators.end() )
+        return(true);
+    return false;
+
 }
 
 
-void Channel::brodcastMessage(Client sender, std::string msg)
+void Channel::broadcastMessage(Client sender, std::string msg)
 {
-    (void)sender;
-
-
     std::map<std::string, Client> ::iterator it = this->_clients.begin();
         for(; it != this->_clients.end(); it++)
             {
                 if(sender.getNickName() == it->second.getNickName())
                     continue;
-                it->second.sendMsg( sender.getNickName() + ": " + msg + " " + this->getTime());
-            }
-            
+                it->second.sendMsg( sender.getNickName() + " " + msg + " " + this->getTime());
+            }         
+}
+
+void Channel::addOperators(Client ope)
+{
+    this->_operators.insert(std::pair<std::string, Client>(ope.getNickName(), ope));
+
+}
+
+void Channel::removeOperators(Client ope)
+{
+    std::map <std::string, Client > ::iterator it = this->_operators.lower_bound(ope.getNickName());
+    if( it != this->_operators.end())
+    this->_operators.erase(it->second.getNickName());
+
 }
 
 void Channel::setInviteOnly(bool mode)
@@ -205,8 +209,5 @@ void Channel::setTopicRestricted(bool mode)
 void  Channel::setUserLimit(int limit)
     {
         this->_userLimit = limit ;
-    }
-void Channel::setOperator(Client &cl, bool mode)
-    {
-       cl.setOperatorStatus(mode);
+        this->_mode.userLimit = true;
     }

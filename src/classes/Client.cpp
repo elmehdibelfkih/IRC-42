@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/08 13:43:23 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/13 20:24:43 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ Client::Client()
     this->_clientFdSocket = -1;
     this->_authenticate = false;
     this->_operatorStatus = false;
-    this->_halfOperatorStatus = false;
     this->_currentChannel = "";
     this->_userName = "";
     this->_nickName = "";
@@ -183,7 +182,7 @@ bool    Client::getHalfOperatorMode() const
     
 void Client::setOperatorStatus(bool mode)
 {
-    this->_operatorStatus == mode;
+    this->_operatorStatus = mode;
 }
 void Client::setHalfOperatorStatus(bool mode)
 {

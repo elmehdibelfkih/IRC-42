@@ -105,7 +105,7 @@
 
 int main()
 {
-    int x;
+    // int x;
 
     //     std::vector<std::string> args{ "user1", "user2", "user3"};
 
@@ -115,7 +115,11 @@ int main()
     //  for (; it != args.end(); it++)
     //          std::cout  <<  *it << std::endl;
 
-    std::string params = "user1,  user2 , user3";
-    std::string reason = params.substr(6);
-    std::cout << x << "\n";
+    // std::string params = "user1,  user2 , user3";
+    // std::string reason = params.substr(6);
+    // std::cout << x << "\n";
+
+    bool signal;
+    std::cout <<   (signal ? "enabled" : "disabled");
+
 }
