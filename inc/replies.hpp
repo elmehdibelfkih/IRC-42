@@ -21,7 +21,8 @@
 #define ERR_INVITEONLYCHAN(client, channel) ("473 " + client + " " + channel + " :Cannot join channel (+i)\r\n")
 #define ERR_BADCHANMASK(client, channel) ("476 " + client + " " + channel + " :Bad Channel Name\r\n")
 #define ERR_USERONCHANNEL(client ) ("443 " + client + " :" + " is already on channel\r\n")
-#define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : SyntaxErr \r\n")
+#define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : Invalid parameters provided \r\n")
+
 #define ERR_NOTONCHANNEL(client, channel) ("442 " + client + " " + channel + " :You're not on that channel.\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) ("482 " + client + " " + channel + " :You're not channel operator\r\n")
 #define ERR_UNKNOWNMODE(client, modechar) ("472 " + client + " " + modechar  + " :is unknown mode char to me\r\n")
@@ -47,7 +48,7 @@
 #define ERR_NOORIGIN(client) ("409 " + client + " " + " :No origin specified\r\n")
  
  // invite
-#define RPL_INVITING(client, nick, channel) ("341 " + client + " :" + nick + " has been invited to " + channel + "\r\n")
+#define RPL_INVITING(client, inviter, channel) ("341 " + client + " :" + inviter + " has been invited to " + channel + "\r\n")
 
 #define RPL_KICKEDUSER(nick, user, host, channel, kickeduser, raison) ( nick + "!" + user + "@" + host  + "KICK  from the " + channel + " " + kickeduser  + " " + raison + "\r\n")
 

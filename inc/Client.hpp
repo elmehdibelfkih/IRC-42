@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/08 14:20:46 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/19 13:27:54 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,11 @@
 #include <sys/socket.h>
 
 
-typedef struct s_userAway
-{
-    bool status;
-    std::string away_msg;
-} t_userAway;
+// typedef struct s_userAway
+// {
+//     bool status;
+//     std::string away_msg;
+// } t_userAway;
 
 
 class Channel;
@@ -42,8 +42,9 @@ private:
     std::string				_nickName;
     std::string				_IP;
     std::vector<Channel>	_channels;
+    size_t                  _nbrchannels;
     Message					_msg;
-    t_userAway              _userAway;
+    // t_userAway              _userAway;
     
 public:
     Client();
@@ -66,8 +67,8 @@ public:
     Message&    getMessage();
     bool        getOperatorMode() const;
     bool        getHalfOperatorMode() const ;                                
-    size_t      getChannelsize();
     std::string getTime() const;
+    size_t      getnbrChannels();
     
     // setters
     void setClientFdSocket(int fd);
@@ -81,6 +82,7 @@ public:
     void setStatus(std::string msg);
     void setOperatorStatus(bool mode);
     void setHalfOperatorStatus(bool mode);
+    void setnbrChannels(char sign);
     
     // utils
     void disconnect();

@@ -103,6 +103,14 @@
 // }
 #include <vector>
 
+std::string join_msg(std::vector <std::string>&vec)
+{
+    std::string res = "";
+    int i = 0;
+while(vec.size() > ++i)
+    res += vec[i];
+return res;
+}
 int main()
 {
     // int x;
@@ -119,7 +127,25 @@ int main()
     // std::string reason = params.substr(6);
     // std::cout << x << "\n";
 
-    bool signal;
-    std::cout <<   (signal ? "enabled" : "disabled");
+
+std::vector<std::string> vec ;
+    vec.push_back("cmd");
+    vec.push_back("user2");
+    vec.push_back(":user3");
+
+
+    // std::string res = join_msg(vec);
+    std::string res =  "user3:";
+    std::cout << res << "\n";
+    std::cout << res.erase(res.size() - 1) << "\n";
+
+    // bool signal;
+    // std::cout <<   (signal ? "enabled" : "disabled");
 
 }
+
+
+
+//splitString
+//status of clients.
+//usercommand , kickcommand

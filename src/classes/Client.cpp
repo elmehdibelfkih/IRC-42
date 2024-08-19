@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/13 20:24:43 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/19 13:29:29 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authentic
     this->_IP = "";
     this->_pass = false;
     this->_clientFdSocket = clientFdSocket;
-    this->_userAway.status = false;
+    // this->_userAway.status = false;
 }
 
 int Client::getClientFdSocket() const
@@ -166,9 +166,16 @@ bool Client::getPass() const
     return this->_pass;
 }
 
-size_t Client::getChannelsize()
+size_t Client::getnbrChannels()
 {
-    return(this->_channels.size());
+    return(this->_nbrchannels);
+}
+void Client::setnbrChannels(char sign)
+{
+    if(sign == '+')
+        this->_nbrchannels++; 
+    else
+        this->_nbrchannels--; 
 }
  
 bool    Client::getOperatorMode() const
@@ -198,21 +205,21 @@ std::string Client::getTime() const
     return(std::string(buffer));
 }
 
-bool Client::getStatus() const
-{
-    return this->_userAway.status;
-}
+// bool Client::getStatus() const
+// {
+//     return this->_userAway.status;
+// }
 
-void Client::setStatus( std::string msg)
-{
-    if(this->_userAway.status == false)
-        {
-            this->_userAway.status = true;
-            this->_userAway.away_msg = msg;
-        }
-    else{
-        this->_userAway.status = false;
-            this->_userAway.away_msg.empty();    
-    }
+// void Client::setStatus( std::string msg)
+// {
+//     if(this->_userAway.status == false)
+//         {
+//             this->_userAway.status = true;
+//             this->_userAway.away_msg = msg;
+//         }
+//     else{
+//         this->_userAway.status = false;
+//             this->_userAway.away_msg.empty();    
+//     }
         
-}
+// }

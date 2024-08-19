@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/13 20:25:56 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/14 19:22:17 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,20 +71,6 @@ std::string Channel::getTopic() const
 {
     return this->_topic;
 }
-std::string Channel::getModes() const
-{
-    std::string modes;
-    
-    if(this->getMode('i'))
-        modes+= 'i';
-    if(this->getMode('t'))
-        modes+= 't';
-    if(this->getMode('l'))
-        modes+= 'l';
-    if(this->getMode('k'))
-        modes+= 'k';
-    return(modes);
-}
 
 bool Channel::getMode(char token) const
 {
@@ -124,17 +110,28 @@ std::string Channel::getTime() const
     return(std::string(buffer));
 }
 
-
-
-
+std::string Channel::getModes() const
+{
+    std::string modes = "";
+    
+    if(this->getMode('i'))
+        modes+= 'i';
+    if(this->getMode('t'))
+        modes+= 't';
+    if(this->getMode('l'))
+        modes+= 'l';
+    if(this->getMode('k'))
+        modes+= 'k';
+    return(modes);
+}
 
 void Channel::addClient(Client cli)
 {
     this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
-
+    cli.setnbrChannels('+');
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
-        cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
+        // cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
     if(this->getTopic().empty())
         cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
