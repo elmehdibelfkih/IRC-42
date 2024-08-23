@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/14 19:22:17 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/21 14:16:24 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Channel::Channel()
     this->_channelName = "";
     this->_passWord = "";
     this->_topic = "";
-    this->_userLimit = -1; //default value . No limit on the number of users who can join the channel
+    this->_userLimit = -1; //default value ofthe number of users who can join the channel.
     this->_mode.inviteOnly = false; // any one can join to the channel ;
     this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
     this->_mode.userLimit = false; // No limit on the number of users who can join the channel.
@@ -110,7 +110,7 @@ std::string Channel::getTime() const
     return(std::string(buffer));
 }
 
-std::string Channel::getModes() const
+std::string Channel::showModes() const
 {
     std::string modes = "";
     
@@ -138,6 +138,7 @@ void Channel::addClient(Client cli)
 }
 void Channel::removeClient(Client cli)
 {
+    cli.setnbrChannels('-');
     this->_clients.erase(cli.getNickName());
 }
 
@@ -167,6 +168,17 @@ bool Channel::hasPermission(Client cli)
     return false;
 
 }
+bool Channel::hasPermissions(Client cli)
+{
+    if(this->_operators.empty())
+        return false;
+
+     if(this->_clients[cli.getNickName()].getOperStatus()== true )
+        return true;
+    else
+        return false;
+
+}
 
 
 void Channel::broadcastMessage(Client sender, std::string msg)
@@ -182,16 +194,17 @@ void Channel::broadcastMessage(Client sender, std::string msg)
 
 void Channel::addOperators(Client ope)
 {
+    this->_clients[ope.getNickName()].setOperStatus(true);
     this->_operators.insert(std::pair<std::string, Client>(ope.getNickName(), ope));
 
 }
 
 void Channel::removeOperators(Client ope)
 {
+    this->_clients[ope.getNickName()].setOperStatus(false);
     std::map <std::string, Client > ::iterator it = this->_operators.lower_bound(ope.getNickName());
     if( it != this->_operators.end())
     this->_operators.erase(it->second.getNickName());
-
 }
 
 void Channel::setInviteOnly(bool mode)

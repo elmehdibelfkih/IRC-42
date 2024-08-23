@@ -32,7 +32,7 @@
 #define RPL_TOPICWHOTIME(client, channel, nick, time) ("333 " + client + " " + channel + " " + nick + " " +time + "\r\n")
 #define RPL_NOTOPIC(client, channel) ("331 " + client + " " + channel + " :No topic to set.\r\n")
 #define RPL_ENDOFNAMES(client, channel) ("366 " + client + " " + channel + " :End of /NAMES list.\r\n")
-#define RPL_SUCCESS(nick, user, host, raison) ( nick + "!" + user + "@" + host  + " :is leaving the channel " + raison + "\r\n")
+#define RPL_SUCCESS(nick, user, host, channelname, raison) ( nick + "!" + user + "@" + host  + " :is leaving the channel " + channelname + " :" + raison + "\r\n")
 //.....
 #define RPL_NAMREPLY(client, symbol, channel, nick) ("353 " + client + " " + symbol + " " + channel + " :@" + nick + "\r\n")
 
@@ -53,6 +53,6 @@
 #define RPL_KICKEDUSER(nick, user, host, channel, kickeduser, raison) ( nick + "!" + user + "@" + host  + "KICK  from the " + channel + " " + kickeduser  + " " + raison + "\r\n")
 
 //mode
-#define RPL_CHANNELMODEIS(client, channel, modestring, key) ("324 "  + client + " " + channel  + ": " + modestring + " " + key  + "\r\n")
+#define RPL_CHANNELMODEIS(client, channel, modestring, key) ("324 "  + client + " " + channel  + " : " + modestring + " " + key  + "\r\n")
 
 #endif

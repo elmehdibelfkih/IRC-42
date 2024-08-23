@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/19 13:29:29 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/21 13:21:25 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ Client& Client::operator=(const Client& obj)
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
         this->_IP = obj._IP;
-        this->_channels = obj._channels;
+        // this->_channels = obj._channels;
         this->_msg = obj._msg;
         this->_pass = obj._pass;
     }
@@ -51,7 +51,7 @@ Client::~Client()
     this->_userName.clear();
     this->_nickName.clear();
     this->_IP.clear();
-    this->_channels.clear();
+    // this->_channels.clear();
 }
 
 
@@ -178,23 +178,16 @@ void Client::setnbrChannels(char sign)
         this->_nbrchannels--; 
 }
  
-bool    Client::getOperatorMode() const
+bool    Client::getOperStatus() const
 {
     return(this->_operatorStatus);
 }
-bool    Client::getHalfOperatorMode() const 
-{
-    return(this->_halfOperatorStatus);
-}
     
-void Client::setOperatorStatus(bool mode)
+void Client::setOperStatus(bool mode)
 {
     this->_operatorStatus = mode;
 }
-void Client::setHalfOperatorStatus(bool mode)
-{
-    this->_halfOperatorStatus = mode;
-}
+
 
 std::string Client::getTime() const
 {
@@ -205,21 +198,3 @@ std::string Client::getTime() const
     return(std::string(buffer));
 }
 
-// bool Client::getStatus() const
-// {
-//     return this->_userAway.status;
-// }
-
-// void Client::setStatus( std::string msg)
-// {
-//     if(this->_userAway.status == false)
-//         {
-//             this->_userAway.status = true;
-//             this->_userAway.away_msg = msg;
-//         }
-//     else{
-//         this->_userAway.status = false;
-//             this->_userAway.away_msg.empty();    
-//     }
-        
-// }

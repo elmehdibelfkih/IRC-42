@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/13 19:18:03 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/21 13:23:00 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,8 +38,8 @@ class Channel
 {
 friend class Server;
 private:
-    int						        _userLimit;
     std::string				        _channelName;
+    int						        _userLimit;
     std::string				        _passWord;
     std::string				        _topic;
     t_SetterCl                      _setterCl;
@@ -64,7 +64,7 @@ public:
     std::string getTopic() const;
     bool        getMode(char token) const;
     int         getUserlimit() const;
-    std::string getModes() const;
+    std::string showModes() const;
     std::string getTime() const;
     
     // setters
@@ -81,8 +81,7 @@ public:
     void removeOperators(Client ope);
     bool hasPermission (Client cli);  
     void broadcastMessage(Client sender, std::string msg);
-
-    // applyMode();
+    bool hasPermissions(Client cli);
 };
 
 #endif

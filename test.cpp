@@ -147,5 +147,5 @@ std::vector<std::string> vec ;
 
 
 //splitString
-//status of clients.
+//status of clients. 
 //usercommand , kickcommand

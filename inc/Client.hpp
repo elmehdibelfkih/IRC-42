@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/19 13:27:54 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/21 13:19:06 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,6 @@
 #include <sys/socket.h>
 
 
-// typedef struct s_userAway
-// {
-//     bool status;
-//     std::string away_msg;
-// } t_userAway;
-
 
 class Channel;
 class Client
@@ -36,15 +30,13 @@ private:
     bool					_authenticate;
     bool                    _pass;
     bool                    _operatorStatus;
-    bool                    _halfOperatorStatus;
     std::string				_currentChannel;
     std::string				_userName;
     std::string				_nickName;
     std::string				_IP;
-    std::vector<Channel>	_channels;
+    // std::vector<Channel>	_channels;
     size_t                  _nbrchannels;
     Message					_msg;
-    // t_userAway              _userAway;
     
 public:
     Client();
@@ -59,14 +51,12 @@ public:
     int         getClientFdSocket() const;
     bool        getAuthenticate() const;
     bool        getPass() const;
-    bool        getStatus() const;
     std::string getCurrentChannel() const;
     std::string getNickName() const;
     std::string getUserName() const;
     std::string getIP() const;
     Message&    getMessage();
-    bool        getOperatorMode() const;
-    bool        getHalfOperatorMode() const ;                                
+    bool        getOperStatus() const;                     
     std::string getTime() const;
     size_t      getnbrChannels();
     
@@ -79,9 +69,7 @@ public:
     void setIP(std::string IP);
     void setMessage(Message msg);
     void setPass(bool newPass);
-    void setStatus(std::string msg);
-    void setOperatorStatus(bool mode);
-    void setHalfOperatorStatus(bool mode);
+    void setOperStatus(bool mode);
     void setnbrChannels(char sign);
     
     // utils
