@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/21 13:19:06 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/27 11:47:54 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,6 @@ private:
     std::string				_userName;
     std::string				_nickName;
     std::string				_IP;
-    // std::vector<Channel>	_channels;
     size_t                  _nbrchannels;
     Message					_msg;
     

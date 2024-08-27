@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/21 18:26:57 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/27 15:19:28 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,16 +107,24 @@ void Server::handleClientConnection()
         }
         // Check for new connections
         if (this->_fds[0].revents & POLLIN){
-            int clientFdSocket = accept(this->_fds[0].fd, NULL, NULL);
+            struct sockaddr_in clientAddr;
+            socklen_t addrLen = sizeof(clientAddr);
+            int clientFdSocket = accept(this->_fds[0].fd,(struct sockaddr*)&clientAddr, &addrLen);
             if (clientFdSocket < 0)
-            std::cerr << "accept() failed" << std::endl;
-            else {
+                std::cerr << "accept() failed" << std::endl;
+            else
+            {
                 std::cout << "New client connected" << std::endl;
+                std::string clientIP = "";
+                clientIP = inet_ntoa(clientAddr.sin_addr);
+                
                 pollfd tmp;
                 tmp.fd = clientFdSocket;
                 tmp.events = POLLIN;
+               
                 this->_fds.push_back(tmp);
                 Client Ctmp(clientFdSocket, false);
+                Ctmp.setIP(clientIP);
                 this->_clients[clientFdSocket] = Ctmp;
             }
         }
@@ -222,24 +230,7 @@ Client* Server::getClientByNickName(std::string nick)
     return NULL;
 }
 
-bool Server::checkNickName(int i)
-{
-    if (this->_clients[i].getMessage().getToken().find(' ') != std::string::npos || this->_clients[i].getMessage().getToken().find(',') != std::string::npos 
-            || this->_clients[i].getMessage().getToken().find('*') != std::string::npos ||  this->_clients[i].getMessage().getToken().find('!') != std::string::npos 
-            || this->_clients[i].getMessage().getToken().find('?') != std::string::npos || this->_clients[i].getMessage().getToken().find('@') != std::string::npos 
-            || this->_clients[i].getMessage().getToken().find('.') != std::string::npos)
-        return false;
-    if (*(this->_clients[i].getMessage().getToken().begin()) == ':' || *(this->_clients[i].getMessage().getToken().begin()) == '$')
-        return false;
-    this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
-    return true;
-}
 
-bool Server::checkUserName(int i)
-{
-    (void)i;
-    return true;
-}
 
 void Server::passCommand(int i)
 {
@@ -258,6 +249,18 @@ void Server::passCommand(int i)
          this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
 }
 
+bool Server::checkNickName(int i)
+{
+    if (this->_clients[i].getMessage().getToken().find(' ') != std::string::npos || this->_clients[i].getMessage().getToken().find(',') != std::string::npos 
+            || this->_clients[i].getMessage().getToken().find('*') != std::string::npos ||  this->_clients[i].getMessage().getToken().find('!') != std::string::npos 
+            || this->_clients[i].getMessage().getToken().find('?') != std::string::npos || this->_clients[i].getMessage().getToken().find('@') != std::string::npos 
+            || this->_clients[i].getMessage().getToken().find('.') != std::string::npos)
+        return false;
+    if (*(this->_clients[i].getMessage().getToken().begin()) == ':' || *(this->_clients[i].getMessage().getToken().begin()) == '$')
+        return false;
+    this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+    return true;
+}
 void Server::nickCommand(int i)
 {
     if (this->_clients[i].getMessage().getCommand() == NICK)
@@ -273,46 +276,59 @@ void Server::nickCommand(int i)
          this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));    
 }
 
-// void Server::userCommand(int i)
-// {
-//     if (this->_clients[i].getMessage().getCommand() == USER) 
-//     {
-//         if (this->_clients[i].getMessage().getToken().size() == 0)
-//             this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user"));
-//         // else if (this->_clients[i].getUserName().size() == 0)
-//         //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-//         else
-//         {
-//             this->_clients[i].setUserName("*****");
-//             this->_clients[i].setAuthenticate(true);
-//         }
-            
-//         // else if ()
-            
-//     }
-//     else
-//          this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
-// }
+bool Server::checkUserName(int i)
+{
+    const std::string& username = this->_clients[i].getMessage().getToken();
+    if (username.length() < 3 || username.length() > 9)
+        return false;
+
+    for (size_t i = 0; i < username.size(); ++i)
+    {
+        char c = username[i];
+        if (!(isalpha(c)))
+            return false;
+    }
+    return true;
+}
+
+ 
+std::vector<std::string> splitString(const std::string& str, char delimiter)
+{
+    std::vector<std::string> vec ;
+    std::stringstream iss(str);
+    std::string key;
+
+    if(str.empty())
+        return vec;
+    while (std::getline(iss, key, delimiter)) {
+        if(!key.empty())
+            vec.push_back(key);
+    }
+    return vec;
+}
 void Server::userCommand(int i)
 {
+
+    
     std::string params;
     if (this->_clients[i].getMessage().getCommand() == USER) 
     {
-        params =  this->_clients[i].getMessage().getToken();
-        if (params.empty())
+       if ((params = this->_clients[i].getMessage().getToken()).empty())
             return(this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"USER")));
-        if (this->_clients[i].getUserName().size() != 0)
+        std::vector<std::string>argsVec = splitString(params, ' ');
+        if (argsVec.size() != 1)
+            return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "USER"));
+        if (this->_clients[i].getAuthenticate())
             return(this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName())));
-        // if (this->_clients[i].getAuthenticate())
-        // {
-        //     this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
-        //     return;
-        // }
-        if(params.size() < 2 || params.size() > 12)
-            return(this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "USER")));
+       if(!checkUserName(i))
+            this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
+            
+        this->_clients[i].setUserName(argsVec[0]);
+        this->_clients[i].setAuthenticate(true);
+        
+        this->_clients[i].sendMsg(RPL_WELCOME(this->_clients[i].getNickName(), this->_clients[i].getUserName(), this->_clients[i].getIP()));
 
-            this->_clients[i].setUserName(params);
-            this->_clients[i].setAuthenticate(true);
+      
     }
 }
 
@@ -369,23 +385,13 @@ bool Server::isValidChannelName(std::string& channelName)
 {
     if(channelName.empty())
         return(0);
-    if(channelName.at(0) != '#' && channelName.at(0) != '&')
+    if(channelName.at(0) != '#')
         return(0);
     if(!(channelName.size() >= 4 && channelName.size()<= 16))
         return(0);
     return(1);         
 }
 
-std::vector<std::string> Server::splitString(const std::string& str, char delimiter)
-{
-    std::vector<std::string> result ;
-    std::stringstream iss(str);
-    std::string key;
-    while (std::getline(iss, key, delimiter)) {
-        result.push_back(key);
-    }
-    return result;
-}
 void Server::joinCommand(int i)
 {
     
@@ -416,10 +422,14 @@ void Server::joinCommand(int i)
             if(this->_channels[channelname].getMode('k') == true)//required key to join the channel.
             {
                 if( !argsVec[1].empty() && this->_channels[channelname].getpassWord() == argsVec[1])
-                    this->_channels[channelname].addClient(this->_clients[i]);
+                    return this->_channels[channelname].addClient(this->_clients[i]);
                 else
                     return(this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), channelname))); 
-            }     
+            }
+            else if(argsVec.size() == 2 )
+                return(this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"JOIN"))); 
+                
+            this->_channels[channelname].addClient(this->_clients[i]);
         }
     else
     { 
@@ -437,8 +447,8 @@ void Server::joinCommand(int i)
         this->_channels[channelname].addClient(this->_clients[i]);
         this->_channels[channelname].addOperators(this->_clients[i]);
     }
-        argsVec.clear();
-        params.clear();       
+        // argsVec.clear();
+        // params.clear();       
 }
 
 void Server::partCommand(int i)
@@ -471,8 +481,8 @@ void Server::partCommand(int i)
             reason.clear();
         }
   
-    argsVec.clear();
-    params.clear(); 
+    // argsVec.clear();
+    // params.clear(); 
         
    
     }
@@ -496,13 +506,13 @@ void Server::topicCommand(int i)
         return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
     if (!is_memberInChannel(argsVec[0], this->_clients[i])) 
         return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
-    if(argsVec.size() == 1)
-        return this->_clients[i].sendMsg( this->_channels[argsVec[0]].getTopic() + "\r\n");
     if(this->_channels[argsVec[0]].getMode('t') == true)
     {
         if(!this->_channels[argsVec[0]].hasPermission(_clients[i]))
             return(this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), argsVec[0])));
     }
+    if(argsVec.size() == 1)
+        return this->_clients[i].sendMsg( this->_channels[argsVec[0]].getTopic() + "\r\n");
     if( argsVec.size() > 1)
     {
         if(argsVec[1].size() == 1 && argsVec[1].at(0) == ':')
@@ -515,12 +525,6 @@ void Server::topicCommand(int i)
         else
             this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"TOPIC"));
     }
-    // else
-    //     this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"TOPIC"));
-
-    argsVec.clear();
-    params.clear();
-
 }
 
 
@@ -535,10 +539,10 @@ void Server::privmsgCommand(int i)
     std::vector<std::string>argsVec = splitString(params, ':');
     if(argsVec.size() < 2)
         return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
-
+    //set target 
     std::string &target = argsVec[0] ;
     if(!target.empty())
-        target.erase( target.size() - 1);
+        target.erase(target.size() - 1);
         
     if (target.at(0) == '#' )  // target channel.
         {
@@ -556,7 +560,8 @@ void Server::privmsgCommand(int i)
                return this->_clients[i].sendMsg(ERR_NOSUCHNICK( target));  
             if(sender.getNickName() == cl->getNickName())
                 return this->_clients[i].sendMsg(ERR_NOSUCHNICK( target));
-        cl->sendMsg( sender.getNickName() + " : " +  join_msg(argsVec) + " "+ sender.getTime() + "\r\n");
+
+        cl->sendMsg( sender.getNickName() + " " +  join_msg(argsVec) + " "+ sender.getTime() + "\r\n");
     }
     argsVec.clear();
     params.clear();
@@ -642,12 +647,11 @@ void Server::kickCommand(int i)
         
     std::string &channelname = argsVec[0];
     std::string &kickeduser = argsVec[1];
-        if(!this->_channels[channelname].hasPermission(_clients[i]))
-            return this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelname));
-            
         if (!findChannelName(channelname)) 
            return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
-
+        if(!this->_channels[channelname].hasPermission(_clients[i]))
+            return this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelname));
+   
         Client *cl = getClientByNickName(kickeduser); 
         if(cl == NULL )
              this->_clients[i].sendMsg(ERR_NOSUCHNICK(channelname));
@@ -761,16 +765,15 @@ void Server::modeCommand(int i)
                return(this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelName)));
             if (!is_memberInChannel(channelName, this->_clients[i]))
                 return(this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), channelName)));      
-            // if(!this->_channels[channelName].hasPermission(_clients[i]))
-            //     return(this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelName)));
-           
-            if(!this->_channels[channelName].hasPermissions(_clients[i]))
+            if(!this->_channels[channelName].hasPermission(_clients[i]))
                 return(this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelName)));
+           
+            // if(!this->_channels[channelName].hasPermissions(_clients[i]))
+            //     return(this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelName)));
            
             if(argsVec.size() == 1) //display status modes of the channel "+t +k +i"
             {
                 std::string key = (_channels[channelName].getMode('k') ? _channels[channelName].getpassWord() : "");
-                // int userlimit = (_channels[channelName].getMode('l') ? _channels[channelName].getUserlimit() : (int)"");
                 return (this->_clients[i].sendMsg(RPL_CHANNELMODEIS(this->_clients[i].getNickName(), _channels[channelName].getChannelName() ,_channels[argsVec[0]].showModes(), key) ));   
             }    
             std::string  &mode = argsVec[1];

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/21 13:21:25 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/27 11:47:03 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ Client& Client::operator=(const Client& obj)
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
         this->_IP = obj._IP;
-        // this->_channels = obj._channels;
         this->_msg = obj._msg;
         this->_pass = obj._pass;
     }
@@ -51,7 +50,6 @@ Client::~Client()
     this->_userName.clear();
     this->_nickName.clear();
     this->_IP.clear();
-    // this->_channels.clear();
 }
 
 
@@ -68,7 +66,6 @@ Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authentic
     this->_IP = "";
     this->_pass = false;
     this->_clientFdSocket = clientFdSocket;
-    // this->_userAway.status = false;
 }
 
 int Client::getClientFdSocket() const

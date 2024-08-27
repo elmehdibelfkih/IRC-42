@@ -21,7 +21,7 @@
 #define ERR_INVITEONLYCHAN(client, channel) ("473 " + client + " " + channel + " :Cannot join channel (+i)\r\n")
 #define ERR_BADCHANMASK(client, channel) ("476 " + client + " " + channel + " :Bad Channel Name\r\n")
 #define ERR_USERONCHANNEL(client ) ("443 " + client + " :" + " is already on channel\r\n")
-#define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : Invalid parameters provided \r\n")
+#define ERR_SYNTAXERROR(client, command) ("461 " + client + " " + command + " : Invalid parameters provided. \r\n")
 
 #define ERR_NOTONCHANNEL(client, channel) ("442 " + client + " " + channel + " :You're not on that channel.\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) ("482 " + client + " " + channel + " :You're not channel operator\r\n")
@@ -32,10 +32,11 @@
 #define RPL_TOPICWHOTIME(client, channel, nick, time) ("333 " + client + " " + channel + " " + nick + " " +time + "\r\n")
 #define RPL_NOTOPIC(client, channel) ("331 " + client + " " + channel + " :No topic to set.\r\n")
 #define RPL_ENDOFNAMES(client, channel) ("366 " + client + " " + channel + " :End of /NAMES list.\r\n")
-#define RPL_SUCCESS(nick, user, host, channelname, raison) ( nick + "!" + user + "@" + host  + " :is leaving the channel " + channelname + " :" + raison + "\r\n")
+#define RPL_SUCCESS(nick, user, host, channelname, raison) ( nick + "!" + user + "@" + host  + " :is leaving the channel " + channelname + " " + raison + "\r\n")
 //.....
 #define RPL_NAMREPLY(client, symbol, channel, nick) ("353 " + client + " " + symbol + " " + channel + " :@" + nick + "\r\n")
-
+//USER
+#define RPL_WELCOME(nick, user, host) ("001" + nick + " :Welcome to the IRC Network " + nick + "!" + user + "@" + host +  "\r\n")
 //prvmsg
 #define RPL_AWAY(client, msg) ("301" + client + " is currently away and  and sends the away message: " + msg +  "\r\n")
 

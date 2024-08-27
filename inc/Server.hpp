@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/19 12:17:10 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/08/27 14:41:48 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <map>
 #include <poll.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <cstring>
 #include <cstdlib>
 #include <unistd.h>
@@ -39,46 +40,40 @@ private:
     
 public:
     Server();
+    Server(std::string port, std::string password);
     Server& operator=(const Server& obj);
     Server(const Server& obj);
     ~Server();
 
-    Server(std::string port, std::string password);
-    void startServer(); // mehdi
-    bool authenticateUser(int i); // mehdi
-    void handleClientConnection(); // mehdi
-    void handleClientMessage(int i); // <==
-    bool checkNickName(int i);
-    bool checkUserName(int i);
+    void        startServer(); // mehdi
+    bool        authenticateUser(int i); // mehdi
+    void        handleClientConnection(); // mehdi
+    void        handleClientMessage(int i); // <==
+    bool        checkNickName(int i);
+    bool        checkUserName(int i);
 
 
 
 // ------ussef
-    Client*                     getClientByNickName(std::string nick); // <==
-    void                        createChannel(std::string& channelName, std::string key);
-    bool                        findChannelName(std::string& channelName);
-    bool                        is_memberInChannel(std::string& channelName, Client cl);
-    bool                        isValidChannelName(std::string& channelName);
-    bool                        isValidChannelKey( std::string& keys);
-    // void                        sendingOper(Client sender, Client receiver, std::string msg);
-    std::vector<std::string>    splitString(const std::string& str, char delimiter);
-    void                        applyMode(const std::vector<std::string>& argsVec, int i);
-
-    
-    void    passCommand(int i);
-    void    nickCommand(int i);
-    void    userCommand(int i);
-    void    joinCommand(int i);
-    void    partCommand(int i);
-    void    topicCommand(int i);
-    void    privmsgCommand(int i);
-    // void    noticeCommand(int i);
-    void    pingCommand(int i);
-    void    listCommand(int i);
-    void    inviteCommand(int i);
-    void    kickCommand(int i);
-    void    modeCommand(int i);
-
+    void                        createChannel(std::string &channelName, std::string key);
+    bool                        findChannelName(std::string &channelName);
+    bool                        is_memberInChannel(std::string &channelName, Client cl);
+    bool                        isValidChannelName(std::string &channelName);
+    bool                        isValidChannelKey(std::string &keys);
+    Client                      *getClientByNickName(std::string nick);
+    void                        applyMode(const std::vector<std::string> &argsVec, int i);
+    void                        passCommand(int i);
+    void                        nickCommand(int i);
+    void                        userCommand(int i);
+    void                        joinCommand(int i);
+    void                        partCommand(int i);
+    void                        topicCommand(int i);
+    void                        privmsgCommand(int i);
+    void                        pingCommand(int i);
+    void                        listCommand(int i);
+    void                        inviteCommand(int i);
+    void                        kickCommand(int i);
+    void                        modeCommand(int i);
 };
 
 #endif

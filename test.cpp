@@ -146,6 +146,54 @@ std::vector<std::string> vec ;
 
 
 
-//splitString
-//status of clients. 
-//usercommand , kickcommand
+
+
+//test all by limechat (user )
+
+
+
+
+
+
+
+/**/
+
+// JOIN
+// Syntax: JOIN <channel> [<key>]
+
+// PART
+// Syntax: PART <channel> [<message>]
+
+// INVITE
+// Syntax: INVITE <nickname> <channel>
+
+// KICK
+// Syntax: KICK <channel> <nickname> [<comment>]
+
+// TOPIC
+// Syntax: TOPIC <channel> [<topic>]
+
+// PRIVMSG
+// Syntax: PRIVMSG <target> <message>
+
+// USER
+// Syntax: USER <username> <hostname> <servername> <realname>
+
+// NICK
+// Syntax: NICK <nickname>
+
+// PASS
+// Syntax: PASS <password>
+
+// MODE
+// Syntax:
+
+// For Channels: MODE <channel> +/-<modes> [<parameters>]
+// Supported modes: +/-ioktl
+// i: Invite-only channel
+// o: Channel operator
+// k: Channel key
+// t: Topic settable by channel operator only
+// l: Set user limit
+// For Users: MODE <nickname> +/-<modes>
+/***/
