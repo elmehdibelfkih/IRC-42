@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/21 14:16:24 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/03 04:43:45 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ void Channel::addClient(Client cli)
     cli.setnbrChannels('+');
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
-        // cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
+        cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
     if(this->getTopic().empty())
         cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
@@ -168,17 +168,17 @@ bool Channel::hasPermission(Client cli)
     return false;
 
 }
-bool Channel::hasPermissions(Client cli)
-{
-    if(this->_operators.empty())
-        return false;
+// bool Channel::hasPermissions(Client cli)
+// {
+//     if(this->_operators.empty())
+//         return false;
 
-     if(this->_clients[cli.getNickName()].getOperStatus()== true )
-        return true;
-    else
-        return false;
+//      if(this->_clients[cli.getNickName()].getOperStatus()== true )
+//         return true;
+//     else
+//         return false;
 
-}
+// }
 
 
 void Channel::broadcastMessage(Client sender, std::string msg)
@@ -194,14 +194,14 @@ void Channel::broadcastMessage(Client sender, std::string msg)
 
 void Channel::addOperators(Client ope)
 {
-    this->_clients[ope.getNickName()].setOperStatus(true);
+    // this->_clients[ope.getNickName()].setOperStatus(true);
     this->_operators.insert(std::pair<std::string, Client>(ope.getNickName(), ope));
 
 }
 
 void Channel::removeOperators(Client ope)
 {
-    this->_clients[ope.getNickName()].setOperStatus(false);
+    // this->_clients[ope.getNickName()].setOperStatus(false);
     std::map <std::string, Client > ::iterator it = this->_operators.lower_bound(ope.getNickName());
     if( it != this->_operators.end())
     this->_operators.erase(it->second.getNickName());

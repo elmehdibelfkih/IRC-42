@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/27 11:47:03 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/02 23:18:15 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ Client::Client()
 {
     this->_clientFdSocket = -1;
     this->_authenticate = false;
-    this->_operatorStatus = false;
-    this->_currentChannel = "";
+    // this->_operatorStatus = false;
+    // this->_currentChannel = "";
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
@@ -35,12 +35,13 @@ Client& Client::operator=(const Client& obj)
     {
         this->_clientFdSocket = obj._clientFdSocket;
         this->_authenticate = obj._authenticate;
-        this->_currentChannel = obj._currentChannel;
+        this->_pass = obj._pass;
+        // this->_currentChannel = obj._currentChannel;
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
         this->_IP = obj._IP;
+        this->_nbrchannels = obj._nbrchannels;
         this->_msg = obj._msg;
-        this->_pass = obj._pass;
     }
     return *this;
 }
@@ -60,7 +61,7 @@ Client::~Client()
 
 Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authenticate)
 {
-    this->_currentChannel = "";
+    // this->_currentChannel = "";
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
@@ -78,10 +79,10 @@ bool Client::getAuthenticate() const
     return this->_authenticate;
 }
 
-std::string Client::getCurrentChannel() const
-{
-    return this->_currentChannel;
-}
+// std::string Client::getCurrentChannel() const
+// {
+//     return this->_currentChannel;
+// }
 
 std::string Client::getUserName() const
 {
@@ -114,10 +115,10 @@ void Client::setAuthenticate(bool au)
     this->_authenticate = au;
 }
 
-void Client::setCurrentChannel(std::string channelName)
-{
-    this->_currentChannel = channelName;
-}
+// void Client::setCurrentChannel(std::string channelName)
+// {
+//     this->_currentChannel = channelName;
+// }
 
 void Client::setUserName(std::string userName)
 {
@@ -175,15 +176,15 @@ void Client::setnbrChannels(char sign)
         this->_nbrchannels--; 
 }
  
-bool    Client::getOperStatus() const
-{
-    return(this->_operatorStatus);
-}
+// bool    Client::getOperStatus() const
+// {
+//     return(this->_operatorStatus);
+// }
     
-void Client::setOperStatus(bool mode)
-{
-    this->_operatorStatus = mode;
-}
+// void Client::setOperStatus(bool mode)
+// {
+//     this->_operatorStatus = mode;
+// }
 
 
 std::string Client::getTime() const

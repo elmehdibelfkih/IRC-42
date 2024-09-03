@@ -101,16 +101,7 @@
 
 //     return 0;
 // }
-#include <vector>
 
-std::string join_msg(std::vector <std::string>&vec)
-{
-    std::string res = "";
-    int i = 0;
-while(vec.size() > ++i)
-    res += vec[i];
-return res;
-}
 int main()
 {
     // int x;
@@ -149,51 +140,6 @@ std::vector<std::string> vec ;
 
 
 //test all by limechat (user )
+//checj easy way to get the operator status .
 
-
-
-
-
-
-
-/**/
-
-// JOIN
-// Syntax: JOIN <channel> [<key>]
-
-// PART
-// Syntax: PART <channel> [<message>]
-
-// INVITE
-// Syntax: INVITE <nickname> <channel>
-
-// KICK
-// Syntax: KICK <channel> <nickname> [<comment>]
-
-// TOPIC
-// Syntax: TOPIC <channel> [<topic>]
-
-// PRIVMSG
-// Syntax: PRIVMSG <target> <message>
-
-// USER
-// Syntax: USER <username> <hostname> <servername> <realname>
-
-// NICK
-// Syntax: NICK <nickname>
-
-// PASS
-// Syntax: PASS <password>
-
-// MODE
-// Syntax:
-
-// For Channels: MODE <channel> +/-<modes> [<parameters>]
-// Supported modes: +/-ioktl
-// i: Invite-only channel
-// o: Channel operator
-// k: Channel key
-// t: Topic settable by channel operator only
-// l: Set user limit
-// For Users: MODE <nickname> +/-<modes>
-/***/
+//file tools for secondary function (optimisation);

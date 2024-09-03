@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/27 14:41:48 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/03 07:13:30 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include "Channel.hpp"
 #include "Message.hpp"
 #include "replies.hpp"
+#include "IRC.hpp"
 
 class Server
 {
@@ -49,8 +50,8 @@ public:
     bool        authenticateUser(int i); // mehdi
     void        handleClientConnection(); // mehdi
     void        handleClientMessage(int i); // <==
-    bool        checkNickName(int i);
-    bool        checkUserName(int i);
+    bool        checkNickName(std::string nickname);
+    bool        checkUserName(std::string username);
 
 
 

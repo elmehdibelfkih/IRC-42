@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/08/27 11:47:54 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/02 23:14:46 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,28 +29,26 @@ private:
     int 					_clientFdSocket;
     bool					_authenticate;
     bool                    _pass;
-    bool                    _operatorStatus;
-    std::string				_currentChannel;
     std::string				_userName;
     std::string				_nickName;
+    // std::string				_currentChannel;
     std::string				_IP;
     size_t                  _nbrchannels;
     Message					_msg;
     
 public:
     Client();
+    Client(int clientFdSocket, bool authenticate);
     Client(const Client& obj);
     Client& operator=(const Client& obj);
     ~Client();
 
-    // param constructor
-    Client(int clientFdSocket, bool authenticate);
     
     // getters
     int         getClientFdSocket() const;
     bool        getAuthenticate() const;
     bool        getPass() const;
-    std::string getCurrentChannel() const;
+    // std::string getCurrentChannel() const;
     std::string getNickName() const;
     std::string getUserName() const;
     std::string getIP() const;
@@ -62,7 +60,7 @@ public:
     // setters
     void setClientFdSocket(int fd);
     void setAuthenticate(bool au);
-    void setCurrentChannel(std::string channelName);
+    // void setCurrentChannel(std::string channelName);
     void setUserName(std::string userName);
     void setNickName(std::string nickName);
     void setIP(std::string IP);
