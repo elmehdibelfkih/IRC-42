@@ -102,9 +102,16 @@
 //     return 0;
 // }
 
-int main()
-{
-    // int x;
+
+
+
+
+
+
+
+// int main()
+// {
+//     // int x;
 
     //     std::vector<std::string> args{ "user1", "user2", "user3"};
 
@@ -119,27 +126,25 @@ int main()
     // std::cout << x << "\n";
 
 
-std::vector<std::string> vec ;
-    vec.push_back("cmd");
-    vec.push_back("user2");
-    vec.push_back(":user3");
 
 
     // std::string res = join_msg(vec);
-    std::string res =  "user3:";
-    std::cout << res << "\n";
-    std::cout << res.erase(res.size() - 1) << "\n";
+    // std::string res =  "user3:";
+    // std::cout << res << "\n";
+    // std::cout << res.erase(res.size() - 1) << "\n";
 
     // bool signal;
     // std::cout <<   (signal ? "enabled" : "disabled");
 
-}
+// }
+
+
+
+//tasks :
+
+//check easy way to get the operator status .
+//test all by limechat (user , kick)
 
 
 
 
-
-//test all by limechat (user )
-//checj easy way to get the operator status .
-
-//file tools for secondary function (optimisation);

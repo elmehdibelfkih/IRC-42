@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/09/03 07:09:09 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/04 06:48:11 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,11 @@ enum commands
 
 void		printHeader();
 void		printUsage();
+
+std::string trimFunc(std::string& str);
+std::vector<std::string> splitString(const std::string& str, char delimiter);
+std::string join_msg(std::vector <std::string>&vec);
+
 
 
 #endif // IRC_HPP

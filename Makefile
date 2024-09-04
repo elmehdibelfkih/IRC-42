@@ -6,7 +6,7 @@
 #    By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/07 01:27:20 by ebelfkih          #+#    #+#              #
-#    Updated: 2024/09/03 07:09:19 by ybouchra         ###   ########.fr        #
+#    Updated: 2024/09/03 23:02:50 by ybouchra         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ NAME			= ircserv
 SRC				= main.cpp					\
 				utils/helpers.cpp			\
 				utils/errors.cpp			\
+				utils/tools.cpp				\
 				classes/Server.cpp			\
 				classes/Client.cpp			\
 				classes/Message.cpp			\

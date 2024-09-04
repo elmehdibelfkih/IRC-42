@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/03 07:14:04 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/04 06:50:59 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -315,31 +315,6 @@ bool Server::isValidChannelName(std::string& channelName)
     return(1);         
 }
 
-   std::string join_msg(std::vector <std::string>&vec)
-{
-    std::string res = "";
-    size_t i = 0;
-    while(vec.size() > ++i)
-        res += vec[i] + " ";
-    return res;
-} 
-
-std::vector<std::string> splitString(const std::string& str, char delimiter)
-{
-    std::vector<std::string> vec ;
-    std::stringstream iss(str);
-    std::string key;
-
-    if(str.empty())
-        return vec;
-    while (std::getline(iss, key, delimiter)) {
-        if(!key.empty())
-            vec.push_back(key);
-    }
-    return vec;
-}
-
-
 
 void Server::passCommand(int i)
 {
@@ -379,8 +354,6 @@ void Server::nickCommand(int i)
 
 void Server::userCommand(int i)
 {
-
-
     std::string params;
     if (this->_clients[i].getMessage().getCommand() == USER) 
     {
@@ -409,9 +382,8 @@ void Server::userCommand(int i)
 
 void Server::joinCommand(int i)
 {
-    
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return (this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"JOIN"))); 
      std::vector<std::string> argsVec = splitString(params, ' ');  
     if(argsVec.empty() || argsVec.size() > 2)
@@ -467,16 +439,13 @@ void Server::joinCommand(int i)
 void Server::partCommand(int i)
 {
     std::string params, reason;
-    
-    params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
          return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PART")); 
     std::vector<std::string>argsVec = splitString(params, ' ');
     if(argsVec.empty() )
         return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PART"));
          
-    std::string &channelname = argsVec[0];
-    
+    std::string channelname = argsVec[0];
     if (!findChannelName(channelname)) 
         return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
     if (!is_memberInChannel(channelname, this->_clients[i]))
@@ -499,8 +468,8 @@ void Server::partCommand(int i)
 
 void Server::topicCommand(int i)
 {
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"TOPIC")); 
     std::vector<std::string>argsVec = splitString(params, ' ');
     if(argsVec.empty())
@@ -536,17 +505,14 @@ void Server::topicCommand(int i)
 
 void Server::privmsgCommand(int i)
 {
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
     std::vector<std::string>argsVec = splitString(params, ':');
-    if(argsVec.size() < 2)
+    if(argsVec.size() != 2)
         return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
-    //set target 
-    std::string &target = argsVec[0] ;
-    if(!target.empty())
-        target.erase(target.size() - 1);
-        
+    
+    std::string target = argsVec[0];     
     if (target.at(0) == '#' )  // target channel.
         {
             if(findChannelName(target) == false)
@@ -572,8 +538,8 @@ void Server::privmsgCommand(int i)
 }
 void Server::pingCommand(int i)
 {
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PING")); 
     std::vector<std::string>argsVec = splitString(params, ' ');
     if(argsVec.size() != 2)
@@ -588,8 +554,8 @@ void Server::pingCommand(int i)
 
 void Server::listCommand(int i)
 {
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
       return  this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"LIST")); 
     std::vector<std::string>argsVec = splitString(params, ' ');
     if(argsVec.size() != 1)
@@ -610,8 +576,8 @@ void Server::listCommand(int i)
 void Server::inviteCommand(int i)
 {
   
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
        return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "INVITE")); 
     std::vector<std::string>argsVec = splitString(params, ' ');
     if(argsVec.size() != 2)
@@ -640,9 +606,8 @@ void Server::inviteCommand(int i)
 
 void Server::kickCommand(int i)
 {
-    std::string reason;
-    std::string params = this->_clients[i].getMessage().getToken();
-    if(params.empty())
+    std::string params, reason;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"KICK")); 
     std::vector<std::string>argsVec = splitString(params, ' ');
     if( argsVec.size() < 2)
@@ -754,8 +719,8 @@ void Server::applyMode(const std::vector<std::string>& argsVec, int i)
 }
 void Server::modeCommand(int i)
 {
-    std::string params = this->_clients[i].getMessage().getToken();
-    if (params.empty())
+    std::string params;
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return(this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"MODE")));
     std::vector<std::string>argsVec = splitString(params, ' ');
     if (argsVec.empty() || argsVec.size() > 3 )

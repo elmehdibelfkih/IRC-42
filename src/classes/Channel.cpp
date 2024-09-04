@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/03 04:43:45 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/04 07:03:17 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,14 @@ Channel& Channel::operator=(const Channel& obj)
 {
     if (this != &obj)
     {
-        this->_userLimit = obj._userLimit;
         this->_channelName = obj._channelName;
+        this->_userLimit = obj._userLimit;
         this->_passWord = obj._passWord;
         this->_topic = obj._topic;
-        this->_mode = obj._mode;
+        this->_mode.inviteOnly = obj._mode.inviteOnly;
+        this->_mode.topicRestricted = obj._mode.topicRestricted;
+        this->_mode.userLimit = obj._mode.userLimit;
+        this->_mode.requiredKey = obj._mode.requiredKey;
         this->_clients = obj._clients;
         this->_operators = obj._operators;
         this->_invitees = obj._invitees;

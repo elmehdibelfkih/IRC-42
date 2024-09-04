@@ -6,13 +6,15 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/03 07:13:30 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/03 23:09:01 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include <string>
+#include <cctype>
 #include <iostream>
 #include <algorithm>
 #include <vector>
@@ -52,6 +54,7 @@ public:
     void        handleClientMessage(int i); // <==
     bool        checkNickName(std::string nickname);
     bool        checkUserName(std::string username);
+ 
 
 
 
