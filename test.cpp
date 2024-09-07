@@ -148,3 +148,8 @@
 
 
 
+// sets
+
+// remove current channel attribute in class channel .
+// add replie in nickcommand , to restrict the client from set nickname any time.
+

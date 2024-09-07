@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/02 23:18:15 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/06 09:12:42 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@ Client::Client()
 {
     this->_clientFdSocket = -1;
     this->_authenticate = false;
+    this->_pass = false;
     // this->_operatorStatus = false;
-    // this->_currentChannel = "";
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
-    this->_pass = false;
+    // this->_nbrchannels = 0;
 }
 
 Client::Client(const Client& obj)
@@ -67,6 +67,7 @@ Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authentic
     this->_IP = "";
     this->_pass = false;
     this->_clientFdSocket = clientFdSocket;
+    this->_nbrchannels = 0;
 }
 
 int Client::getClientFdSocket() const
@@ -164,7 +165,7 @@ bool Client::getPass() const
     return this->_pass;
 }
 
-size_t Client::getnbrChannels()
+int  Client::getnbrChannels()
 {
     return(this->_nbrchannels);
 }

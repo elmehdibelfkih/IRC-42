@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/04 07:03:17 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/06 09:23:57 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,7 +128,7 @@ std::string Channel::showModes() const
     return(modes);
 }
 
-void Channel::addClient(Client cli)
+void Channel::addClient(Client& cli)
 {
     this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
     cli.setnbrChannels('+');
@@ -139,7 +139,7 @@ void Channel::addClient(Client cli)
         cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
 }
-void Channel::removeClient(Client cli)
+void Channel::removeClient(Client& cli)
 {
     cli.setnbrChannels('-');
     this->_clients.erase(cli.getNickName());

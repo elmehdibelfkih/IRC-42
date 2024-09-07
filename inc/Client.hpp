@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/04 06:16:40 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/06 09:04:01 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,13 +27,13 @@ class Client
 {
 private:
     int 					_clientFdSocket;
+    int                     _nbrchannels;
     bool					_authenticate;
     bool                    _pass;
     std::string				_userName;
     std::string				_nickName;
     // std::string				_currentChannel;
     std::string				_IP;
-    size_t                  _nbrchannels;
     Message					_msg;
     
 public:
@@ -53,9 +53,9 @@ public:
     std::string getUserName() const;
     std::string getIP() const;
     Message&    getMessage();
-    bool        getOperStatus() const;                     
+    // bool        getOperStatus() const;                     
     std::string getTime() const;
-    size_t      getnbrChannels();
+    int         getnbrChannels();
     
     // setters
     void setClientFdSocket(int fd);
@@ -66,7 +66,7 @@ public:
     void setIP(std::string IP);
     void setMessage(Message msg);
     void setPass(bool newPass);
-    void setOperStatus(bool mode);
+    // void setOperStatus(bool mode);
     void setnbrChannels(char sign);
     
     // utils

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/04 06:50:59 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/07 13:51:42 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,6 +169,16 @@ void Server::handleClientMessage(int i)
         {   
             switch (this->_clients[i].getMessage().getCommand())
                 {
+                    case(PASS):
+                        passCommand(i);
+                        break;
+                    case(NICK):
+                        nickCommand(i);
+                        break;
+                    case(USER):
+                        userCommand(i);
+                        break;
+                        
                     case(JOIN):
                         joinCommand(i);
                         break;
@@ -195,11 +205,8 @@ void Server::handleClientMessage(int i)
                         break;
                     case(MODE):
                         modeCommand(i);
-                        break;
-
-                    
+                        break;                    
                 }
-           
         }
         this->_clients[i].getMessage().clearBuffer();
     }
@@ -217,6 +224,7 @@ bool Server::authenticateUser(int i)
         this->userCommand(i);
     return false;
 }
+
 
 Client* Server::getClientByNickName(std::string nick)
 {
@@ -342,11 +350,17 @@ void Server::nickCommand(int i)
     {
         if (this->_clients[i].getMessage().getToken().size() == 0)
             this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
+        else if (this->_clients[i].getAuthenticate()) // Check if the nick is already registered // add ussef
+            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
         else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
             this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
         else if (!this->checkNickName(this->_clients[i].getMessage().getToken()))
             this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
-        this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+        else
+        {
+            this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+            return this->_clients[i].sendMsg(RPL_VALIDNICK());
+        } 
     }
     else
          this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));    
@@ -392,6 +406,7 @@ void Server::joinCommand(int i)
     std::string &channelname = argsVec[0];
     if(!isValidChannelName(channelname)) // check the format of the channelname.
         return this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), channelname)); //channel name is not a valid.
+
     if(this->_clients[i].getnbrChannels() >= LIMITCHANNELS) // the client has joined their maximum number of channels.
         return this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(), channelname)); 
     if(findChannelName(channelname) == true)
@@ -509,7 +524,7 @@ void Server::privmsgCommand(int i)
     if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
     std::vector<std::string>argsVec = splitString(params, ':');
-    if(argsVec.size() != 2)
+    if(argsVec.size() < 2)
         return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(),"PRIVATE MESSAGE")); 
     
     std::string target = argsVec[0];     
@@ -540,17 +555,11 @@ void Server::pingCommand(int i)
 {
     std::string params;
     if ((params = this->_clients[i].getMessage().getToken()).empty())
-        return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(),"PING")); 
-    std::vector<std::string>argsVec = splitString(params, ' ');
-    if(argsVec.size() != 2)
-       return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "PING")); 
-    std::string &target = argsVec[1];
-    if( target.empty())
-       return this->_clients[i].sendMsg(ERR_NOORIGIN(this->_clients[i].getNickName()));
+            return this->_clients[i].sendMsg(ERR_NOORIGIN(this->_clients[i].getNickName()));
 
-        this->_clients[i].sendMsg("PONG :" +  target);
+        this->_clients[i].sendMsg("PONG :" +  params + "\r\n");
 
-    }
+}
 
 void Server::listCommand(int i)
 {

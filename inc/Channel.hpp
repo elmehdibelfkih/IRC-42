@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/03 06:31:16 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/06 09:23:45 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,13 +75,13 @@ public:
     void setInviteOnly(bool mode);
     void setTopicRestricted(bool mode);
 
-    void addClient(Client cli);
-    void removeClient(Client cli);
+    void addClient(Client& cli);
+    void removeClient(Client& cli);
     void addOperators(Client ope);
     void removeOperators(Client ope);
     bool hasPermission (Client cli);  
     void broadcastMessage(Client sender, std::string msg);
-    bool hasPermissions(Client cli);
+    // bool hasPermissions(Client cli);
 };
 
 #endif
