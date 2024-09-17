@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/06 09:12:42 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/16 02:51:05 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,12 @@
 Client::Client()
 {
     this->_clientFdSocket = -1;
+    this->_nbrchannels = 0;
     this->_authenticate = false;
     this->_pass = false;
-    // this->_operatorStatus = false;
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
-    // this->_nbrchannels = 0;
 }
 
 Client::Client(const Client& obj)
@@ -36,7 +35,6 @@ Client& Client::operator=(const Client& obj)
         this->_clientFdSocket = obj._clientFdSocket;
         this->_authenticate = obj._authenticate;
         this->_pass = obj._pass;
-        // this->_currentChannel = obj._currentChannel;
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
         this->_IP = obj._IP;
@@ -61,7 +59,7 @@ Client::~Client()
 
 Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authenticate)
 {
-    // this->_currentChannel = "";
+
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
@@ -79,11 +77,6 @@ bool Client::getAuthenticate() const
 {
     return this->_authenticate;
 }
-
-// std::string Client::getCurrentChannel() const
-// {
-//     return this->_currentChannel;
-// }
 
 std::string Client::getUserName() const
 {
@@ -116,10 +109,6 @@ void Client::setAuthenticate(bool au)
     this->_authenticate = au;
 }
 
-// void Client::setCurrentChannel(std::string channelName)
-// {
-//     this->_currentChannel = channelName;
-// }
 
 void Client::setUserName(std::string userName)
 {

@@ -109,23 +109,18 @@
 
 
 
-// int main()
-// {
-//     // int x;
+int main()
+{
+    // int x;
 
-    //     std::vector<std::string> args{ "user1", "user2", "user3"};
-
-    //  args.erase(args.begin());
-
-    //  std::vector<std::string> ::iterator it = args.begin();
-    //  for (; it != args.end(); it++)
-    //          std::cout  <<  *it << std::endl;
-
-    // std::string params = "user1,  user2 , user3";
-    // std::string reason = params.substr(6);
-    // std::cout << x << "\n";
+// std::vector<std::string> args;
+// args.push_back("PRIV0");
+// args.push_back("PRIV1");
+// args.push_back("PRIV2");
+// std::cout << std::string::substr(args[0].size(), 10) << std::endl;
 
 
+}
 
 
     // std::string res = join_msg(vec);
@@ -143,13 +138,14 @@
 //tasks :
 
 //check easy way to get the operator status .
-//test all by limechat (user , kick)
+//test all by limechat ( kick)
 
-
+// &
+//
 
 
 // sets
 
-// remove current channel attribute in class channel .
+
 // add replie in nickcommand , to restrict the client from set nickname any time.
 

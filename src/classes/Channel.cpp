@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/06 09:23:57 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/17 17:09:06 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,17 @@
 
 Channel::Channel()
 {
-    this->_channelName = "";
-    this->_passWord = "";
-    this->_topic = "";
-    this->_userLimit = -1; //default value ofthe number of users who can join the channel.
-    this->_mode.inviteOnly = false; // any one can join to the channel ;
+}
+Channel::Channel(std::string channelname, std::string key) :_channelName(channelname), _passWord(key)
+{
+    this->_topic                = "default topic";
+    this->_userLimit            = -1;    //default value ofthe number of users who can join the channel.
+    this->_mode.inviteOnly      = false; // any one can join to the channel ;
     this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
-    this->_mode.userLimit = false; // No limit on the number of users who can join the channel.
-    this->_mode.requiredKey = false; // the key of channel required .
-    
+    this->_mode.userLimit       = false; // No limit on the number of users who can join the channel.
+    this->_mode.requiredKey     = false; // the key of channel required .
+    this->_setterCl.nickName    = "";
+    this->_setterCl.time        = this->getTime();
 }
 
 Channel& Channel::operator=(const Channel& obj)
@@ -132,6 +134,9 @@ void Channel::addClient(Client& cli)
 {
     this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
     cli.setnbrChannels('+');
+    
+        
+        cli.sendMsg(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName() ));
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
         cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
@@ -151,12 +156,17 @@ void Channel::setTopic(std::string newTopic, Client setter)
     this->_setterCl.nickName = setter.getNickName();
     this->_setterCl.time = this->getTime();
 
-    std::map<std::string, Client> ::iterator it = this->_clients.begin();
-    for(; it != this->_clients.end(); it++)
-        {
-            it->second.sendMsg(RPL_TOPIC(it->second.getNickName(),this->getChannelName(), this->getTopic()));
-            it->second.sendMsg(RPL_TOPICWHOTIME(it->first, this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
-        }
+this->broadcastMessage(setter, RPL_TOPIC(setter.getNickName(),this->getChannelName(), this->getTopic()) );
+this->broadcastMessage(setter, RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time) );
+
+    // std::map<std::string, Client> ::iterator it = this->_clients.begin();
+    // for(; it != this->_clients.end(); it++)
+    //     {
+    //         if(it->second.getNickName() == setter.getNickName())
+    //             continue;
+    //         it->second.sendMsg(RPL_TOPIC(it->second.getNickName(),this->getChannelName(), this->getTopic()));
+    //         it->second.sendMsg(RPL_TOPICWHOTIME(it->first, this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
+    //     }
     
 }
 
@@ -171,18 +181,6 @@ bool Channel::hasPermission(Client cli)
     return false;
 
 }
-// bool Channel::hasPermissions(Client cli)
-// {
-//     if(this->_operators.empty())
-//         return false;
-
-//      if(this->_clients[cli.getNickName()].getOperStatus()== true )
-//         return true;
-//     else
-//         return false;
-
-// }
-
 
 void Channel::broadcastMessage(Client sender, std::string msg)
 {
@@ -191,7 +189,7 @@ void Channel::broadcastMessage(Client sender, std::string msg)
             {
                 if(sender.getNickName() == it->second.getNickName())
                     continue;
-                it->second.sendMsg( sender.getNickName() + " " + msg + " " + this->getTime());
+                it->second.sendMsg( msg + "\r\n");
             }         
 }
 

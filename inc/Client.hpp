@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/06 09:04:01 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/13 02:02:20 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ private:
     bool                    _pass;
     std::string				_userName;
     std::string				_nickName;
-    // std::string				_currentChannel;
     std::string				_IP;
     Message					_msg;
     
@@ -48,25 +47,21 @@ public:
     int         getClientFdSocket() const;
     bool        getAuthenticate() const;
     bool        getPass() const;
-    // std::string getCurrentChannel() const;
     std::string getNickName() const;
     std::string getUserName() const;
     std::string getIP() const;
-    Message&    getMessage();
-    // bool        getOperStatus() const;                     
+    Message&    getMessage();                  
     std::string getTime() const;
     int         getnbrChannels();
     
     // setters
     void setClientFdSocket(int fd);
     void setAuthenticate(bool au);
-    // void setCurrentChannel(std::string channelName);
     void setUserName(std::string userName);
     void setNickName(std::string nickName);
     void setIP(std::string IP);
     void setMessage(Message msg);
     void setPass(bool newPass);
-    // void setOperStatus(bool mode);
     void setnbrChannels(char sign);
     
     // utils

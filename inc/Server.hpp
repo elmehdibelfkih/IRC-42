@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/03 23:09:01 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/17 04:37:07 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ public:
     void                        partCommand(int i);
     void                        topicCommand(int i);
     void                        privmsgCommand(int i);
-    void                        pingCommand(int i);
     void                        listCommand(int i);
     void                        inviteCommand(int i);
     void                        kickCommand(int i);

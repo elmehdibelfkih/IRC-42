@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/06 09:23:45 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/17 14:57:11 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include "replies.hpp"
 class Client;
 
-typedef struct s_SetterCl
+typedef struct s_SetterCl // For Topic 
 {
     std::string nickName;
     std::string time;
@@ -39,11 +39,11 @@ class Channel
 friend class Server;
 private:
     std::string				        _channelName;
-    int						        _userLimit;
     std::string				        _passWord;
     std::string				        _topic;
-    t_SetterCl                      _setterCl;
+    int						        _userLimit;
     t_Mode                          _mode;
+    t_SetterCl                      _setterCl;
     std::map<std::string, Client>	_clients;
     std::map<std::string, Client>	_operators;
     std::map<std::string, Client>	_invitees;
@@ -51,12 +51,11 @@ private:
 
 public:
     Channel();
-    // Channel(std::string channelName, std::string key);
+    Channel(std::string channelName, std::string key);
     Channel& operator=(const Channel& obj);
     Channel(const Channel& obj);
     ~Channel();
 
-    // param constructor
 
     // getters
     std::string getChannelName() const;
@@ -81,7 +80,6 @@ public:
     void removeOperators(Client ope);
     bool hasPermission (Client cli);  
     void broadcastMessage(Client sender, std::string msg);
-    // bool hasPermissions(Client cli);
 };
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/09/04 06:48:11 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/16 03:29:36 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ enum commands
 #define NICKLEN 17
 #define CHANNELNAMELEN 18
 #define LIMITCHANNELS  11
-#define SERVERNAME (ES_GREEN + std::string("<ft_irc> ") + ES_RESET)
+
+#define SERVERNAME std::string(":ircserver ")
 
 
 
@@ -71,7 +72,6 @@ std::string join_msg(std::vector <std::string>&vec);
 
 // JOIN <channel> [<key>]
 
-
 //PART <channel> [<message>]
 
 //  INVITE <nickname> <channel>
@@ -82,16 +82,14 @@ std::string join_msg(std::vector <std::string>&vec);
 
 // PRIVMSG <target> <message>
 
-// USER <username> <hostname> <servername> <realname>
+// USER <username>++
 
-// NICK
-// Syntax: NICK <nickname>
+// NICK <nickname>
 
-// PASS
-// Syntax: PASS <password>
+//  PASS <password>
 
-// MODE
-// Syntax:
+// MODE <channelname> <modes> <..>
+
 
 // For Channels: MODE <channel> +/-<modes> [<parameters>]
 // Supported modes: +/-ioktl
