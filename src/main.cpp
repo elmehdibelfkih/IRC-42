@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:55 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/07 11:42:45 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/18 20:37:16 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 int main(int argc, char const *argv[])
 {
-	if (argc != 3)
+	if (argc != 3 && argc != 2)
 	{
 		printUsage();
 		printErrorAndExit(INVALID_ARGUMENT_ERROR);
@@ -28,11 +28,20 @@ int main(int argc, char const *argv[])
 		std::cout << ES_GREEN << "<< ----- ft_irc ----- >>" << ES_RESET << std::endl;
 		std::cout << std::endl;
 		std::cout << "Port:     " << argv[1] << std::endl;
-		std::cout << "Password: " << argv[2] << std::endl;
+		if(argc == 3)
+			std::cout <<  "Password: " << argv[2] << std::endl;
 	}
 	
-	Server test(argv[1], argv[2]);
-	test.startServer();
+	if(argc == 3)
+	{
+		Server test(argv[1], argv[2]);
+		test.startServer();
+	}
+	else
+	{
+		Server test(argv[1], "");
+		test.startServer();
+	}
 
 	return 0;
 }

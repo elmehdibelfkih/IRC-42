@@ -8,7 +8,8 @@
 //Error Replies (ERR)
 #define ERR_NOTREGISTERED(client) (SERVERNAME + " 451 " + client + " :You have not registered\r\n")
 #define ERR_PASSWDMISMATCH(client) (SERVERNAME + " 465 " + client + " :Password incorrect\r\n")
-#define ERR_ALREADYREGISTERED(client) (SERVERNAME + " 462 " + client + " :You may not reregister again\r\n")
+#define ERR_ALREADYREGISTERED(client) (SERVERNAME + " 462 " + client + " :You may not reregister\r\n")
+
 #define ERR_NICKNAMEINUSE(client, nick) (SERVERNAME + " 433 " + client + " " + nick + " :Nickname is already in use\r\n")
 #define ERR_NONICKNAMEGIVEN(client) (SERVERNAME + " 431 " + client + " :No nickname given\r\n")
 #define ERR_ERRONEUSNICKNAME(client, nick) (SERVERNAME + " 432 " + client + " " + nick + " :Erroneous nickname\r\n")

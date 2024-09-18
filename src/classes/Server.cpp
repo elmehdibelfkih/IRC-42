@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/17 17:47:55 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/18 21:15:27 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,6 +179,8 @@ void Server::handleClientMessage(int i)
                         break;
                     case(PONG):
                         break;
+                    case(QUIT):
+                        break;
                     case(JOIN):
                         joinCommand(i);
                         break;
@@ -215,16 +217,17 @@ void Server::handleClientMessage(int i)
 
 bool Server::authenticateUser(int i)
 {
+    if(this->_passWord.empty()) this->_clients[i].setPass(true);
     if (this->_clients[i].getAuthenticate())
         return true;
-    else if (this->_clients[i].getMessage().getCommand() == PASS)
+    else if ( this->_clients[i].getMessage().getCommand() == PASS)
         this->passCommand(i);
-    else if ( this->_clients[i].getMessage().getCommand() == NICK)
+    else if ( this->_clients[i].getNickName().empty() && _clients[i].getMessage().getCommand() == NICK)
         this->nickCommand(i);
-    else if ( this->_clients[i].getMessage().getCommand() == USER)
+    else if ( this->_clients[i].getMessage().getCommand() == USER )
         this->userCommand(i);
     else
-        this->_clients[i].sendMsg(ERR_NOTREGISTERED("x")); 
+        this->_clients[i].sendMsg(ERR_NOTREGISTERED("")); 
     
     return false;
 }
@@ -326,19 +329,20 @@ void Server::passCommand(int i)
 {
     if (this->_clients[i].getMessage().getCommand() == PASS)
     {
+
         if (this->_clients[i].getMessage().getToken().empty())
             return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PASS"));
         else if (this->_clients[i].getPass() == true)
             return this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
-        else if (this->_clients[i].getMessage().getToken() == this->_passWord)
+        else if (this->_clients[i].getMessage().getToken() != this->_passWord)
+                    return this->_clients[i].sendMsg(ERR_PASSWDMISMATCH(this->_clients[i].getNickName()));
+        else
         {
             this->_clients[i].setPass(true);
             return this->_clients[i].sendMsg(RPL_VALIDPASS());
         }
-        else
-            return this->_clients[i].sendMsg(ERR_PASSWDMISMATCH(this->_clients[i].getNickName()));
+
     }
-   
 }
 
 void Server::nickCommand(int i)
@@ -347,14 +351,14 @@ void Server::nickCommand(int i)
     {
         if (this->_clients[i].getMessage().getToken().size() == 0)
             this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
-        else if (!this->_clients[i].getPass())
-            return this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
         else if (this->_clients[i].getAuthenticate()) // Check if the nick is already registered // add ussef
             this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
+        else if( this->_clients[i].getPass() == false)
+            return this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName())); 
         else if (!this->checkNickName(this->_clients[i].getMessage().getToken()))
             this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"",this->_clients[i].getMessage().getToken()));
         else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
-            this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"",this->_clients[i].getMessage().getToken()));
+            this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
         else
         {
             this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
@@ -375,13 +379,11 @@ void Server::userCommand(int i)
 
         if(!checkUserName(argsVec[0])) //check param if valide.
             return this->_clients[i].sendMsg(ERR_ERRONEUSUSERNAME(this->_clients[0].getNickName(), params));
-
+            
         if (this->_clients[i].getAuthenticate()) // Check if the user is already registered
             return(this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName())));
-        if (this->_clients[i].getNickName().empty() || !this->_clients[i].getPass())
+        if (this->_clients[i].getNickName().empty() )
             return this->_clients[i].sendMsg(ERR_NOTREGISTERED(this->_clients[i].getNickName()));
-            
-            
         this->_clients[i].setUserName(argsVec[0]);
         this->_clients[i].setAuthenticate(true);
         
