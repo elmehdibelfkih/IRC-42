@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/09/16 03:29:36 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/20 05:43:20 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ enum commands
 #define CHANNELNAMELEN 18
 #define LIMITCHANNELS  11
 
-#define SERVERNAME std::string(":ircserver ")
+#define SERVERNAME std::string(":ircserver")
 
 
 

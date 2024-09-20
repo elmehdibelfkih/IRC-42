@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/17 17:09:06 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/20 16:26:37 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,8 +136,8 @@ void Channel::addClient(Client& cli)
     cli.setnbrChannels('+');
     
         
-        cli.sendMsg(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName() ));
-        cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(),this->getTopic()));
+       this->broadcastMessage(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName() ));
+        cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
         cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
     if(this->getTopic().empty())
@@ -156,17 +156,8 @@ void Channel::setTopic(std::string newTopic, Client setter)
     this->_setterCl.nickName = setter.getNickName();
     this->_setterCl.time = this->getTime();
 
-this->broadcastMessage(setter, RPL_TOPIC(setter.getNickName(),this->getChannelName(), this->getTopic()) );
-this->broadcastMessage(setter, RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time) );
-
-    // std::map<std::string, Client> ::iterator it = this->_clients.begin();
-    // for(; it != this->_clients.end(); it++)
-    //     {
-    //         if(it->second.getNickName() == setter.getNickName())
-    //             continue;
-    //         it->second.sendMsg(RPL_TOPIC(it->second.getNickName(),this->getChannelName(), this->getTopic()));
-    //         it->second.sendMsg(RPL_TOPICWHOTIME(it->first, this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
-    //     }
+this->broadcastMessage(RPL_TOPIC(setter.getNickName(),this->getChannelName(), this->getTopic()) );
+this->broadcastMessage(RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time) );
     
 }
 
@@ -182,14 +173,14 @@ bool Channel::hasPermission(Client cli)
 
 }
 
-void Channel::broadcastMessage(Client sender, std::string msg)
+void Channel::broadcastMessage( std::string msg)
 {
     std::map<std::string, Client> ::iterator it = this->_clients.begin();
         for(; it != this->_clients.end(); it++)
             {
-                if(sender.getNickName() == it->second.getNickName())
-                    continue;
-                it->second.sendMsg( msg + "\r\n");
+                // if(sender.getNickName() == it->second.getNickName())
+                //     continue;
+                it->second.sendMsg( msg );
             }         
 }
 

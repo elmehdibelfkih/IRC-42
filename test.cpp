@@ -137,14 +137,8 @@ int main()
 
 //tasks :
 
-//check easy way to get the operator status .
-//test all by limechat ( kick)
+//topic kick invite mode
 
-// &
-//
-
-
-// sets
 
 
 // add replie in nickcommand , to restrict the client from set nickname any time.
