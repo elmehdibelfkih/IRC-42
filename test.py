@@ -2,7 +2,7 @@ import socket
 import threading
 
 # Informations de connexion au serveur IRC
-server_ip = "localhost"
+server_ip = "127.0.0.1"
 # server_ip = "localhost"
 server_port = 8080
 server_password = "0000"

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/18 10:38:36 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 16:08:44 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ private:
     int                     _nbrchannels;
     bool					_authenticate;
     bool                    _pass;
+    bool                    _operStatus;
     std::string				_userName;
     std::string				_nickName;
     std::string				_IP;
@@ -47,6 +48,7 @@ public:
     int         getClientFdSocket() const;
     bool        getAuthenticate() const;
     bool        getPass() const;
+    bool        getOperStatus() const;
     std::string getNickName() const;
     std::string getUserName() const;
     std::string getIP() const;
@@ -54,9 +56,11 @@ public:
     std::string getTime() const;
     int         getnbrChannels();
     
+    
     // setters
     void setClientFdSocket(int fd);
     void setAuthenticate(bool au);
+    void setOperStatus(bool status);
     void setUserName(std::string userName);
     void setNickName(std::string nickName);
     void setIP(std::string IP);

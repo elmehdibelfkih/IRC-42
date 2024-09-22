@@ -108,12 +108,11 @@
 
 
 
-
-
-//tasks :
-
- //mode
-
+//mode
+// add attribut in client class " operstatus"
+//add geters seters setoperStatus and get
+// set status in same cases 
+// remove map of _operators
 
 // RPL_MYINFO (004),
 // at least one RPL_ISUPPORT (005) numeric to the client.

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 06:09:09 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 17:24:05 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ Channel& Channel::operator=(const Channel& obj)
         this->_mode.userLimit = obj._mode.userLimit;
         this->_mode.requiredKey = obj._mode.requiredKey;
         this->_clients = obj._clients;
-        this->_operators = obj._operators;
         this->_invitees = obj._invitees;
         this->_setterCl.nickName = obj._setterCl.nickName;
         this->_setterCl.time = obj._setterCl.time;
@@ -56,11 +55,9 @@ Channel::Channel(const Channel& obj)
 Channel::~Channel()
 {
     this->_clients.clear();
-    this->_operators.clear();
     this->_invitees.clear();
 }
 
-/////////////////////////////////////////////////////////////////////////////////
 
 std::string Channel::getChannelName() const
 {
@@ -132,9 +129,13 @@ std::string Channel::showModes() const
 
 void Channel::addClient(Client& cli)
 {
-    this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
-    cli.setnbrChannels('+');
 
+    cli.setnbrChannels('+');
+    this->_clients.insert(std::pair<std::string ,Client>(cli.getNickName(), cli));
+    if(this->_clients.size() == 1)
+        this->_clients[cli.getNickName()].setOperStatus(true);
+
+        
     this->broadcastMessage(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName() ));
     if(!this->getTopic().empty() )
     {
@@ -144,7 +145,7 @@ void Channel::addClient(Client& cli)
     else   
         cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
-    // Send RPL_NAMREPLY to the new client with the list of all users in the channel
+    // Send RPL_NAMREPLY refrech list users in the channel
     std::string userList; 
     for (std::map<std::string, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
     {
@@ -203,14 +204,12 @@ void Channel::setTopic(std::string newTopic, Client setter)
 
 bool Channel::hasPermission(Client cli)
 {
-    if(this->_operators.empty())
+    if(this->_clients.empty())
         return false;
-
-    std::map <std::string, Client > ::iterator it = this->_operators.lower_bound(cli.getNickName());
-    if( it != this->_operators.end() )
-        return(true);
+    if(this->_clients[cli.getNickName()].getOperStatus())
+        return true;
     return false;
-
+        
 }
 
 void Channel::broadcastMessage( std::string msg)
@@ -224,20 +223,6 @@ void Channel::broadcastMessage( std::string msg)
             }         
 }
 
-void Channel::addOperators(Client ope)
-{
-    // this->_clients[ope.getNickName()].setOperStatus(true);
-    this->_operators.insert(std::pair<std::string, Client>(ope.getNickName(), ope));
-
-}
-
-void Channel::removeOperators(Client ope)
-{
-    // this->_clients[ope.getNickName()].setOperStatus(false);
-    std::map <std::string, Client > ::iterator it = this->_operators.lower_bound(ope.getNickName());
-    if( it != this->_operators.end())
-    this->_operators.erase(it->second.getNickName());
-}
 
 void Channel::setInviteOnly(bool mode)
     {

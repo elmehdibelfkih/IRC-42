@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 06:50:39 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 17:26:57 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ Client::Client()
     this->_clientFdSocket = -1;
     this->_nbrchannels = 0;
     this->_authenticate = false;
+    this->_operStatus = false;
     this->_pass = false;
     this->_userName = "";
     this->_nickName = "";
@@ -37,6 +38,7 @@ Client& Client::operator=(const Client& obj)
         this->_pass = obj._pass;
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
+        this->_operStatus = obj._operStatus;
         this->_IP = obj._IP;
         this->_nbrchannels = obj._nbrchannels;
         this->_msg = obj._msg;
@@ -58,6 +60,7 @@ Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authentic
     this->_nickName = "";
     this->_IP = "";
     this->_pass = false;
+    this->_operStatus = false;
     this->_clientFdSocket = clientFdSocket;
     this->_nbrchannels = 0;
 }
@@ -171,3 +174,11 @@ std::string Client::getTime() const
     return(std::string(buffer));
 }
 
+void Client::setOperStatus(bool status)
+{
+    this->_operStatus = status;
+}
+bool Client::getOperStatus() const
+{
+    return this->_operStatus ;
+}

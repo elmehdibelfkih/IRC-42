@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 06:58:53 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 17:24:35 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -143,11 +143,11 @@ void Server::handleClientConnection()
                     std::cout << "Client disconnected" << std::endl;
                     close(this->_fds[i].fd);
                     // this->_clients[this->_fds[i].fd].disconnect();
-                    if (this->_clients[this->_fds[i].fd].getAuthenticate())
-                    {
-                        for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-                        (  *it).second.removeClient(_clients[this->_fds[i].fd]); 
-                    }
+                    // if (this->_clients[this->_fds[i].fd].getAuthenticate())
+                    // {
+                    //     for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+                    //     (  *it).second.removeClient(_clients[this->_fds[i].fd]); 
+                    // }
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
                     break;
@@ -203,8 +203,6 @@ void Server::handleClientMessage(int i)
                 this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(_clients[i].getNickName()));
             }
         }
-
-        std::cout << this->_clients[i].getMessage().getBuffer() << std::endl;
         this->_clients[i].getMessage().clearBuffer();
     }
 }
@@ -238,13 +236,12 @@ Client *Server::getClientByNickName(std::string nick)
 
 bool Server::checkUserName(std::string username)
 {
-    // if (username.length() < 3 || username.length() > 9)
-    //     return false;
+
 
     for (size_t i = 0; i < username.size(); ++i)
     {
         char c = username[i];
-        if (!(isalpha(c)))
+        if (!(isalpha(c) || isdigit(c) ))
             return false;
     }
     return true;
@@ -252,16 +249,9 @@ bool Server::checkUserName(std::string username)
 
 bool Server::checkNickName(std::string nickname)
 {
-
-    // if (nickname.length() < 3 || nickname.length() > 9)
-    //     return false;
-
-    for (size_t i = 0; i < nickname.size(); ++i)
-    {
-        char c = nickname[i];
+        char c = nickname.at(0);
         if (!(isalpha(c)))
             return false;
-    }
     return true;
 }
 
@@ -428,8 +418,7 @@ void Server::joinCommand(int i)
         if (!key.empty() && !isValidChannelKey(key))
             return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), key));
 
-        this->createChannel(channelname, key);                        // Create the channel
-        this->_channels[channelname].addOperators(this->_clients[i]); // Add the client as an operator
+        this->createChannel(channelname, key);
     }
     this->_channels[channelname].addClient(this->_clients[i]);
 }
@@ -450,9 +439,6 @@ void Server::partCommand(int i)
         return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
     if (!is_memberInChannel(channelname, this->_clients[i]))
         return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), channelname));
-
-    if (this->_channels[channelname].hasPermission(_clients[i]))
-        this->_channels[channelname].removeOperators(this->_clients[i]);
 
     if (argsVec.size() > 1) //  reason provided
         reason = params.substr(channelname.size() + 1); 
@@ -705,9 +691,10 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
             return (client.sendMsg(ERR_NOSUCHNICK(argsVec[2])));
 
         if (signal)
-            channel.addOperators(*targetClient);
+            channel._clients[targetClient->getNickName()].setOperStatus(true);
         else
-            channel.removeOperators(*targetClient);
+            channel._clients[targetClient->getNickName()].setOperStatus(true);
+
         channel.broadcastMessage("MODE " + channelName + " " + mode + " :Operator privileges " + (signal ? "granted to " : "removed from ") + argsVec[2] + "\r\n");
         break;
     default:

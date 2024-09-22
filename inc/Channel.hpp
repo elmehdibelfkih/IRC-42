@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/20 15:25:17 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 17:23:15 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@ private:
     t_Mode                          _mode;
     t_SetterCl                      _setterCl;
     std::map<std::string, Client>	_clients;
-    std::map<std::string, Client>	_operators;
     std::map<std::string, Client>	_invitees;
 
 
@@ -78,8 +77,8 @@ public:
     void removeClient(Client& cli);
     void addOperators(Client ope);
     void removeOperators(Client ope);
-    bool hasPermission (Client cli);  
     void broadcastMessage(std::string msg);
+    bool hasPermission(Client cli);
 };
 
 #endif
