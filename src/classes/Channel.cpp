@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/21 20:51:43 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 06:09:09 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Channel::Channel()
 }
 Channel::Channel(std::string channelname, std::string key) :_channelName(channelname), _passWord(key)
 {
-    this->_topic                = "";
+    this->_topic                = "*";
     this->_userLimit            = -1;    //default value ofthe number of users who can join the channel.
     this->_mode.inviteOnly      = false; // any one can join to the channel ;
     this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
@@ -114,14 +114,6 @@ std::string Channel::getTime() const {
     return std::string(buffer);
 }
 
-// std::string Channel::getTime() const
-// {
-//     std::time_t currentTime = std::time(0);
-//     std::tm* localTime = *std::localtime(&currentTime);
-//     char buffer[80];
-//         std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
-//     return(std::string(buffer));
-// }
 
 std::string Channel::showModes() const
 {
@@ -173,7 +165,10 @@ void Channel::removeClient(Client& cli)
 {
     cli.setnbrChannels('-');
     
-    this->broadcastMessage(":" + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
+    
+    this->broadcastMessage(SERVERNAME + " " + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
+    this->_clients.erase(cli.getNickName());
+
     std::string userList; 
     for (std::map<std::string, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
     {
@@ -182,9 +177,13 @@ void Channel::removeClient(Client& cli)
         else
             userList += it->second.getNickName() + " ";
     }
-    cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), "=", this->getChannelName(), trimFunc(userList)));
-    cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
-    this->_clients.erase(cli.getNickName());
+
+   for (std::map<std::string, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+    {
+        it->second.sendMsg(RPL_NAMREPLY(it->second.getNickName(), "=", this->getChannelName(), trimFunc(userList)));
+        it->second.sendMsg(RPL_ENDOFNAMES(it->second.getNickName(), this->getChannelName()));
+    }
+    
 }
 
 void Channel::setTopic(std::string newTopic, Client setter)

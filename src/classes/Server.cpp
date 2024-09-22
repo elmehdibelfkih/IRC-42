@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 01:35:54 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 06:58:53 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ Server::~Server()
     this->_channels.clear();
 }
 
-///////////////////////////////////////////////////////////////////////////////////
 
 Server::Server(std::string port, std::string password) : _passWord(password)
 {
@@ -144,6 +143,11 @@ void Server::handleClientConnection()
                     std::cout << "Client disconnected" << std::endl;
                     close(this->_fds[i].fd);
                     // this->_clients[this->_fds[i].fd].disconnect();
+                    if (this->_clients[this->_fds[i].fd].getAuthenticate())
+                    {
+                        for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+                        (  *it).second.removeClient(_clients[this->_fds[i].fd]); 
+                    }
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
                     break;
@@ -234,8 +238,8 @@ Client *Server::getClientByNickName(std::string nick)
 
 bool Server::checkUserName(std::string username)
 {
-    if (username.length() < 3 || username.length() > 9)
-        return false;
+    // if (username.length() < 3 || username.length() > 9)
+    //     return false;
 
     for (size_t i = 0; i < username.size(); ++i)
     {
@@ -249,8 +253,8 @@ bool Server::checkUserName(std::string username)
 bool Server::checkNickName(std::string nickname)
 {
 
-    if (nickname.length() < 3 || nickname.length() > 9)
-        return false;
+    // if (nickname.length() < 3 || nickname.length() > 9)
+    //     return false;
 
     for (size_t i = 0; i < nickname.size(); ++i)
     {
@@ -272,10 +276,9 @@ bool Server::findChannelName(std::string &channelName)
 {
     if (this->_channels.empty() || channelName.empty())
         return (false);
-    std::map<std::string, Channel>::iterator it = this->_channels.lower_bound(channelName);
-    if (it != this->_channels.end() && it->first == channelName)
-        return true;
-    return (false);
+    std::map<std::string, Channel>::iterator it = this->_channels.lower_bound(channelName);  
+    return (it != this->_channels.end() );
+
 }
 
 bool Server::is_memberInChannel(std::string &channelName, Client cl)
@@ -365,7 +368,7 @@ void Server::userCommand(int i)
         return (this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName())));
     std::vector<std::string> argsVec = splitString(params, ' ');
     
-    if (argsVec.empty())
+    if (argsVec.empty() || argsVec.size() != 4)
         return (this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "USER")));
     
     if (!checkUserName(argsVec[0])) // check param if valide.
@@ -438,7 +441,7 @@ void Server::partCommand(int i)
     if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PART"));
 
-    std::vector<std::string> argsVec = splitString(params, ':');
+    std::vector<std::string> argsVec = splitString(params, ' ');
     if (argsVec.empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PART"));
 
@@ -452,15 +455,15 @@ void Server::partCommand(int i)
         this->_channels[channelname].removeOperators(this->_clients[i]);
 
     if (argsVec.size() > 1) //  reason provided
-        reason = params.substr(channelname.size() + 1); // Get reason after channel name
+        reason = params.substr(channelname.size() + 1); 
     else // No reason provided
         reason = "No reason provided";
-
-
+        
     this->_channels[channelname].broadcastMessage(RPL_PART(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), channelname, reason));
     this->_channels[channelname].removeClient(this->_clients[i]);
 
 }
+
 void Server::kickCommand(int i)
 {
     std::string params, reason;
