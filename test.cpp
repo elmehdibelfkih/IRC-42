@@ -109,37 +109,11 @@
 
 
 
-int main()
-{
-    // int x;
-
-// std::vector<std::string> args;
-// args.push_back("PRIV0");
-// args.push_back("PRIV1");
-// args.push_back("PRIV2");
-// std::cout << std::string::substr(args[0].size(), 10) << std::endl;
-
-
-}
-
-
-    // std::string res = join_msg(vec);
-    // std::string res =  "user3:";
-    // std::cout << res << "\n";
-    // std::cout << res.erase(res.size() - 1) << "\n";
-
-    // bool signal;
-    // std::cout <<   (signal ? "enabled" : "disabled");
-
-// }
-
-
 
 //tasks :
 
-//topic kick invite mode
+ //mode
 
 
-
-// add replie in nickcommand , to restrict the client from set nickname any time.
-
+// RPL_MYINFO (004),
+// at least one RPL_ISUPPORT (005) numeric to the client.

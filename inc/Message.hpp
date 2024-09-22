@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:53 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/10 11:52:38 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/09/22 01:14:26 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,10 @@
 class Message
 {
 private:
-    std::string     _buffer; // mehdi
-    std::string     _tokens; // <==
+    std::string     _buffer; 
+    std::string     _tokens;
     int             _fdsender;
-    int             _command; // <== getcommand == NICK
+    int             _command; 
 public:
     Message();
     Message& operator=(const Message& obj);

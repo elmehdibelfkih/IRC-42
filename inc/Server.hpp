@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/17 04:37:07 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 01:15:17 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,17 +48,16 @@ public:
     Server(const Server& obj);
     ~Server();
 
-    void        startServer(); // mehdi
-    bool        authenticateUser(int i); // mehdi
-    void        handleClientConnection(); // mehdi
-    void        handleClientMessage(int i); // <==
+    void        startServer(); 
+    bool        authenticateUser(int i); 
+    void        handleClientConnection(); 
+    void        handleClientMessage(int i); 
     bool        checkNickName(std::string nickname);
     bool        checkUserName(std::string username);
  
 
 
 
-// ------ussef
     void                        createChannel(std::string &channelName, std::string key);
     bool                        findChannelName(std::string &channelName);
     bool                        is_memberInChannel(std::string &channelName, Client cl);

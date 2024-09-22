@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/04/06 20:48:09 by slaanani          #+#    #+#             */
-/*   Updated: 2024/09/20 05:43:20 by ybouchra         ###   ########.fr       */
+/*   Created: 2024/09/21 09:49:55 by ybouchra          #+#    #+#             */
+/*   Updated: 2024/09/21 21:05:06 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,7 @@ std::string join_msg(std::vector <std::string>&vec);
 
 //PART <channel> [<message>]
 
-//  INVITE <nickname> <channel>
+// INVITE <nickname> <channel>
 
 // KICK <channel> <nickname> [<comment>]
 

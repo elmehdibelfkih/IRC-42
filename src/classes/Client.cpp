@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/18 10:39:11 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/22 01:36:12 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,6 @@ Client::~Client()
     this->_nickName.clear();
     this->_IP.clear();
 }
-
-
-
-/////////////////////////////////////////////////////////////////
-
-
 
 Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authenticate)
 {
@@ -135,14 +129,14 @@ void Client::setPass(bool b)
     this->_pass = b;
 }
 
-void Client::disconnect()
-{
+// void Client::disconnect()
+// {
 //     if (this->_authenticate)
 //     {
 //         for (std::vector<Channel>::iterator it = this->_channels.begin(); it < this->_channels.end(); it++)
 //             (*it).removeClient(this->_clientFdSocket);        
 //     }
-}
+// }
 
 void  Client::sendMsg(std::string str)
 {

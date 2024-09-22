@@ -37,23 +37,27 @@
 // Reply Messages (RPL)
 
 
-#define RPL_WELCOME(nick, user, host) (SERVERNAME + " 001 " + nick + " :Welcome to the IRC Network " + nick + "!" + user + "@" + host + "\r\n")
+#define RPL_WELCOME(nick, user, host) (SERVERNAME + " 001 " + nick + " :*** Welcome to the IRC Network " + nick + "!" + user + "@" + host + "\r\n")
+#define RPL_YOURHOST(nick) (SERVERNAME + " 002 " + nick + " :*** Your host is ircserver@localhost.io , running version v2.00\r\n")
+#define RPL_CREATED(nick, date) (SERVERNAME + " 003 " + nick + " :*** This server was created " + date + "\r\n")
 #define RPL_JOIN(nick, user, host, channel) (":" + nick + "!~" + user + "@" + host + " JOIN " + channel + "\r\n")
+#define RPL_PART(nick, user, host, channel, reason) (":" + nick + "!~" + user + "@" + host + " PART " + channel + " :" + reason + "\r\n")
+#define RPL_KICK(nick, user, host, channel, kickeduser, reason) (":" + nick + "!~" + user + "@" + host + " KICK " + channel + " " + kickeduser + " :" + reason + "\r\n")
+#define RPL_INVITING(client, inviter, channel) (SERVERNAME + " 341 " + client + " :" + inviter + " has been invited to " + channel + "\r\n")
+#define RPL_KICKEDUSER(nick, user, host, channel, kickeduser, raison) (SERVERNAME + " " + nick + "!" + user + "@" + host + " KICK " + channel + " " + kickeduser + " :" + raison + "\r\n")
 #define RPL_TOPIC(client, channel, topic) (SERVERNAME + " 332 " + client + " " + channel + " :" + topic + "\r\n")
 #define RPL_TOPICWHOTIME(client, channel, nick, time) (SERVERNAME + " 333 " + client + " " + channel + " " + nick + " " + time + "\r\n")
-
 #define RPL_ENDOFNAMES(client, channel) (SERVERNAME + " 366 " + client + " " + channel + " :End of /NAMES list.\r\n")
 #define RPL_NOTOPIC(client, channel) (SERVERNAME + " 331 " + client + " " + channel + " :No topic to set.\r\n")
- 
-#define RPL_SUCCESS(nick, user, host, channelname, raison) (":" + nick + "!" + user + "@" + host + " PART " + channelname + raison + "\r\n")
+#define RPL_LIST(client, channel, userCount, topic) (SERVERNAME + " 322 " + client + " " + channel + " " + std::to_string(userCount) + " :" + topic + "\r\n")
+#define RPL_LISTEND(client) (SERVERNAME + " 323 " + client + " :End of /LIST\r\n")
+#define RPL_AWAY(client, msg) (SERVERNAME + " 301 " + client + " :is currently away and sends the away message: " + msg + "\r\n")
+#define RPL_CHANNELMODEIS(client, channel, modestring, key) (SERVERNAME + " 324 " + client + " " + channel + " :" + modestring + " " + key + "\r\n")
+
 #define RPL_VALIDNICK() (SERVERNAME + " :Nickname accepted\r\n")
 #define RPL_VALIDPASS() (SERVERNAME + " :Password accepted | Continue with NICK and USER commands.\r\n")
+#define RPL_NAMREPLY(client, symbol, channel, userlist) \
+(SERVERNAME + " 353 " + client + " " + symbol + " " + channel + " :" + userlist + "\r\n")
 
-#define RPL_NAMREPLY(client, symbol, channel, nick) (SERVERNAME + " 353 " + client + " " + symbol + " " + channel + " :@" + nick + "\r\n")
-#define RPL_AWAY(client, msg) (SERVERNAME + " 301 " + client + " :is currently away and sends the away message: " + msg + "\r\n")
-#define RPL_INVITING(client, inviter, channel) (SERVERNAME + " 341 " + client + " :" + inviter + " has been invited to " + channel + "\r\n")
-#define RPL_KICKEDUSER(nick, user, host, channel, kickeduser, raison) (SERVERNAME + " " + nick + "!" + user + "@" + host + " KICK from the " + channel + " " + kickeduser + " :" + raison + "\r\n")
-
-#define RPL_CHANNELMODEIS(client, channel, modestring, key) (SERVERNAME + " 324 " + client + " " + channel + " :" + modestring + " " + key + "\r\n")
 
 #endif
