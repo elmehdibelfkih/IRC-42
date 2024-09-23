@@ -6,23 +6,18 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/03 21:47:11 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/09/07 13:32:09 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/23 01:55:19 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "IRC.hpp"
 
-std::string join_msg(std::vector <std::string>&vec)
-{
-    std::string res = "";
-    size_t i = 0;
-    while(vec.size() > ++i)
-        res += vec[i] + " ";
-    return res;
-} 
+
 
 std::string trimFunc(std::string &str)
 {
+    if(str.empty())
+        return "";
     std::size_t start = 0;
     while(str.size() > start && std::isspace(str[start]))
         start++;

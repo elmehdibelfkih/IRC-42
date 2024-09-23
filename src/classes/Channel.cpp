@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 17:24:05 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/23 12:58:41 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Channel::Channel()
 }
 Channel::Channel(std::string channelname, std::string key) :_channelName(channelname), _passWord(key)
 {
-    this->_topic                = "*";
+    this->_topic                = "";
     this->_userLimit            = -1;    //default value ofthe number of users who can join the channel.
     this->_mode.inviteOnly      = false; // any one can join to the channel ;
     this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
@@ -105,7 +105,7 @@ void Channel::setpassWord(std::string newpassWord)
 
 std::string Channel::getTime() const {
     std::time_t currentTime = std::time(0);
-    std::tm localTime = *std::localtime(&currentTime);  // Avoid pointer dereference issues
+    std::tm localTime = *std::localtime(&currentTime); 
     char buffer[80];
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &localTime);
     return std::string(buffer);
@@ -136,14 +136,14 @@ void Channel::addClient(Client& cli)
         this->_clients[cli.getNickName()].setOperStatus(true);
 
         
-    this->broadcastMessage(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName() ));
-    if(!this->getTopic().empty() )
-    {
-        cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
-        cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
-    }
-    else   
-        cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
+    this->broadcastMessage(cli , RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName() ), true);
+    // if(this->getTopic().size() == 0)
+    //     cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
+    // else
+    // {
+    //     cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
+    //     cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
+    // }
     
     // Send RPL_NAMREPLY refrech list users in the channel
     std::string userList; 
@@ -167,7 +167,7 @@ void Channel::removeClient(Client& cli)
     cli.setnbrChannels('-');
     
     
-    this->broadcastMessage(SERVERNAME + " " + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
+    this->broadcastMessage(cli, SERVERNAME + " " + cli.getNickName() + " has left " + this->getChannelName() + "\r\n", true);
     this->_clients.erase(cli.getNickName());
 
     std::string userList; 
@@ -194,11 +194,13 @@ void Channel::setTopic(std::string newTopic, Client setter)
     this->_topic = newTopic;
     this->_setterCl.nickName = setter.getNickName();
     this->_setterCl.time = this->getTime();
+
+    this->broadcastMessage(setter, ":" + setter.getNickName() + "!" + setter.getUserName() + "@" + setter.getIP() +" TOPIC " + this->getChannelName() + " :" + this->getTopic() + "\r\n", true); 
    if (this->_topic.empty()) 
-        this->broadcastMessage(RPL_NOTOPIC(setter.getNickName(), this->getChannelName()));
+        this->broadcastMessage(setter, RPL_NOTOPIC(setter.getNickName(), this->getChannelName()), true);
  else {
-        this->broadcastMessage(RPL_TOPIC(setter.getNickName(), this->getChannelName(), this->getTopic()));
-        this->broadcastMessage(RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
+        this->broadcastMessage(setter, RPL_TOPIC(setter.getNickName(), this->getChannelName(), this->getTopic()), true);
+        this->broadcastMessage(setter, RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time), true);
     }
 }
 
@@ -212,13 +214,14 @@ bool Channel::hasPermission(Client cli)
         
 }
 
-void Channel::broadcastMessage( std::string msg)
+
+void Channel::broadcastMessage( Client &sender, std::string msg, bool all)
 {
     std::map<std::string, Client> ::iterator it = this->_clients.begin();
         for(; it != this->_clients.end(); it++)
             {
-                // if(sender.getNickName() == it->second.getNickName())
-                //     continue;
+                if(!all && sender.getNickName() == it->second.getNickName())
+                    continue;
                 it->second.sendMsg( msg );
             }         
 }

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 01:15:17 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/23 11:04:30 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ private:
     uint16_t                        _port; 
     std::string                     _passWord;
     std::vector<pollfd>             _fds; 
-    std::map<int, Client>           _clients; 
+    std::map<int, Client>           _clients;
     std::map<std::string, Channel>  _channels; 
     
 public:

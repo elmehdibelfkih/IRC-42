@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 17:23:15 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/23 11:28:01 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,10 +75,9 @@ public:
 
     void addClient(Client& cli);
     void removeClient(Client& cli);
-    void addOperators(Client ope);
-    void removeOperators(Client ope);
-    void broadcastMessage(std::string msg);
     bool hasPermission(Client cli);
+    void broadcastMessage( Client &sender, std::string msg, bool all);
+
 };
 
 #endif
