@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/23 13:00:19 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/24 07:37:05 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ void Server::handleClientConnection()
                     if (this->_clients[this->_fds[i].fd].getAuthenticate())
                     {
                         for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-                        (  *it).second.removeClient(_clients[this->_fds[i].fd]); 
+                        (  *it).second.removeClient(_clients[this->_fds[i].fd], -1); 
                     }
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
@@ -453,10 +453,14 @@ void Server::partCommand(int i)
         reason = params.substr(channelname.size() + 1); 
     else // No reason provided
         reason = "No reason provided";
-        
-    this->_channels[channelname].broadcastMessage(this->_clients[i], RPL_PART(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), channelname, reason), true);
-    this->_channels[channelname].removeClient(this->_clients[i]);
+    
+    if (!reason.empty() && reason[0] != ':')
+        reason = ":" + reason; 
 
+    std::string partMessage = ":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PART " + channelname + " " + reason + "\r\n";
+    this->_channels[channelname].broadcastMessage(partMessage);
+    this->_channels[channelname].removeClient(this->_clients[i], PART);
+    
 }
 
 void Server::kickCommand(int i)
@@ -489,9 +493,12 @@ void Server::kickCommand(int i)
         reason = params.substr(channelname.size() + kickeduser.size() + 2 ); 
     else
         reason = "No reason provided";
-    
-    this->_channels[channelname].broadcastMessage(this->_clients[i], RPL_KICKEDUSER(_clients[i].getNickName(),_clients[i].getUserName(),_clients[i].getIP(),channelname,kickeduser,reason), false);
-    this->_channels[channelname].removeClient(*cl);
+       
+    if (!reason.empty() && reason[0] != ':')
+        reason = ":" + reason; 
+        
+    this->_channels[channelname].broadcastMessage( RPL_KICK(_clients[i].getNickName(),_clients[i].getUserName(),_clients[i].getIP(),channelname,kickeduser,reason));
+    this->_channels[channelname].removeClient(*cl, KICK);
 }
 
 
@@ -554,7 +561,7 @@ void Server::privmsgCommand(int i)
             return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), target));
         
         std::string msg = params.substr(target.size() + 1) ;
-        this->_channels[target].broadcastMessage(this->_clients[i], ":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PRIVMSG " + target + " " + msg + "\r\n", false);
+        this->_channels[target].broadcastMessage(":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PRIVMSG " + target + " " + msg + "\r\n");
     }
     else // target client.
     {
@@ -628,7 +635,7 @@ void Server::inviteCommand(int i)
         return this->_clients[i].sendMsg(ERR_USERONCHANNEL(inviteduser));
 
     this->_channels[channelname].addClient(*cl);
-    this->_channels[channelname].broadcastMessage(this->_clients[i], RPL_INVITING(this->_clients[i].getNickName(), inviteduser, channelname), true);
+    this->_channels[channelname].broadcastMessage(RPL_INVITING(this->_clients[i].getNickName(), inviteduser, channelname));
 }
 
 
@@ -651,11 +658,11 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
     {
     case 'i':
         channel.setInviteOnly(signal);
-        channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " " + mode + " :Invite-only mode " + (signal ? "enabled" : "disabled") + "\r\n", true);
+        channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " " + "i" + " :Invite-only mode " + (signal ? "enabled" : "disabled") + "\r\n");
         break;
     case 't':
         channel.setTopicRestricted(signal);
-        channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " " + mode + " :Topic restriction " + (signal ? "enabled" : "disabled") + "\r\n", true);
+        channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " " + "t" + " :Topic restriction " + (signal ? "enabled" : "disabled") + "\r\n");
         break;
     case 'k':
         if (signal)
@@ -665,13 +672,13 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
             std::string key = argsVec[2];
             channel._mode.requiredKey = true;
             channel.setpassWord(key);
-            channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " +k :Channel key set" + "\r\n", true);
+            channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " +k :Channel key set" + "\r\n");
         }
         else
         {
             channel._passWord.clear();
             channel._mode.requiredKey = false;
-            channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " -k :Channel key removed" + "\r\n", true);
+            channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " -k :Channel key removed" + "\r\n");
         }
         break;
     case 'l':
@@ -684,12 +691,12 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
             if (limit <= 0)
                 return client.sendMsg(ERR_SYNTAXERROR(client.getNickName(), "MODE +l"));
             channel.setUserLimit(limit);
-            channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " +l :User limit set to " + std::to_string(limit) + "\r\n", true);
+            channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP() + " MODE " + channelName + " +l :User limit set to " + std::to_string(limit) + "\r\n");
         }
         else
         {
             channel._mode.userLimit = false;
-            channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  +" MODE " + channelName + " -l :User limit removed " + "\r\n", true);
+            channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  +" MODE " + channelName + " -l :User limit removed " + "\r\n");
         }
         break;
     case 'o':
@@ -701,17 +708,25 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
             return (client.sendMsg(ERR_NOSUCHNICK(argsVec[2])));
 
         if (signal)
+        {
             channel._clients[targetClient->getNickName()].setOperStatus(true);
+            channel.refrechChannel(*targetClient);
+        }
         else
+        {
             channel._clients[targetClient->getNickName()].setOperStatus(false);
-
-        channel.broadcastMessage(client, ":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " " + mode + " :Operator privileges " + (signal ? "granted to " : "removed from ") + argsVec[2] + "\r\n", true);
+            channel.refrechChannel(*targetClient);
+        }
+        channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " " + "o" + " :Operator privileges " + (signal ? "granted to " : "removed from ") + argsVec[2] + "\r\n");
         break;
     default:
         client.sendMsg(ERR_UNKNOWNMODE(client.getNickName(), mode));
         break;
     }
 }
+
+
+
 void Server::modeCommand(int i)
 {
     std::string params;
@@ -731,15 +746,18 @@ void Server::modeCommand(int i)
         if (!this->_channels[channelName].hasPermission(_clients[i]))
             return (this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelName)));
 
-        if (argsVec.size() == 1) // display status modes of the channel "+t +k +i"
+        if (argsVec.size() == 1) // display modes
         {
             std::string key = (_channels[channelName].getMode('k') ? _channels[channelName].getpassWord() : "");
-            return (this->_clients[i].sendMsg(RPL_CHANNELMODEIS(this->_clients[i].getNickName(), _channels[channelName].getChannelName(), _channels[argsVec[0]].showModes(), key)));
+            std::string userlimit = "";
+            if(_channels[channelName].getMode('l'))
+                 userlimit = intToString(_channels[channelName].getUserlimit());
+
+            return (this->_clients[i].sendMsg(RPL_CHANNELMODEIS(this->_clients[i].getNickName(), _channels[channelName].getChannelName(), _channels[argsVec[0]].showModes(), key, userlimit) ));
         }
         std::string &mode = argsVec[1];
         if (mode.empty() || (mode.at(0) != '+' && mode.at(0) != '-')   )
             return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "MODE"));
-    
         applyMode(argsVec, i);
 
     }

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/03 21:47:11 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/09/23 01:55:19 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/24 07:28:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,9 @@ std::vector<std::string> splitString(const std::string& str, char delimiter)
             vec.push_back(trimFunc(buff));
     }
     return vec;
+}
+std::string intToString(int num) {
+    std::stringstream ss;
+    ss << num;
+    return ss.str();
 }

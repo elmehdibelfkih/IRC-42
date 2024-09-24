@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 17:26:57 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/24 07:05:12 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,14 +165,15 @@ void Client::setnbrChannels(char sign)
 }
  
 
-std::string Client::getTime() const
-{
+
+std::string Client::getTime() const {
     std::time_t currentTime = std::time(0);
-    std::tm* localTime = std::localtime(&currentTime);
+    std::tm *localTime = std::localtime(&currentTime); 
     char buffer[80];
-        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
-    return(std::string(buffer));
+    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);
+    return std::string(buffer);
 }
+
 
 void Client::setOperStatus(bool status)
 {

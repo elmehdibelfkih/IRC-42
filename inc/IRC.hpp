@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/21 09:49:55 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/09/21 21:05:06 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/24 07:30:04 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,8 @@ void		printUsage();
 std::string trimFunc(std::string& str);
 std::vector<std::string> splitString(const std::string& str, char delimiter);
 std::string join_msg(std::vector <std::string>&vec);
+std::string intToString(int num);
+
 
 
 
@@ -91,7 +93,8 @@ std::string join_msg(std::vector <std::string>&vec);
 // MODE <channelname> <modes> <..>
 
 
-// For Channels: MODE <channel> +/-<modes> [<parameters>]
+// For Channels: 
+// MODE <channel> +/-<modes> [<parameters>]
 // Supported modes: +/-ioktl
 
 // i: Invite-only channel
