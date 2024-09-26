@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 10:31:26 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 11:22:14 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -450,7 +450,12 @@ void Server::joinCommand(int i)
     
     if (findChannelName(channelname))
     {
+
         Channel &channel = this->_channels[channelname]; 
+
+        if (!key.empty() && channel._passWord != key)
+            return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), key));
+
         if (is_memberInChannel(channelname, this->_clients[i]))
             return _clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), channelname));
 
@@ -466,9 +471,6 @@ void Server::joinCommand(int i)
     }
     else
     {
-        if (!key.empty() && !isValidChannelKey(key))
-            return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), key));
-
         this->createChannel(channelname, key);
     }
     this->_channels[channelname].addClient(this->_clients[i]);
