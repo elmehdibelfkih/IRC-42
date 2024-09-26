@@ -64,6 +64,7 @@
 #define RPL_CHANNELMODEIS(client, channel, modestring, key, userlimit) (SERVERNAME + " 324 " + client + " " + channel + " :" + modestring + " " + key + " " + userlimit + "\r\n")
 
 #define RPL_VALIDNICK() (SERVERNAME + " :Nickname accepted\r\n")
+#define CHANGENICK(nick, username, host, message)                     ":" + (nick) + "!" + (username) + "@" + (host) + " NICK :" + (message) + "\r\n"
 #define RPL_VALIDPASS() (SERVERNAME + " :Password accepted | Continue with NICK and USER\r\n")
 
 

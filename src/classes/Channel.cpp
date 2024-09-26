@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 10:16:21 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 10:23:18 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,12 +150,6 @@ std::string Channel::listusers( void )
     }
     return userList;
 }
-
-    // :nickname!~username@197.230.30.146 JOIN #9986
-    // :tungsten.libera.chat MODE #9986 +Cnst
-    // :tungsten.libera.chat 353 kjdskdjfdfs @ #9986 :@kjdskdjfdfs
-    // :tungsten.libera.chat 366 kjdskdjfdfs #9986 :End of /NAMES list.
-    // :kjdskdjf!~fdsf@197.230.30.146 JOIN #9986
 std::string    reply_join(Client clt, Channel ch) {
     std::stringstream ss;
     
@@ -163,9 +157,6 @@ std::string    reply_join(Client clt, Channel ch) {
     ss << ":ircserver " << "MODE " + ch.getChannelName() << " +" << ch.showModes() << "\r\n";
     ss << ":ircserver " << "353 " << clt.getNickName() << " @ " << ch.getChannelName() << " :" << ch.listusers() << "\r\n";
     ss << ":ircserver 366 " << clt.getNickName() << " " << ch.getChannelName() << " :End of /NAMES list.\r\n";
-    
-    // msg.append(":" + clt.getNickName() + "!~" + clt.getUserName() + "@" + clt.getIP() + " JOIN " + ch.getChannelName() + "\r\n");
-    // msg.append((":ircserver ") + "MODE " + ch.getChannelName())
     return ss.str();
 }
 

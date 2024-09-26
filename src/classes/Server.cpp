@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 04:07:32 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 09:09:05 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -240,9 +240,6 @@ void Server:: handleClientMessage(int i)
                 this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(_clients[i].getNickName()));
             }
         }
-    
-        // std::cout << "-------" << this->_clients[i].getMessage().getBuffer() << "-------" << std::endl;
-
 }
 
 bool Server::authenticateUser(int i)
@@ -370,7 +367,6 @@ void Server::nickCommand(int i)
 {
     std::string params = this->_clients[i].getMessage().getToken();
     params = trimFunc(params);
-    
     std::string nickname = this->_clients[i].getNickName();
     if (nickname.empty())
         nickname = "*";
@@ -379,16 +375,25 @@ void Server::nickCommand(int i)
         return this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN(nickname));
     if (this->_clients[i].getPass() == false)
         return this->_clients[i].sendMsg(ERR_NOTREGISTERED(nickname));
-    // if (this->_clients[i].getAuthenticate()) 
-    //     return this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
-        
     if (!this->checkNickName(params))
         return this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME(nickname, this->_clients[i].getMessage().getToken()));
     if (this->getClientByNickName(params) != NULL)
         return this->_clients[i].sendMsg(ERR_NICKNAMEINUSE(nickname, this->_clients[i].getMessage().getToken()));
     else
     {
-
+        std::string msg = CHANGENICK(nickname , _clients[i].getUserName(), _clients[i].getIP(), params);
+        std::map<std::string, Channel> ::iterator it = this->_channels.begin();
+        std::string oldnickname = this->_clients[i].getNickName();
+        this->_clients[i].setNickName(params);
+        for(; it != _channels.end(); ++it)
+        {
+            if (it->second._clients.find(oldnickname) != it->second._clients.end()) {
+                it->second._clients.erase(oldnickname);
+                it->second._clients.insert(std::make_pair(params, &this->_clients[i]));
+                
+                // oldnickname NICK newNICk
+            }
+        }
         this->_clients[i].setNickName(params);
         return this->_clients[i].sendMsg(RPL_VALIDNICK());
     }
@@ -608,7 +613,8 @@ void Server::privmsgCommand(int i)
             return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), target));
         
         std::string msg = params.substr(target.size() + 1) ;
-        this->_channels[target].broadcastMessage(":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PRIVMSG " + target + " " + msg + "\r\n");
+        this->_channels[target].broadcastMessage(":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PRIVMSG " + target + " " + msg + "\r\n", 
+        this->_clients[i].getClientFdSocket());
     }
     else // target client.
     {

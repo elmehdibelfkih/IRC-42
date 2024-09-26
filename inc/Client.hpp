@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 01:39:40 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 09:09:16 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ public:
 
 
     void writeMessageToSocket() {
-        // std::cout << "writeMessageToSocket called\n";
         while (!stream.empty()) {
             ssize_t n = send(this->_clientFdSocket, stream.c_str(), stream.size(), 0);
             

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 02:57:07 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 09:09:10 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,12 @@ Client::Client()
     this->_IP = "";
 }
 
-Client::Client(const Client& obj)
+Client::Client(const Client &obj)
 {
     *this = obj;
 }
 
-Client& Client::operator=(const Client& obj)
+Client &Client::operator=(const Client &obj)
 {
     if (this != &obj)
     {
@@ -54,7 +54,7 @@ Client::~Client()
     this->_IP.clear();
 }
 
-Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authenticate)
+Client::Client(int clientFdSocket, bool authenticate) : _authenticate(authenticate)
 {
 
     this->_userName = "";
@@ -91,11 +91,10 @@ std::string Client::getIP() const
     return this->_IP;
 }
 
-Message& Client::getMessage()
+Message &Client::getMessage()
 {
     return this->_msg;
 }
-
 
 void Client::setClientFdSocket(int fd)
 {
@@ -106,7 +105,6 @@ void Client::setAuthenticate(bool au)
 {
     this->_authenticate = au;
 }
-
 
 void Client::setUserName(std::string userName)
 {
@@ -139,12 +137,12 @@ void Client::setPass(bool b)
 //     {
 //         std::vector<Channel>::iterator it = this->_channels.begin();
 //         for (; it != this->_channels.end(); it++)
-//             (*it).removeClient(*this);        
+//             (*it).removeClient(*this);
 //     }
-    
+
 // }
 
-void  Client::sendMsg(std::string str)
+void Client::sendMsg(std::string str)
 {
     stream += str;
 }
@@ -154,28 +152,26 @@ bool Client::getPass() const
     return this->_pass;
 }
 
-int  Client::getnbrChannels()
+int Client::getnbrChannels()
 {
-    return(this->_nbrchannels);
+    return (this->_nbrchannels);
 }
 void Client::setnbrChannels(char sign)
 {
-    if(sign == '+')
-        this->_nbrchannels++; 
+    if (sign == '+')
+        this->_nbrchannels++;
     else
-        this->_nbrchannels--; 
+        this->_nbrchannels--;
 }
- 
 
-
-std::string Client::getTime() const {
+std::string Client::getTime() const
+{
     std::time_t currentTime = std::time(0);
-    std::tm *localTime = std::localtime(&currentTime); 
+    std::tm *localTime = std::localtime(&currentTime);
     char buffer[80];
     std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);
     return std::string(buffer);
 }
-
 
 void Client::setOperStatus(bool status)
 {
@@ -183,5 +179,5 @@ void Client::setOperStatus(bool status)
 }
 bool Client::getOperStatus() const
 {
-    return this->_operStatus ;
+    return this->_operStatus;
 }

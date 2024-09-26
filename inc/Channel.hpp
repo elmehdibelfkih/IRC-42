@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 01:39:12 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 10:16:33 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ public:
 
 
     // getters
-    std::string getChannelName() const;
+    std::string getChannelName() ;
     std::string getpassWord() const;
     std::string getTopic() const;
     bool        getMode(char token) const;
@@ -80,9 +80,10 @@ public:
     void removeClient(Client& cli, int indxcmd);
     void addInvitee(Client& cli);
     bool isInvitee(Client& cli);
-    bool hasPermission(Client cli);
+    bool hasPermission(Client &cli);
     void refrechChannel(Client cli);
     void broadcastMessage(std::string msg);
+    std::string listusers( void );
 };
 
 #endif
