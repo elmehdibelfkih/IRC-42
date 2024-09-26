@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 04:32:30 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 10:16:21 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ Channel::~Channel()
     this->_invitee.clear();
 }
 
-std::string Channel::getChannelName() const
+std::string Channel::getChannelName() 
 {
     return this->_channelName;
 }
@@ -138,16 +138,45 @@ void Channel::refrechChannel(Client cli)
     cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
 }
 
+std::string Channel::listusers( void )
+{
+    std::string userList;
+    for (std::map<std::string, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
+    {
+        if (this->hasPermission(*it->second))
+            userList += "@" + (*it->second).getNickName() + " ";
+        else
+            userList += (*it->second).getNickName() + " ";
+    }
+    return userList;
+}
+
+    // :nickname!~username@197.230.30.146 JOIN #9986
+    // :tungsten.libera.chat MODE #9986 +Cnst
+    // :tungsten.libera.chat 353 kjdskdjfdfs @ #9986 :@kjdskdjfdfs
+    // :tungsten.libera.chat 366 kjdskdjfdfs #9986 :End of /NAMES list.
+    // :kjdskdjf!~fdsf@197.230.30.146 JOIN #9986
+std::string    reply_join(Client clt, Channel ch) {
+    std::stringstream ss;
+    
+    ss << ":" + clt.getNickName() + "!~" + clt.getUserName() + "@" + clt.getIP() + " JOIN " + ch.getChannelName() + "\r\n";
+    ss << ":ircserver " << "MODE " + ch.getChannelName() << " +" << ch.showModes() << "\r\n";
+    ss << ":ircserver " << "353 " << clt.getNickName() << " @ " << ch.getChannelName() << " :" << ch.listusers() << "\r\n";
+    ss << ":ircserver 366 " << clt.getNickName() << " " << ch.getChannelName() << " :End of /NAMES list.\r\n";
+    
+    // msg.append(":" + clt.getNickName() + "!~" + clt.getUserName() + "@" + clt.getIP() + " JOIN " + ch.getChannelName() + "\r\n");
+    // msg.append((":ircserver ") + "MODE " + ch.getChannelName())
+    return ss.str();
+}
+
 void Channel::addClient(Client &cli)
 {
     cli.setnbrChannels('+');
     this->_clients.insert(std::pair<std::string, Client *>(cli.getNickName(), &cli));
     if (this->_clients.size() == 1)
-        this->_clients[cli.getNickName()]->setOperStatus(true);
-
-    this->broadcastMessage(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName()));
-    refrechChannel(cli);
-
+        cli.setOperStatus(true);
+    this->broadcastMessage(reply_join(cli, *this));
+    // this->broadcastMessage(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName()));
     if(!this->getTopic().empty() )
     {
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
@@ -156,6 +185,7 @@ void Channel::addClient(Client &cli)
     else   
         cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
+    refrechChannel(cli);
 }
 
 void Channel::removeClient(Client &cli, int indexcmd)
@@ -167,9 +197,9 @@ void Channel::removeClient(Client &cli, int indexcmd)
     else if (indexcmd == PART)
         this->broadcastMessage(":" + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
 
+    refrechChannel(cli);
     this->_clients.erase(cli.getNickName());
 
-    refrechChannel(cli);
 }
 
 void Channel::setTopic(std::string newTopic, Client setter)
@@ -190,11 +220,11 @@ void Channel::setTopic(std::string newTopic, Client setter)
     }
 }
 
-bool Channel::hasPermission(Client cli)
+bool Channel::hasPermission(Client &cli)
 {
     if (this->_clients.empty())
         return false;
-    if (this->_clients[cli.getNickName()]->getOperStatus())
+    if (cli.getOperStatus())
         return true;
     return false;
 }
@@ -206,9 +236,10 @@ void Channel::broadcastMessage(std::string msg)
 
     for (; it != this->_clients.end(); it++)
     {
-        it->second->sendMsg(msg);
+            it->second->sendMsg(msg);
     }
 }
+
 
 void Channel::setInviteOnly(bool mode)
 {
