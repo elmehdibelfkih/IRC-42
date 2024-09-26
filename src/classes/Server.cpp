@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/24 07:37:05 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 04:07:32 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,17 @@ void Server::startServer()
         exit(EXIT_FAILURE);
     }
     memset(&serverAddr, 0, sizeof(serverAddr));
+    int opt = 1;
+	if (setsockopt(fdSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        std::cerr << "error set server socket to reuseaddress" << std::endl;
+        close(fdSocket);
+        exit(EXIT_FAILURE);        
+    }
+    if (fcntl(fdSocket, F_SETFL, O_NONBLOCK) == -1) {
+        std::cerr << "error set server socket to non-blocking" << std::endl;
+        close(fdSocket);
+        exit(EXIT_FAILURE);
+    }
     serverAddr.sin_addr.s_addr = INADDR_ANY;
     serverAddr.sin_port = this->_port;
     serverAddr.sin_family = AF_INET;
@@ -94,6 +105,13 @@ void Server::startServer()
     this->handleClientConnection();
 }
 
+
+
+// void disconnect()
+// {
+
+
+// }
 void Server::handleClientConnection()
 {
     while (true)
@@ -110,22 +128,26 @@ void Server::handleClientConnection()
             struct sockaddr_in clientAddr;
             socklen_t addrLen = sizeof(clientAddr);
             int clientFdSocket = accept(this->_fds[0].fd, (struct sockaddr *)&clientAddr, &addrLen);
-            if (clientFdSocket < 0)
+            if (clientFdSocket < 0) {
                 std::cerr << "accept() failed" << std::endl;
-            else
-            {
-                std::string clientIP = inet_ntoa(clientAddr.sin_addr);
-                std::cout << "New client connected: " << clientIP << std::endl;
-
-                pollfd tmp;
-                tmp.fd = clientFdSocket;
-                tmp.events = POLLIN;
-
-                this->_fds.push_back(tmp);
-                Client Ctmp(clientFdSocket, false);
-                Ctmp.setIP(clientIP);
-                this->_clients[clientFdSocket] = Ctmp;
+                continue;
             }
+            if (fcntl(clientFdSocket, F_SETFL, O_NONBLOCK) == -1) {
+                std::cerr << "failed set client socket to non-blocking" << std::endl;
+                close(clientFdSocket);
+                continue;
+            }
+            std::string clientIP = inet_ntoa(clientAddr.sin_addr);
+            std::cout << "New client connected: " << clientIP << std::endl;
+
+            pollfd tmp;
+            tmp.fd = clientFdSocket;
+            tmp.events = POLLIN | POLLOUT;
+
+            this->_fds.push_back(tmp);
+            Client Ctmp(clientFdSocket, false);
+            Ctmp.setIP(clientIP);
+            this->_clients[clientFdSocket] = Ctmp;
         }
 
         // Check for data on client sockets
@@ -133,48 +155,58 @@ void Server::handleClientConnection()
         {
             if (this->_fds[i].revents & POLLIN)
             {
-                Message msg;
+                // Message 
                 int bytesReceived;
-                char buffer[4096];
-                memset(buffer, 0, 4096);
+                char buffer[1024];
+                memset(buffer, 0, 1024);
                 bytesReceived = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
                 if (bytesReceived == 0)
                 {
                     std::cout << "Client disconnected" << std::endl;
-                    close(this->_fds[i].fd);
                     // this->_clients[this->_fds[i].fd].disconnect();
                     if (this->_clients[this->_fds[i].fd].getAuthenticate())
                     {
                         for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
                         (  *it).second.removeClient(_clients[this->_fds[i].fd], -1); 
                     }
+                    close(this->_fds[i].fd);
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
-                    break;
+                    continue;
                 }
-                if (bytesReceived < 0)
+                if (bytesReceived < 0) {
                     std::cerr << "recv() failed" << std::endl;
-                else
-                {
-                    msg = msg + buffer;
-                    this->_clients[this->_fds[i].fd].setMessage(msg);
-                    this->handleClientMessage(this->_fds[i].fd);
+                    continue;
                 }
+                this->_clients[this->_fds[i].fd].consume_message(buffer);
+                // else
+                // {
+
+                //    this->_clients[this->_fds[i].fd].setMessage()
+                    
+                    // msg = msg + buffer;
+                    // this->handleClientMessage(this->_fds[i].fd);
+                // }
             }
+            if (this->_clients[this->_fds[i].fd].getMessage().IsReady()) {
+                this->handleClientMessage(this->_fds[i].fd);
+            }
+            if (this->_fds[i].revents & POLLOUT)
+                this->_clients[this->_fds[i].fd].writeMessageToSocket();
         }
+        // for (size_t i = 1; i < this->_fds.size(); i++) {
+        //     if (this->_fds[i].revents & POLLOUT) {
+        //     }
+        // }
     }
 }
 
-void Server::handleClientMessage(int i)
+void Server:: handleClientMessage(int i)
 {
-    if (this->_clients[i].getMessage().IsReady())
-    {
         if (this->authenticateUser(i))
         {
             switch (this->_clients[i].getMessage().getCommand())
             {
-            case PASS:case NICK:case USER:case PONG:case QUIT:
-                break;
             case (JOIN):
                 joinCommand(i);
                 break;
@@ -199,13 +231,18 @@ void Server::handleClientMessage(int i)
             case (MODE):
                 modeCommand(i);
                 break;
+            case (NICK):
+                nickCommand(i);
+                break;
+            case PASS:case USER:case PONG:case QUIT:
+                break;
             default:
                 this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(_clients[i].getNickName()));
             }
         }
-        std::cout << this->_clients[i].getMessage().getBuffer() << std::endl;
-        this->_clients[i].getMessage().clearBuffer();
-    }
+    
+        // std::cout << "-------" << this->_clients[i].getMessage().getBuffer() << "-------" << std::endl;
+
 }
 
 bool Server::authenticateUser(int i)
@@ -275,7 +312,7 @@ bool Server::findChannelName(std::string &channelName)
 
 bool Server::is_memberInChannel(std::string &channelName, Client cl)
 {
-    std::map<std::string, Client>::iterator it = this->_channels[channelName]._clients.find(cl.getNickName());
+    std::map<std::string, Client*>::iterator it = this->_channels[channelName]._clients.find(cl.getNickName());
     if (it != _channels[channelName]._clients.end() && it->first == cl.getNickName())
         return (true);
     return (false);
@@ -301,7 +338,7 @@ bool Server::isValidChannelName(std::string &channelName)
         return (0);
     if (channelName.at(0) != '#')
         return (0);
-    if (!(channelName.size() >= 4 && channelName.size() <= 16))
+    if (!(channelName.size() >= 2 && channelName.size() <= 16))
         return (0);
     return (1);
 }
@@ -340,10 +377,11 @@ void Server::nickCommand(int i)
 
     if (params.empty())
         return this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN(nickname));
-    if (this->_clients[i].getAuthenticate()) 
-        return this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
-    // if (this->_clients[i].getPass() == false)
-    //     return this->_clients[i].sendMsg(ERR_NOTREGISTERED(nickname));
+    if (this->_clients[i].getPass() == false)
+        return this->_clients[i].sendMsg(ERR_NOTREGISTERED(nickname));
+    // if (this->_clients[i].getAuthenticate()) 
+    //     return this->_clients[i].sendMsg(ERR_ALREADYREGISTERED(this->_clients[i].getNickName()));
+        
     if (!this->checkNickName(params))
         return this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME(nickname, this->_clients[i].getMessage().getToken()));
     if (this->getClientByNickName(params) != NULL)
@@ -401,23 +439,21 @@ void Server::joinCommand(int i)
     if (!isValidChannelName(channelname))
         return this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), channelname));
 
-    // Check if client is over the channel limit
-    if (this->_clients[i].getnbrChannels() >= LIMITCHANNELS)
+    if (this->_clients[i].getnbrChannels() >= LIMITCHANNELS)    // Check if client is over the channel limit
         return this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(), channelname));
     
     if (findChannelName(channelname))
     {
         Channel &channel = this->_channels[channelname]; 
         if (is_memberInChannel(channelname, this->_clients[i]))
-            return _clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName()));
+            return _clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), channelname));
 
         // userlimit nbr  defined 
         if (channel.getMode('l') && channel._clients.size() >= (size_t)channel.getUserlimit())
             return this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(), channelname));
-
-        if (channel.getMode('i'))// Invite-only mode check
+        //invite only mode  
+        if (channel.getMode('i') && !channel.isInvitee(this->_clients[i]))// Invite-only mode check
             return this->_clients[i].sendMsg(ERR_INVITEONLYCHAN(this->_clients[i].getNickName(), channelname));
-
         // required key to join the channel.
         if (channel.getMode('k') && (key.empty() || key != channel.getpassWord()))
             return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), channelname));
@@ -430,6 +466,18 @@ void Server::joinCommand(int i)
         this->createChannel(channelname, key);
     }
     this->_channels[channelname].addClient(this->_clients[i]);
+
+
+if (this->_channels[channelname].isInvitee(this->_clients[i]))
+{
+    std::vector<std::string>& inviteeList = this->_channels[channelname]._invitee;
+    std::vector<std::string>::iterator it = std::find(inviteeList.begin(), inviteeList.end(), this->_clients[i].getNickName());
+
+    if (it != inviteeList.end())
+        inviteeList.erase(it);
+}
+
+
 }
 
 void Server::partCommand(int i)
@@ -496,7 +544,7 @@ void Server::kickCommand(int i)
        
     if (!reason.empty() && reason[0] != ':')
         reason = ":" + reason; 
-        
+
     this->_channels[channelname].broadcastMessage( RPL_KICK(_clients[i].getNickName(),_clients[i].getUserName(),_clients[i].getIP(),channelname,kickeduser,reason));
     this->_channels[channelname].removeClient(*cl, KICK);
 }
@@ -518,7 +566,6 @@ void Server::topicCommand(int i)
     if (!is_memberInChannel(argsVec[0], this->_clients[i]))
         return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), argsVec[0]));
 
-    //   mode 't' topicRestricted
     if (this->_channels[argsVec[0]].getMode('t') == true)
     {
         if (!this->_channels[argsVec[0]].hasPermission(_clients[i]))
@@ -570,9 +617,6 @@ void Server::privmsgCommand(int i)
         Client *cl = getClientByNickName(target); // reciever client .
         if (cl == NULL)
             return this->_clients[i].sendMsg(ERR_NOSUCHNICK(target));
-        if (sender.getNickName() == cl->getNickName())
-            return this->_clients[i].sendMsg(ERR_NOSUCHNICK(target));
-
         cl->sendMsg(":" + sender.getNickName() + "!~" + sender.getUserName() + "@" + sender.getIP() + " PRIVMSG " + target + "" + params.substr(argsVec[0].size()) + "\r\n");
     }
 }
@@ -603,10 +647,11 @@ void Server::listCommand(int i)
     this->_clients[i].sendMsg(RPL_LISTEND(this->_clients[i].getNickName()));
 }
 
-// 
+
 void Server::inviteCommand(int i)
 {
     std::string params;
+
     if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "INVITE"));
 
@@ -619,23 +664,29 @@ void Server::inviteCommand(int i)
 
     if (!findChannelName(channelname))
         return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
-    
+
     if (!is_memberInChannel(channelname, this->_clients[i]))
         return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), channelname));
 
-    if (this->_channels[channelname].getMode('i') && !this->_channels[channelname].hasPermission(_clients[i])) {
+    if (this->_channels[channelname].getMode('i') && !this->_channels[channelname].hasPermission(_clients[i]))
         return this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelname));
-    }
 
     Client *cl = getClientByNickName(inviteduser);
     if (cl == NULL)
         return this->_clients[i].sendMsg(ERR_NOSUCHNICK(inviteduser));
-    
-    if (is_memberInChannel(channelname, *cl))
-        return this->_clients[i].sendMsg(ERR_USERONCHANNEL(inviteduser));
 
-    this->_channels[channelname].addClient(*cl);
-    this->_channels[channelname].broadcastMessage(RPL_INVITING(this->_clients[i].getNickName(), inviteduser, channelname));
+    if (is_memberInChannel(channelname, *cl))
+        return this->_clients[i].sendMsg(ERR_USERONCHANNEL(inviteduser, channelname));
+
+    this->_channels[channelname].addInvitee(*cl);
+
+    // Notify the invited user about the invitation
+    cl->sendMsg(RPL_INVITING(this->_clients[i].getNickName(), inviteduser, channelname));
+
+    // Send confirmation to the inviter
+    this->_clients[i].sendMsg(RPL_INVITING(this->_clients[i].getNickName(), inviteduser, channelname));
+
+
 }
 
 
@@ -709,12 +760,12 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
 
         if (signal)
         {
-            channel._clients[targetClient->getNickName()].setOperStatus(true);
+            channel._clients[targetClient->getNickName()]->setOperStatus(true);
             channel.refrechChannel(*targetClient);
         }
         else
         {
-            channel._clients[targetClient->getNickName()].setOperStatus(false);
+            channel._clients[targetClient->getNickName()]->setOperStatus(false);
             channel.refrechChannel(*targetClient);
         }
         channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " " + "o" + " :Operator privileges " + (signal ? "granted to " : "removed from ") + argsVec[2] + "\r\n");

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/24 07:31:29 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 01:39:12 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ private:
     int						        _userLimit;
     t_Mode                          _mode;
     t_SetterCl                      _setterCl;
-    std::map<std::string, Client>	_clients;
+    std::map<std::string, Client*>	_clients;
+    std::vector<std::string>    	_invitee;
+    
 
 
 
@@ -73,8 +75,11 @@ public:
     void setInviteOnly(bool mode);
     void setTopicRestricted(bool mode);
 
+    
     void addClient(Client& cli);
     void removeClient(Client& cli, int indxcmd);
+    void addInvitee(Client& cli);
+    bool isInvitee(Client& cli);
     bool hasPermission(Client cli);
     void refrechChannel(Client cli);
     void broadcastMessage(std::string msg);

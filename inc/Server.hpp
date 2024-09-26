@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/24 07:31:05 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/25 01:56:23 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@
 #include "Message.hpp"
 #include "replies.hpp"
 #include "IRC.hpp"
+#include <fcntl.h>
 
 class Server
 {

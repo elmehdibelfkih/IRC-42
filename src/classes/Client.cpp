@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/24 07:05:12 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 02:57:07 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ Client& Client::operator=(const Client& obj)
         this->_IP = obj._IP;
         this->_nbrchannels = obj._nbrchannels;
         this->_msg = obj._msg;
+        this->stream = obj.stream;
     }
     return *this;
 }
@@ -140,11 +141,12 @@ void Client::setPass(bool b)
 //         for (; it != this->_channels.end(); it++)
 //             (*it).removeClient(*this);        
 //     }
+    
 // }
 
 void  Client::sendMsg(std::string str)
 {
-    send(this->_clientFdSocket, str.c_str(), str.size(), 0);
+    stream += str;
 }
 
 bool Client::getPass() const

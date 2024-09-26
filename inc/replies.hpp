@@ -21,12 +21,13 @@
 #define ERR_CHANNELISFULL(client, channel) (SERVERNAME + " 471 " + client + " " + channel + " :Cannot join channel (+l)\r\n")
 #define ERR_INVITEONLYCHAN(client, channel) (SERVERNAME + " 473 " + client + " " + channel + " :Cannot join channel (+i)\r\n")
 #define ERR_BADCHANMASK(client, channel) (SERVERNAME + " 476 " + client + " " + channel + " :Bad channel name\r\n")
-#define ERR_USERONCHANNEL(client) (SERVERNAME + " 443 " + client + " :User is already on the channel\r\n")
+
+#define ERR_USERONCHANNEL(client, channel) (SERVERNAME + " 443 " + client + " " + channel + " :is already on channel\r\n")
 #define ERR_SYNTAXERROR(client, command) (SERVERNAME + " " + client + " " + command + " :Invalid parameters provided\r\n")
 #define ERR_NOTONCHANNEL(client, channel) (SERVERNAME + " 442 " + client + " " + channel + " :You're not on that channel\r\n")
 #define ERR_CHANOPRIVSNEEDED(client, channel) (SERVERNAME + " 482 " + client + " " + channel + " :You're not channel operator\r\n")
 #define ERR_NOSUCHNICK(client) (SERVERNAME + " 401 " + client + " :No such nick\r\n")
-#define ERR_NOSUCHSERVER(client) (SERVERNAME + " 402 " + client + " :No such server\r\n")
+#define ERR_NOSUCHSERVER(client) (SERVERNAME + " 402 " + client + " :No such channel\r\n")
 #define ERR_NOTEXTTOSEND(client) (SERVERNAME + " 412 " + client + " :No text to send\r\n")
 #define ERR_CANNOTSENDTOCHAN(client, channel) (SERVERNAME + " 404 " + client + " " + channel + " :Cannot send to channel\r\n")
 #define ERR_NOORIGIN(client) (SERVERNAME + " 409 " + client + " :No origin specified\r\n")
@@ -44,7 +45,7 @@
 #define RPL_PART(nick, user, host, channel, reason) (":" + nick + "!~" + user + "@" + host + " PART " + channel + " " + reason + "\r\n")
 #define RPL_KICK(nick, user, host, channel, kickeduser, reason) (":" + nick + "!~" + user + "@" + host + " KICK " + channel + " " + kickeduser + " " + reason + "\r\n")
 
-#define RPL_INVITING(client, inviter, channel) (SERVERNAME + " 341 " + client + " :" + inviter + " has been invited to " + channel + "\r\n")
+#define RPL_INVITING(client, inviteduser, channel) (SERVERNAME + " 341 " + client + " :" + inviteduser + " has been invited to join " + channel + "\r\n")
 #define RPL_KICKEDUSER(nick, user, host, channel, kickeduser, raison) (SERVERNAME + " " + nick + "!" + user + "@" + host + " KICK " + channel + " " + kickeduser + " " + raison + "\r\n")
 
 
@@ -63,7 +64,7 @@
 #define RPL_CHANNELMODEIS(client, channel, modestring, key, userlimit) (SERVERNAME + " 324 " + client + " " + channel + " :" + modestring + " " + key + " " + userlimit + "\r\n")
 
 #define RPL_VALIDNICK() (SERVERNAME + " :Nickname accepted\r\n")
-#define RPL_VALIDPASS() (SERVERNAME + " :Password accepted | Continue with  NICK or USER\r\n")
+#define RPL_VALIDPASS() (SERVERNAME + " :Password accepted | Continue with NICK and USER\r\n")
 
 
 #endif

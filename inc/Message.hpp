@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:53 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/22 01:14:26 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/24 23:30:56 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,17 @@
 #include <cstring>
 #include <vector>
 #include "IRC.hpp"
-
+#include <sstream>
 
 class Message
 {
 private:
-    std::string     _buffer; 
+    std::string     _buffer;
     std::string     _tokens;
     int             _fdsender;
-    int             _command; 
+    int             _command;
+
+    std::string ss; 
 public:
     Message();
     Message& operator=(const Message& obj);
@@ -48,6 +50,11 @@ public:
     void clearBuffer();
     bool IsReady();
     void parsBuffer();
+
+
+    void consume_buffer(const std::string& s) {
+        ss.append(s);
+    }
 };
 
 #endif
