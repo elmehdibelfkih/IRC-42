@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 11:22:14 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 13:43:33 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -391,8 +391,7 @@ void Server::nickCommand(int i)
                 it->second._clients.erase(oldnickname);
                 it->second._clients.insert(std::make_pair(params, &this->_clients[i]));
                 
-            it->second.broadcastMessage(msg);
-                // oldnickname NICK newNICk
+                it->second.broadcastMessage(msg);
             }
         }
         this->_clients[i].setNickName(params);
@@ -429,63 +428,118 @@ void Server::userCommand(int i)
     
 }
 
+std::vector<std::pair<std::string, std::string> > parseChannels(std::string params) {
+    std::vector<std::pair<std::string, std::string> > channels;
+    size_t la = 0;
+
+    // parse channel names
+    for (size_t i = 0; i < params.size(); i++) {
+        if (isspace(params[i])) {
+            la = i;  // Remember position of first space
+            break;
+        }
+
+        if (params[i] == '#') {  // Start of a channel name
+            std::string name = "";
+            while (i < params.size() && params[i] != ',' && !isspace(params[i])) {
+                name += params[i];
+                i++;
+            }
+            channels.push_back(std::make_pair(name, ""));
+            if (params[i] == ',') {  // continue to next name
+                continue;
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Skip whitespace between names and keys
+    while (la < params.size() && isspace(params[la])) {
+        la++;
+    }
+
+    size_t idx = 0;
+
+    // Parse keys
+    for (size_t i = la; i < params.size(); i++) {
+        std::string key = "";
+        while (i < params.size() && params[i] != ',') {
+            key += params[i];
+            i++;
+        }
+
+        // Assign the parsed key to the appropriate channel, if it exists
+        if (idx < channels.size()) {
+            channels[idx++].second = key;
+        } else {
+            break;
+        }
+    }
+
+    return channels;
+}
+
+
 void Server::joinCommand(int i)
 {
     std::string params = this->_clients[i].getMessage().getToken();
     if (params.empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "JOIN"));
+    std::vector<std::pair<std::string, std::string> > channels = parseChannels(params);
+    for (size_t j = 0; j < channels.size(); j++) {
 
-    std::vector<std::string> argsVec = splitString(params, ' ');
-    if (argsVec.empty() || argsVec.size() > 2)
-        return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "JOIN"));
+        // std::vector<std::string> argsVec = splitString(params, ' ');
+        // if (argsVec.empty() || argsVec.size() > 2)
+        //     return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "JOIN"));
 
-    std::string &channelname = argsVec[0];
-    std::string key = (argsVec.size() == 2) ? argsVec[1] : "";
+        std::string channelname = channels[j].first;
+        std::string key = channels[j].second;
 
-    if (!isValidChannelName(channelname))
-        return this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), channelname));
+        if (!isValidChannelName(channelname))
+            return this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), channelname));
 
-    if (this->_clients[i].getnbrChannels() >= LIMITCHANNELS)    // Check if client is over the channel limit
-        return this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(), channelname));
-    
-    if (findChannelName(channelname))
-    {
+        if (this->_clients[i].getnbrChannels() >= LIMITCHANNELS)    // Check if client is over the channel limit
+            return this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(), channelname));
+        
+        if (findChannelName(channelname))
+        {
 
-        Channel &channel = this->_channels[channelname]; 
+            Channel &channel = this->_channels[channelname]; 
 
-        if (!key.empty() && channel._passWord != key)
-            return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), key));
+            if (!key.empty() && channel._passWord != key)
+                return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), key));
 
-        if (is_memberInChannel(channelname, this->_clients[i]))
-            return _clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), channelname));
+            if (is_memberInChannel(channelname, this->_clients[i]))
+                return _clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), channelname));
 
-        // userlimit nbr  defined 
-        if (channel.getMode('l') && channel._clients.size() >= (size_t)channel.getUserlimit())
-            return this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(), channelname));
-        //invite only mode  
-        if (channel.getMode('i') && !channel.isInvitee(this->_clients[i]))// Invite-only mode check
-            return this->_clients[i].sendMsg(ERR_INVITEONLYCHAN(this->_clients[i].getNickName(), channelname));
-        // required key to join the channel.
-        if (channel.getMode('k') && (key.empty() || key != channel.getpassWord()))
-            return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), channelname));
+            // userlimit nbr  defined 
+            if (channel.getMode('l') && channel._clients.size() >= (size_t)channel.getUserlimit())
+                return this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(), channelname));
+            //invite only mode  
+            if (channel.getMode('i') && !channel.isInvitee(this->_clients[i]))// Invite-only mode check
+                return this->_clients[i].sendMsg(ERR_INVITEONLYCHAN(this->_clients[i].getNickName(), channelname));
+            // required key to join the channel.
+            if (channel.getMode('k') && (key.empty() || key != channel.getpassWord()))
+                return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), channelname));
+        }
+        else
+        {
+            std::cout << channelname << std::endl;
+            this->createChannel(channelname, key);
+        }
+        this->_channels[channelname].addClient(this->_clients[i]);
+        
+
+        if (this->_channels[channelname].isInvitee(this->_clients[i]))
+        {
+            std::vector<std::string>& inviteeList = this->_channels[channelname]._invitee;
+            std::vector<std::string>::iterator it = std::find(inviteeList.begin(), inviteeList.end(), this->_clients[i].getNickName());
+
+            if (it != inviteeList.end())
+                inviteeList.erase(it);
+        }
     }
-    else
-    {
-        this->createChannel(channelname, key);
-    }
-    this->_channels[channelname].addClient(this->_clients[i]);
-
-
-if (this->_channels[channelname].isInvitee(this->_clients[i]))
-{
-    std::vector<std::string>& inviteeList = this->_channels[channelname]._invitee;
-    std::vector<std::string>::iterator it = std::find(inviteeList.begin(), inviteeList.end(), this->_clients[i].getNickName());
-
-    if (it != inviteeList.end())
-        inviteeList.erase(it);
-}
-
-
 }
 
 void Server::partCommand(int i)
@@ -776,7 +830,9 @@ void Server::applyMode(const std::vector<std::string> &argsVec, int i)
             channel._clients[targetClient->getNickName()]->setOperStatus(false);
             channel.refrechChannel(*targetClient);
         }
-        channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " " + "o" + " :Operator privileges " + (signal ? "granted to " : "removed from ") + argsVec[2] + "\r\n");
+        channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " " + (signal ? "+o " : "-o ") +  argsVec[2] + "\r\n");
+        // channel.broadcastMessage(":" + client.getNickName() + "!" + client.getUserName() + "@" + client.getIP()  + " MODE " + channelName + " " + "o" +
+        //     " :Operator privileges " + (signal ? "granted to " : "removed from ") + argsVec[2] + "\r\n");
         break;
     default:
         client.sendMsg(ERR_UNKNOWNMODE(client.getNickName(), mode));

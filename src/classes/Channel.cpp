@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 11:01:58 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 12:11:19 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,13 +165,13 @@ void Channel::addClient(Client &cli)
     if (this->_clients.size() == 1)
         cli.setOperStatus(true);
     this->broadcastMessage(reply_join(cli, *this));
-    if(!this->getTopic().empty() )
+    if(!this->getTopic().empty())
     {
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
     }
-    else   
-        cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
+    // else   
+    //     cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
     
     refrechChannel(cli);
 }
