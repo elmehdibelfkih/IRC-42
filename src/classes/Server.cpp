@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 09:09:05 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 10:31:26 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -391,6 +391,7 @@ void Server::nickCommand(int i)
                 it->second._clients.erase(oldnickname);
                 it->second._clients.insert(std::make_pair(params, &this->_clients[i]));
                 
+            it->second.broadcastMessage(msg);
                 // oldnickname NICK newNICk
             }
         }
@@ -613,8 +614,7 @@ void Server::privmsgCommand(int i)
             return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), target));
         
         std::string msg = params.substr(target.size() + 1) ;
-        this->_channels[target].broadcastMessage(":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PRIVMSG " + target + " " + msg + "\r\n", 
-        this->_clients[i].getClientFdSocket());
+        this->_channels[target].broadcastMessage(":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PRIVMSG " + target + " " + msg + "\r\n");
     }
     else // target client.
     {

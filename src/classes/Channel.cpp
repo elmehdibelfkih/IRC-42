@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 10:23:18 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/26 11:01:58 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,10 +103,7 @@ void Channel::setpassWord(std::string newpassWord)
 std::string Channel::getTime() const
 {
     std::time_t currentTime = std::time(0);
-    std::tm localTime = *std::localtime(&currentTime);
-    char buffer[80];
-    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", &localTime);
-    return std::string(buffer);
+    return std::to_string(currentTime);
 }
 
 std::string Channel::showModes() const
@@ -150,6 +147,7 @@ std::string Channel::listusers( void )
     }
     return userList;
 }
+
 std::string    reply_join(Client clt, Channel ch) {
     std::stringstream ss;
     
@@ -167,7 +165,6 @@ void Channel::addClient(Client &cli)
     if (this->_clients.size() == 1)
         cli.setOperStatus(true);
     this->broadcastMessage(reply_join(cli, *this));
-    // this->broadcastMessage(RPL_JOIN(cli.getNickName(), cli.getUserName(), cli.getIP(), this->getChannelName()));
     if(!this->getTopic().empty() )
     {
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
