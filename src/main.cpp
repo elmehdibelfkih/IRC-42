@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:55 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/20 00:41:50 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/29 07:22:27 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,5 @@ int main(int argc, char const *argv[])
 		Server test(argv[1], argv[2]);
 		test.startServer();
 	}
-	
-	
-
-
 	return 0;
 }

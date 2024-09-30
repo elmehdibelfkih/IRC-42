@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/25 01:56:23 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/29 06:18:28 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,13 @@ public:
 
 
 
-    void                        createChannel(std::string &channelName, std::string key);
+    void                        createChannel(std::string &channelName, std::string key, t_Mode mode);
     bool                        findChannelName(std::string &channelName);
     bool                        is_memberInChannel(std::string &channelName, Client cl);
     bool                        isValidChannelName(std::string &channelName);
     bool                        isValidChannelKey(std::string &keys);
     Client                      *getClientByNickName(std::string nick);
+    
     void                        applyMode(const std::vector<std::string> &argsVec, int i);
     void                        passCommand(int i);
     void                        nickCommand(int i);

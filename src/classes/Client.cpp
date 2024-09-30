@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/26 09:09:10 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/09/29 04:55:26 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ Client::Client()
     this->_clientFdSocket = -1;
     this->_nbrchannels = 0;
     this->_authenticate = false;
-    this->_operStatus = false;
     this->_pass = false;
     this->_userName = "";
     this->_nickName = "";
@@ -38,7 +37,6 @@ Client &Client::operator=(const Client &obj)
         this->_pass = obj._pass;
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
-        this->_operStatus = obj._operStatus;
         this->_IP = obj._IP;
         this->_nbrchannels = obj._nbrchannels;
         this->_msg = obj._msg;
@@ -61,7 +59,6 @@ Client::Client(int clientFdSocket, bool authenticate) : _authenticate(authentica
     this->_nickName = "";
     this->_IP = "";
     this->_pass = false;
-    this->_operStatus = false;
     this->_clientFdSocket = clientFdSocket;
     this->_nbrchannels = 0;
 }
@@ -164,20 +161,10 @@ void Client::setnbrChannels(char sign)
         this->_nbrchannels--;
 }
 
-std::string Client::getTime() const
-{
-    std::time_t currentTime = std::time(0);
-    std::tm *localTime = std::localtime(&currentTime);
+std::string Client::getTime() const {
+    std::time_t currentTime = std::time(0);  // no std:: prefix
+    std::tm *localTime = std::localtime(&currentTime);  // no std:: prefix
     char buffer[80];
-    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);
+    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);  // no std:: prefix
     return std::string(buffer);
-}
-
-void Client::setOperStatus(bool status)
-{
-    this->_operStatus = status;
-}
-bool Client::getOperStatus() const
-{
-    return this->_operStatus;
 }
