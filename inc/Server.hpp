@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/02 23:30:44 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/03 18:33:25 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ public:
     bool                        isValidChannelName(std::string &channelName);
     bool                        isValidChannelKey(std::string &keys);
     Client                      *getClientByNickName(std::string nick);
-    void                        applyMode(const std::vector<std::string> &argsVec, int i);
+
     void                        passCommand(int i);
     void                        nickCommand(int i);
     void                        userCommand(int i);

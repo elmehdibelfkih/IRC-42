@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/02 23:31:11 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/03 18:34:18 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,6 @@ public:
     int         getClientFdSocket() const;
     bool        getAuthenticate() const;
     bool        getPass() const;
-    bool        getOperStatus() const;
     std::string getNickName() const;
     std::string getUserName() const;
     std::string getIP() const;

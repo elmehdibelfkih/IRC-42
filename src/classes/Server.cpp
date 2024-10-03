@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/02 21:53:20 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/03 18:40:58 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,8 +279,8 @@ bool Server::checkNickName(std::string nickname)
 void Server::createChannel(std::string &channelname, std::string key)
 {
     this->_channels.insert(std::pair<std::string, Channel>(channelname, Channel(channelname, key)));
-    // if (!key.empty())
-    //     this->_channels[channelname]._mode.requiredKey = true;
+    if (!key.empty())
+        this->_channels[channelname]._mode.requiredKey = true;
 
 }
 

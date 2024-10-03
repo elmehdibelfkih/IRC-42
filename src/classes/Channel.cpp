@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/02 23:23:44 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/03 21:27:05 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,8 @@ void Channel::removeClient(Client &cli, int indexcmd)
     if (this->hasPermission(cli))
     {
         std::vector<std::string> ::iterator it = std::find(this->_operators.begin(), this->_operators.end(), cli.getNickName());
-        this->_operators.erase(it);
+        if(it != _operators.end())
+            this->_operators.erase(it);
     }
     this->_clients.erase(cli.getNickName());
     refrechChannel(cli);

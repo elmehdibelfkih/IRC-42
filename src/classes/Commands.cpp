@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 19:06:26 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/10/02 21:53:28 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/03 21:39:08 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,37 +103,46 @@ void Server::userCommand(int i)
 }
 
 
-
 void Server::partCommand(int i)
 {
-    std::string params, reason;
+    std::string params, channelname, reason;
 
     if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PART"));
+    
 
     std::vector<std::string> argsVec = splitString(params, ' ');
-    if (argsVec.empty())
-        return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PART"));
-
-    std::string channelname = argsVec[0];
-    if (!findChannelName(channelname))
-        return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
-    if (!is_memberInChannel(channelname, this->_clients[i]))
-        return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), channelname));
-
-    if (argsVec.size() > 1) //  reason provided
-        reason = params.substr(channelname.size() + 1); 
-    else // No reason provided
-        reason = "No reason provided";
+        if(argsVec.empty())
+            return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "PART"));
+        
+    if(argsVec.size() > 1)
+        reason = params.substr(argsVec[0].size() + 1); 
+    std::istringstream iss(argsVec[0]);
     
-    if (!reason.empty() && reason[0] != ':')
+    while(std::getline(iss, channelname, ','))
+    {
+        if (!findChannelName(channelname))
+            {
+                this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
+                continue;
+            } 
+        if (!is_memberInChannel(channelname, this->_clients[i]))
+            {
+                this->_clients[i].sendMsg(ERR_NOTONCHANNEL(this->_clients[i].getNickName(), channelname));
+                continue;
+            }
+        if (!reason.empty() && reason[0] != ':')
         reason = ":" + reason; 
 
-    std::string partMessage = ":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PART " + channelname + " " + reason + "\r\n";
+        std::string partMessage = ":" + _clients[i].getNickName() + "!~" + _clients[i].getUserName() + "@" + _clients[i].getIP() + " PART " + channelname + " " + reason + "\r\n";
     this->_channels[channelname].broadcastMessage(partMessage);
     this->_channels[channelname].removeClient(this->_clients[i], PART);
-    
+    if(this->_channels[channelname]._clients.empty())
+        this->_channels.erase(channelname);
+        
+    }
 }
+
 
 void Server::kickCommand(int i)
 {
@@ -146,7 +155,7 @@ void Server::kickCommand(int i)
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "KICK"));
 
     std::string &channelname = argsVec[0];
-    std::string &kickeduser = argsVec[1];
+    std::string &kickedusers = argsVec[1];
 
     if (!findChannelName(channelname))
         return this->_clients[i].sendMsg(ERR_NOSUCHCHANNEL(this->_clients[i].getNickName(), channelname));
@@ -154,23 +163,29 @@ void Server::kickCommand(int i)
     if (!this->_channels[channelname].hasPermission(_clients[i]))
         return this->_clients[i].sendMsg(ERR_CHANOPRIVSNEEDED(this->_clients[i].getNickName(), channelname));
 
-    Client *cl = getClientByNickName(kickeduser); 
-    if (cl == NULL)
-        return this->_clients[i].sendMsg(ERR_NOSUCHNICK(kickeduser));
-
-    if (!is_memberInChannel(channelname, *cl))
-        return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(kickeduser, channelname));
-
     if (argsVec.size() > 2)  // reason is provided
-        reason = params.substr(channelname.size() + kickeduser.size() + 2 ); 
+        reason = params.substr(channelname.size() + kickedusers.size() + 2); 
     else
         reason = "No reason provided";
-       
-    if (!reason.empty() && reason[0] != ':')
-        reason = ":" + reason; 
 
-    this->_channels[channelname].broadcastMessage( RPL_KICK(_clients[i].getNickName(),_clients[i].getUserName(),_clients[i].getIP(),channelname,kickeduser,reason));
-    this->_channels[channelname].removeClient(*cl, KICK);
+    if (!reason.empty() && reason[0] != ':')
+        reason = ":" + reason;
+
+    std::istringstream iss(kickedusers);
+    std::string k_user;
+    while (std::getline(iss, k_user, ',')) {
+        Client *cl = getClientByNickName(k_user); 
+        if (cl == NULL) {
+            this->_clients[i].sendMsg(ERR_NOSUCHNICK(k_user));
+            continue;
+        }
+
+        if (!is_memberInChannel(channelname, *cl))
+            return this->_clients[i].sendMsg(ERR_NOTONCHANNEL(k_user, channelname));
+
+        this->_channels[channelname].broadcastMessage(RPL_KICK(_clients[i].getNickName(), _clients[i].getUserName(), _clients[i].getIP(), channelname, k_user, reason));
+        this->_channels[channelname].removeClient(*cl, KICK);
+    }
 }
 
 
@@ -373,8 +388,9 @@ std::vector<std::pair<std::string, std::string> > parseChannels(std::string para
 
 void Server::joinCommand(int i)
 {
-    std::string params = this->_clients[i].getMessage().getToken();
-    if (params.empty())
+    std::string params;
+    
+    if ((params = this->_clients[i].getMessage().getToken()).empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "JOIN"));
     std::vector<std::pair<std::string, std::string> > channels = parseChannels(params);
     for (size_t j = 0; j < channels.size(); j++) {
@@ -575,3 +591,7 @@ void Server::modeCommand(int i)
 
     }
 }
+
+
+
+
