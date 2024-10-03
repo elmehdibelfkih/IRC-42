@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+         #
+#    By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/04/07 01:27:20 by ebelfkih          #+#    #+#              #
-#    Updated: 2024/09/29 07:36:18 by ebelfkih         ###   ########.fr        #
+#    Updated: 2024/10/02 21:43:56 by ybouchra         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,7 @@ NAME			= ircserv
 SRC				= main.cpp					\
 				utils/helpers.cpp			\
 				utils/errors.cpp			\
+				utils/tools.cpp				\
 				classes/Server.cpp			\
 				classes/Client.cpp			\
 				classes/Message.cpp			\
@@ -27,7 +28,7 @@ DIR_INC		= inc/
 OBJ			= ${SRC:%.cpp=${DIR_OBJ}%.o}
 CXX			= c++ 
 DEP			= ${OBJ:%.o=%.d}
-CPPFLAGS	= -Wall -Wextra -Werror -MMD -std=c++98 -c -I ${DIR_INC} 
+CPPFLAGS	=  -c -I ${DIR_INC} 
 RM 			= rm -f
 RMDIR		= rm -rf
 

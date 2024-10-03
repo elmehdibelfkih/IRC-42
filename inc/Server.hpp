@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/29 06:18:28 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/10/02 23:30:44 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #include <cctype>
 #include <iostream>
 #include <algorithm>
+#include <limits>
 #include <vector>
 #include <map>
 #include <poll.h>
@@ -49,23 +50,21 @@ public:
     Server(const Server& obj);
     ~Server();
 
-    void        startServer(); 
-    bool        authenticateUser(int i); 
-    void        handleClientConnection(); 
-    void        handleClientMessage(int i); 
-    bool        checkNickName(std::string nickname);
-    bool        checkUserName(std::string username);
+    void                        startServer(); 
+    bool                        authenticateUser(int i); 
+    void                        handleClientConnection(); 
+    void                        handleClientMessage(int i); 
+    bool                        checkNickName(std::string nickname);
+    bool                        checkUserName(std::string username);
  
+    void                        applyModes(const std::string &modes, const std::vector<std::string> &argsVec, int clientIdx);
 
-
-
-    void                        createChannel(std::string &channelName, std::string key, t_Mode mode);
+    void                        createChannel(std::string &channelName, std::string key);
     bool                        findChannelName(std::string &channelName);
     bool                        is_memberInChannel(std::string &channelName, Client cl);
     bool                        isValidChannelName(std::string &channelName);
     bool                        isValidChannelKey(std::string &keys);
     Client                      *getClientByNickName(std::string nick);
-    
     void                        applyMode(const std::vector<std::string> &argsVec, int i);
     void                        passCommand(int i);
     void                        nickCommand(int i);

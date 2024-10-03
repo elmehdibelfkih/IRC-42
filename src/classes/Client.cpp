@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/29 04:55:26 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/10/02 19:50:52 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ Client::Client()
     this->_clientFdSocket = -1;
     this->_nbrchannels = 0;
     this->_authenticate = false;
+    this->_operStatus = false;
     this->_pass = false;
     this->_userName = "";
     this->_nickName = "";
@@ -37,6 +38,7 @@ Client &Client::operator=(const Client &obj)
         this->_pass = obj._pass;
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
+        this->_operStatus = obj._operStatus;
         this->_IP = obj._IP;
         this->_nbrchannels = obj._nbrchannels;
         this->_msg = obj._msg;
@@ -59,6 +61,7 @@ Client::Client(int clientFdSocket, bool authenticate) : _authenticate(authentica
     this->_nickName = "";
     this->_IP = "";
     this->_pass = false;
+    this->_operStatus = false;
     this->_clientFdSocket = clientFdSocket;
     this->_nbrchannels = 0;
 }
@@ -161,10 +164,12 @@ void Client::setnbrChannels(char sign)
         this->_nbrchannels--;
 }
 
-std::string Client::getTime() const {
-    std::time_t currentTime = std::time(0);  // no std:: prefix
-    std::tm *localTime = std::localtime(&currentTime);  // no std:: prefix
+std::string Client::getTime() const
+{
+    std::time_t currentTime = std::time(0);
+    std::tm *localTime = std::localtime(&currentTime);
     char buffer[80];
-    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);  // no std:: prefix
+    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);
     return std::string(buffer);
 }
+

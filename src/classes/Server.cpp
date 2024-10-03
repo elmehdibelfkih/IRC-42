@@ -1,13 +1,12 @@
-
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/28 10:16:51 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/10/02 21:53:20 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +105,8 @@ void Server::startServer()
     this->handleClientConnection();
 }
 
+
+
 void Server::handleClientConnection()
 {
     while (true)
@@ -132,8 +133,7 @@ void Server::handleClientConnection()
                 continue;
             }
             std::string clientIP = inet_ntoa(clientAddr.sin_addr);
-            logToFile("New client connected");
-            // << "New client connected: " << clientIP << std::endl;
+            std::cout << "New client connected: " << clientIP << std::endl;
 
             pollfd tmp;
             tmp.fd = clientFdSocket;
@@ -157,11 +157,12 @@ void Server::handleClientConnection()
                 bytesReceived = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
                 if (bytesReceived == 0)
                 {
-                    std::cout << "Client disconnected : " << i << std::endl;
+                    std::cout << "Client disconnected" << std::endl;
+                    // this->_clients[this->_fds[i].fd].disconnect();
                     if (this->_clients[this->_fds[i].fd].getAuthenticate())
                     {
-                        for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-                            (*it).second.removeClient(_clients[this->_fds[i].fd], -1); 
+                        for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+                        (  *it).second.removeClient(_clients[this->_fds[i].fd], -1); 
                     }
                     close(this->_fds[i].fd);
                     this->_clients.erase(this->_fds[i].fd);
@@ -173,6 +174,7 @@ void Server::handleClientConnection()
                     continue;
                 }
                 this->_clients[this->_fds[i].fd].consume_message(buffer);
+
             }
             if (this->_clients[this->_fds[i].fd].getMessage().IsReady()) {
                 this->handleClientMessage(this->_fds[i].fd);
@@ -180,12 +182,12 @@ void Server::handleClientConnection()
             if (this->_fds[i].revents & POLLOUT)
                 this->_clients[this->_fds[i].fd].writeMessageToSocket();
         }
+
     }
 }
 
 void Server:: handleClientMessage(int i)
 {
-        logToFile(this->_clients[i].getMessage().getBuffer());
         if (this->authenticateUser(i))
         {
             switch (this->_clients[i].getMessage().getCommand())
@@ -274,15 +276,17 @@ bool Server::checkNickName(std::string nickname)
     return true;
 }
 
-void Server::createChannel(std::string &channelName, std::string key, t_Mode mode)
+void Server::createChannel(std::string &channelname, std::string key)
 {
-    // this->_channels.insert(std::pair<std::string, Channel>(channelname, Channel(channelname, key, topic, mode)));
-    this->_channels[channelName] = Channel(channelName, key, mode);
+    this->_channels.insert(std::pair<std::string, Channel>(channelname, Channel(channelname, key)));
+    // if (!key.empty())
+    //     this->_channels[channelname]._mode.requiredKey = true;
 
 }
 
 bool Server::findChannelName(std::string &channelName)
 {
+
     if (this->_channels.empty() || channelName.empty())
         return (false);
     std::map<std::string, Channel>::iterator it = this->_channels.find(channelName);  
@@ -312,6 +316,7 @@ bool Server::isValidChannelKey(std::string &key)
     return (true);
 }
 
+
 bool Server::isValidChannelName(std::string &channelName)
 {
     if (channelName.empty())
@@ -326,3 +331,5 @@ bool Server::isValidChannelName(std::string &channelName)
     }
     return (true);
 }
+
+

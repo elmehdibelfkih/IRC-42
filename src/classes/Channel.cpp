@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Channel.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/09/30 02:35:50 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/10/02 23:23:44 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,19 +15,15 @@
 Channel::Channel()
 {
 }
-
-Channel::Channel(std::string channelName, std::string key, t_Mode mode) 
-    : _channelName(channelName), _passWord(key), _mode(mode)
+Channel::Channel(std::string channelname, std::string key) : _channelName(channelname), _passWord(key)
 {
-    // this->_topic = "";
+    this->_topic = "";
     this->_userLimit = -1;               // default value ofthe number of users who can join the channel.
-    // this.
-    // this->_mode.inviteOnly = false;      // any one can join to the channel ;
-    // this->_mode.topicRestricted = false; // any one can set the topic of the channel ;
-    // this->_mode.userLimit = false;       // No limit on the number of users who can join the channel.
-    // this->_mode.requiredKey = false;     // the key of channel required .
-    // this->_setterCl.nickName = "";
-    // this->_setterCl.time = getCurrentTime();
+    this->_mode.inviteOnly = false;      // invite only: no one can join a channel whithout pre invite from operator the channel
+    this->_mode.topicRestricted = false; // any one can set the topic of the channel .
+    this->_mode.userLimit = false;       // used to limit the number of users in the channel
+    this->_mode.requiredKey = false;     // password is required to join channel.
+    this->_creationTime = this->getTime();
 }
 
 Channel &Channel::operator=(const Channel &obj)
@@ -35,19 +31,15 @@ Channel &Channel::operator=(const Channel &obj)
     if (this != &obj)
     {
         this->_channelName = obj._channelName;
+        this->_userLimit = obj._userLimit;
         this->_passWord = obj._passWord;
         this->_topic = obj._topic;
-        this->_userLimit = obj._userLimit;
-        this->_mode = obj._mode;
-        this->_invitee = obj._invitee;
+        this->_mode.inviteOnly = obj._mode.inviteOnly;
+        this->_mode.topicRestricted = obj._mode.topicRestricted;
+        this->_mode.userLimit = obj._mode.userLimit;
+        this->_mode.requiredKey = obj._mode.requiredKey;
         this->_clients = obj._clients;
-        this->_operators = obj._operators;
-        // this->_mode.inviteOnly = obj._mode.inviteOnly;
-        // this->_mode.topicRestricted = obj._mode.topicRestricted;
-        // this->_mode.userLimit = obj._mode.userLimit;
-        // this->_mode.requiredKey = obj._mode.requiredKey;
-        // this->_setterCl.nickName = obj._setterCl.nickName;
-        // this->_setterCl.time = obj._setterCl.time;
+
     }
     return *this;
 }
@@ -82,13 +74,13 @@ std::string Channel::getTopic() const
 bool Channel::getMode(char token) const
 {
     if (token == 'i')
-        return this->_mode.i;
+        return this->_mode.inviteOnly;
     if (token == 't')
-        return this->_mode.t;
+        return this->_mode.topicRestricted;
     if (token == 'l')
-        return this->_mode.l;
+        return this->_mode.userLimit;
     if (token == 'k')
-        return this->_mode.k;
+        return this->_mode.requiredKey;
     return false;
 }
 
@@ -105,57 +97,55 @@ void Channel::setChannelName(std::string newName)
 void Channel::setpassWord(std::string newpassWord)
 {
     this->_passWord = newpassWord;
+
+}
+
+std::string Channel::getTime() const
+{
+
+    std::time_t currentTime = std::time(0);
+    std::ostringstream oss;
+    oss << currentTime;  // Convert time_t to string
+    return oss.str();    // Return the string representation
 }
 
 std::string Channel::showModes() const
 {
     std::string modes = "";
 
-    if (this->getMode('k'))
-        modes += 'k';
-    if (this->getMode('i'))
-        modes += 'i';
     if (this->getMode('t'))
         modes += 't';
+    if (this->getMode('i'))
+        modes += 'i';
     if (this->getMode('l'))
         modes += 'l';
+    if (this->getMode('k'))
+    modes += 'k';
+        
+   if (!modes.empty())
+        modes.insert(modes.begin(), '+');
     return (modes);
 }
-void Channel::refrechChannel(Client cli)
+void Channel::refrechChannel(Client &cli)
 {
     std::string userList;
     for (std::map<std::string, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
     {
-        if (this->isOperator(*it->second))
+        if (this->hasPermission(*it->second))
             userList += "@" + (*it->second).getNickName() + " ";
         else
             userList += (*it->second).getNickName() + " ";
     }
-
-    cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), "=", this->getChannelName(), trimFunc(userList)));
+    
+    cli.sendMsg(RPL_NAMREPLY(cli.getNickName(), '=', this->getChannelName(), trimFunc(userList)));
     cli.sendMsg(RPL_ENDOFNAMES(cli.getNickName(), this->getChannelName()));
 }
 
-std::string Channel::listusers( void )
+std::string    reply_join(Client clt, Channel ch)
 {
-    std::string userList;
-    for (std::map<std::string, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
-    {
-        if (this->isOperator(*it->second))
-            userList += "@" + (*it->second).getNickName() + " ";
-        else
-            userList += (*it->second).getNickName() + " ";
-    }
-    return userList;
-}
-
-std::string    reply_join(Client clt, Channel ch) {
     std::stringstream ss;
-    
     ss << ":" + clt.getNickName() + "!~" + clt.getUserName() + "@" + clt.getIP() + " JOIN " + ch.getChannelName() + "\r\n";
-    ss << ":ircserver " << "MODE " + ch.getChannelName() << " +" << ch.showModes() << "\r\n";
-    ss << ":ircserver " << "353 " << clt.getNickName() << " @ " << ch.getChannelName() << " :" << ch.listusers() << "\r\n";
-    ss << ":ircserver 366 " << clt.getNickName() << " " << ch.getChannelName() << " :End of /NAMES list.\r\n";
+    ss << ":ircserver " << "MODE " + ch.getChannelName() << " " << ch.showModes() << "\r\n";
     return ss.str();
 }
 
@@ -164,7 +154,7 @@ void Channel::addClient(Client &cli)
     cli.setnbrChannels('+');
     this->_clients.insert(std::pair<std::string, Client *>(cli.getNickName(), &cli));
     if (this->_clients.size() == 1)
-        this->_operators.push_back(cli.getNickName());
+          this->_operators.push_back(cli.getNickName());
     this->broadcastMessage(reply_join(cli, *this));
     if(!this->getTopic().empty())
     {
@@ -173,8 +163,9 @@ void Channel::addClient(Client &cli)
     }
     // else   
     //     cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
-    
+
     refrechChannel(cli);
+    
 }
 
 void Channel::removeClient(Client &cli, int indexcmd)
@@ -186,92 +177,69 @@ void Channel::removeClient(Client &cli, int indexcmd)
     else if (indexcmd == PART)
         this->broadcastMessage(":" + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
 
-    refrechChannel(cli);
+    if (this->hasPermission(cli))
+    {
+        std::vector<std::string> ::iterator it = std::find(this->_operators.begin(), this->_operators.end(), cli.getNickName());
+        this->_operators.erase(it);
+    }
     this->_clients.erase(cli.getNickName());
+    refrechChannel(cli);
 
 }
 
 void Channel::setTopic(std::string newTopic, Client setter)
 {
-    if (this->_topic == newTopic || newTopic.empty())
-        return;
-    this->_topic = newTopic;
+
+    this->_topic             = newTopic;
     this->_setterCl.nickName = setter.getNickName();
-    this->_setterCl.time = getCurrentTime();
+    this->_setterCl.userName = setter.getUserName();
+    this->_setterCl.ip       = setter.getIP();
+    this->_setterCl.time     = this->getTime();
+
 
     this->broadcastMessage(":" + setter.getNickName() + "!" + setter.getUserName() + "@" + setter.getIP() + " TOPIC " + this->getChannelName() + " :" + this->getTopic() + "\r\n");
-    if (this->_topic.empty())
-        this->broadcastMessage(RPL_NOTOPIC(setter.getNickName(), this->getChannelName()));
-    else
-    {
-        this->broadcastMessage(RPL_TOPIC(setter.getNickName(), this->getChannelName(), this->getTopic()));
-        this->broadcastMessage(RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), this->_setterCl.nickName, this->_setterCl.time));
-    }
+
+        setter.sendMsg(RPL_TOPIC(setter.getNickName(), this->getChannelName(), this->getTopic()));
+        std::string setterInfo = _setterCl.nickName + "!~" + _setterCl.userName + "@" +_setterCl.ip;
+        setter.sendMsg(RPL_TOPICWHOTIME(setter.getNickName(), this->getChannelName(), setterInfo, this->_setterCl.time));
+
+}
+
+bool Channel::hasPermission(Client &cli)
+{
+return std::find(this->_operators.begin(), this->_operators.end(), cli.getNickName()) != this->_operators.end();
 }
 
 void Channel::broadcastMessage(std::string msg)
 {
-    for (std::map<std::string, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
-            it->second->sendMsg(msg);
-}
+    std::map<std::string, Client *>::iterator it = this->_clients.begin();
 
-
-void Channel::broadcastMessage(std::string msg, Client &cli) // duplicate message on channel
-{
-    for (std::map<std::string, Client *>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
+    for (; it != this->_clients.end(); it++)
     {
-        if (it->second->getNickName() != cli.getNickName())
-            it->second->sendMsg(msg);
-    }
-}
-
-bool Channel::isOperator(Client &cli)
-{
-    for (std::vector<std::string>::iterator it = this->_operators.begin(); it != this->_operators.end(); ++it)
-    {
-        if (*it == cli.getNickName())
-            return true;
-    }
-    return false;
-}
-
-void Channel::setOperMode(Client &cli, bool mode)
-{
-    if (mode && !this->isOperator(cli))
-        this->_operators.push_back(cli.getNickName());
-    else if (this->isOperator(cli) && !mode)
-    {
-        for (std::vector<std::string>::iterator it = this->_operators.begin(); it != this->_operators.end(); it++)
-        {
-            if (*it == cli.getNickName())
-            {
-                this->_operators.erase(it);
-                break;
-            }
-        }
+        it->second->sendMsg(msg);
     }
 }
 
 
 void Channel::setInviteOnly(bool mode)
 {
-    this->_mode.i = mode;
+    this->_mode.inviteOnly = mode;
 }
 
 void Channel::setTopicRestricted(bool mode)
 {
-    this->_mode.t = mode;
+    this->_mode.topicRestricted = mode;
 }
 void Channel::setUserLimit(int limit)
 {
     this->_userLimit = limit;
-    this->_mode.l = true;
 }
 
 void Channel::addInvitee(Client &cli)
 {
     this->_invitee.push_back(cli.getNickName());
 }
+
 
 bool Channel::isInvitee(Client &cli)
 {
