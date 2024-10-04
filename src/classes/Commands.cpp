@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/02 19:06:26 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/10/03 21:39:08 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/04 18:28:02 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -333,101 +333,67 @@ void Server::inviteCommand(int i)
 }
 
 
-std::vector<std::pair<std::string, std::string> > parseChannels(std::string params) {
-    std::vector<std::pair<std::string, std::string> > channels;
-    size_t la = 0;
+std::pair<std::vector<std::string>, std::vector<std::string> > parseChannels(std::string params, bool &syntaxerror)
+{
+    std::vector<std::string> channels, keys;
 
-    // parse channel names
-    for (size_t i = 0; i < params.size(); i++) {
-        if (isspace(params[i])) {
-            la = i;  // Remember position of first space
-            break;
-        }
-
-        if (params[i] == '#') {  // Start of a channel name
-            std::string name = "";
-            while (i < params.size() && params[i] != ',' && !isspace(params[i])) {
-                name += params[i];
-                i++;
-            }
-            channels.push_back(std::make_pair(name, ""));
-            if (params[i] == ',') {  // continue to next name
-                continue;
-            } else {
-                break;
-            }
-        }
+    std::vector<std::string> argsVec = splitString(params, ' ');
+    if (argsVec.empty() || argsVec.size() > 2)
+    {
+        syntaxerror = true;
+        return std::pair<std::vector<std::string>, std::vector<std::string> >();
     }
+    channels = splitString(argsVec[0], ',');
+    if (argsVec.size() > 1)
+        keys = splitString(argsVec[1], ',');
+        
+    if (keys.size() < channels.size())
+        keys.resize(channels.size(), "");
 
-    // Skip whitespace between names and keys
-    while (la < params.size() && isspace(params[la])) {
-        la++;
-    }
+return std::pair< std::vector<std::string>, std::vector<std::string> > (channels, keys);
 
-    size_t idx = 0;
-
-    // Parse keys
-    for (size_t i = la; i < params.size(); i++) {
-        std::string key = "";
-        while (i < params.size() && params[i] != ',') {
-            key += params[i];
-            i++;
-        }
-
-        // Assign the parsed key to the appropriate channel, if it exists
-        if (idx < channels.size()) {
-            channels[idx++].second = key;
-        } else {
-            break;
-        }
-    }
-
-    return channels;
+    return std::make_pair(channels, keys);
 }
-
 
 void Server::joinCommand(int i)
 {
-    std::string params;
-    
-    if ((params = this->_clients[i].getMessage().getToken()).empty())
+    bool syntaxerror = false;
+    std::string params = this->_clients[i].getMessage().getToken();
+    if (params.empty())
         return this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS(this->_clients[i].getNickName(), "JOIN"));
-    std::vector<std::pair<std::string, std::string> > channels = parseChannels(params);
-    for (size_t j = 0; j < channels.size(); j++) {
+    std::pair<std::vector<std::string>, std::vector<std::string> > channels = parseChannels(params, syntaxerror);
 
-        std::string channelname = channels[j].first;
-        std::string key = channels[j].second;
+        if (syntaxerror)
+            return this->_clients[i].sendMsg(ERR_SYNTAXERROR(this->_clients[i].getNickName(), "JOIN"));
+    for (size_t j = 0; j < channels.first.size(); j++) 
+    {
+        std::string channelname = channels.first[j];
+        std::string key = channels.second[j];
 
         if (!isValidChannelName(channelname))
             return this->_clients[i].sendMsg(ERR_BADCHANMASK(this->_clients[i].getNickName(), channelname));
-
-        if (this->_clients[i].getnbrChannels() >= LIMITCHANNELS)    // Check if client is over the channel limit
+        if (this->_clients[i].getnbrChannels() >= LIMITCHANNELS)
             return this->_clients[i].sendMsg(ERR_TOOMANYCHANNELS(this->_clients[i].getNickName(), channelname));
-        
         if (findChannelName(channelname))
         {
-
             Channel &channel = this->_channels[channelname]; 
 
-            if (!key.empty() && channel._passWord != key)
-                return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), key));
-
+            if (channel.getMode('k') && channel._passWord != key)
+                return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), channelname));
             if (is_memberInChannel(channelname, this->_clients[i]))
                 return _clients[i].sendMsg(ERR_USERONCHANNEL(this->_clients[i].getNickName(), channelname));
-
-            // userlimit nbr  defined 
             if (channel.getMode('l') && channel._clients.size() >= (size_t)channel.getUserlimit())
                 return this->_clients[i].sendMsg(ERR_CHANNELISFULL(this->_clients[i].getNickName(), channelname));
-            //invite only mode  
             if (channel.getMode('i') && !channel.isInvitee(this->_clients[i]))
                 return this->_clients[i].sendMsg(ERR_INVITEONLYCHAN(this->_clients[i].getNickName(), channelname));
-            // required key to join the channel.
-            if (channel.getMode('k') && (key.empty() || key != channel.getpassWord()))
-                return this->_clients[i].sendMsg(ERR_BADCHANNELKEY(this->_clients[i].getNickName(), channelname));
         }
         else
-            this->createChannel(channelname, key);
-
+        {
+            if (key.empty())
+                this->createChannel(channelname, key);
+            else
+                this->createChannel(channelname, key);
+        }
         this->_channels[channelname].addClient(this->_clients[i]);
         if (this->_channels[channelname].isInvitee(this->_clients[i]))
         {
@@ -439,6 +405,15 @@ void Server::joinCommand(int i)
         }
     }
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -580,8 +555,11 @@ void Server::modeCommand(int i)
             if(_channels[channelName].getMode('l'))
                  userlimit = intToString(_channels[channelName].getUserlimit());
 
+        
             this->_clients[i].sendMsg(RPL_CHANNELMODEIS(this->_clients[i].getNickName(), _channels[channelName].getChannelName(), _channels[channelName].showModes(), key, userlimit) );
-            this->_clients[i].sendMsg(RPL_CREATIONTIME(this->_clients[i].getNickName(), _channels[channelName].getChannelName(), _channels[channelName]._creationTime));
+            this->_clients[i].sendMsg(RPL_CREATIONTIME(this->_clients[i].getNickName(), _channels[channelName].getChannelName(), _channels[channelName].getCreationTime()));
+                    
+            std::cout << _channels[channelName].getChannelName() << "******" << _channels[channelName].getCreationTime() << std::endl;
             return ;
         }
         std::string &mode = argsVec[1];

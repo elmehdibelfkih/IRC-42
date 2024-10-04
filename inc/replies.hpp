@@ -61,7 +61,7 @@
 #define RPL_NAMREPLY(client, symbol, channel, userlist) (SERVERNAME + " 353 " + client + " = " + channel + " :" + userlist + "\r\n")
 #define RPL_ENDOFNAMES(client, channel) (SERVERNAME + " 366 " + client + " " + channel + " :End of /NAMES list.\r\n")
 #define RPL_AWAY(client, msg) (SERVERNAME + " 301 " + client + " :is currently away and sends the away message: " + msg + "\r\n")
-#define RPL_CHANNELMODEIS(client, channel, modestring, key, userlimit) (SERVERNAME + " 324 " + client + " " + channel + " :" + modestring + " " + key + " " + userlimit + "\r\n")
+#define RPL_CHANNELMODEIS(client, channel, modestring, key, userlimit) (SERVERNAME + " 324 " + client + " " + channel + " " + modestring + " " + key + " " + userlimit + "\r\n")
 
 #define RPL_VALIDNICK() (SERVERNAME + " :Nickname accepted\r\n")
 #define CHANGENICK(nick, username, host, message) ":" + (nick) + "!" + (username) + "@" + (host) + " NICK :" + (message) + "\r\n"

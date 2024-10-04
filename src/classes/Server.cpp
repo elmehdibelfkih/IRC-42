@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/03 18:40:58 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/04 17:29:57 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ void Server::handleClientConnection()
                     if (this->_clients[this->_fds[i].fd].getAuthenticate())
                     {
                         for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-                        (  *it).second.removeClient(_clients[this->_fds[i].fd], -1); 
+                        (*it).second.removeClient(_clients[this->_fds[i].fd], -1); 
                     }
                     close(this->_fds[i].fd);
                     this->_clients.erase(this->_fds[i].fd);
@@ -278,7 +278,7 @@ bool Server::checkNickName(std::string nickname)
 
 void Server::createChannel(std::string &channelname, std::string key)
 {
-    this->_channels.insert(std::pair<std::string, Channel>(channelname, Channel(channelname, key)));
+    this->_channels.insert(std::make_pair(channelname, Channel(channelname, key)));
     if (!key.empty())
         this->_channels[channelname]._mode.requiredKey = true;
 

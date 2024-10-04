@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/03 21:27:05 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/04 18:32:06 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,13 +17,13 @@ Channel::Channel()
 }
 Channel::Channel(std::string channelname, std::string key) : _channelName(channelname), _passWord(key)
 {
-    this->_topic = "";
-    this->_userLimit = -1;               // default value ofthe number of users who can join the channel.
-    this->_mode.inviteOnly = false;      // invite only: no one can join a channel whithout pre invite from operator the channel
+    this->_topic                = "";
+    this->_userLimit            = -1;               // default value ofthe number of users who can join the channel.
+    this->_mode.inviteOnly      = false;      // invite only: no one can join a channel whithout pre invite from operator the channel
     this->_mode.topicRestricted = false; // any one can set the topic of the channel .
-    this->_mode.userLimit = false;       // used to limit the number of users in the channel
-    this->_mode.requiredKey = false;     // password is required to join channel.
-    this->_creationTime = this->getTime();
+    this->_mode.userLimit       = false;       // used to limit the number of users in the channel
+    this->_mode.requiredKey     = false;     // password is required to join channel.
+    this->_creationTime         = this->getTime();
 }
 
 Channel &Channel::operator=(const Channel &obj)
@@ -39,6 +39,7 @@ Channel &Channel::operator=(const Channel &obj)
         this->_mode.userLimit = obj._mode.userLimit;
         this->_mode.requiredKey = obj._mode.requiredKey;
         this->_clients = obj._clients;
+        this->_creationTime = obj._creationTime;
 
     }
     return *this;
@@ -107,6 +108,12 @@ std::string Channel::getTime() const
     std::ostringstream oss;
     oss << currentTime;  // Convert time_t to string
     return oss.str();    // Return the string representation
+
+}
+
+std::string Channel::getCreationTime() const
+{
+    return this->_creationTime;
 }
 
 std::string Channel::showModes() const
@@ -161,9 +168,6 @@ void Channel::addClient(Client &cli)
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
         cli.sendMsg(RPL_TOPICWHOTIME(cli.getNickName(), this->getChannelName(),this->_setterCl.nickName, this->_setterCl.time));
     }
-    // else   
-    //     cli.sendMsg(RPL_NOTOPIC(cli.getNickName(), this->getChannelName()));
-
     refrechChannel(cli);
     
 }

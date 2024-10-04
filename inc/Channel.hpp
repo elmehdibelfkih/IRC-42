@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/02 20:44:46 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/04 18:13:12 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ public:
     int         getUserlimit() const;
     std::string showModes() const;
     std::string getTime() const;
+    std::string getCreationTime() const;
     
     // setters
     void setChannelName(std::string newName);

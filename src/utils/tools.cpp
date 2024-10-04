@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tools.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ussef <ussef@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/03 21:47:11 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/09/30 08:03:15 by ussef            ###   ########.fr       */
+/*   Updated: 2024/10/04 17:37:22 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,12 @@ std::string intToString(int num) {
 
 int stringToInt(const std::string& str) {
     std::stringstream ss(str);
-    long long temp;  // Use long long to detect overflow
+    long long temp;  
     ss >> temp;
 
     if (ss.fail() || temp < std::numeric_limits<int>::min() || temp > std::numeric_limits<int>::max()) {
-        return -1;  // Return 0 to indicate overflow or conversion error
+        return -1;
     }
 
-    return static_cast<int>(temp);  // Safe to cast to int
+    return static_cast<int>(temp);
 }
