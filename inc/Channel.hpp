@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/04 18:13:12 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/05 00:04:13 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ public:
     
     void addClient(Client& cli);
     void removeClient(Client& cli, int indxcmd);
+    void addOperator(Client& Ope);
+    void removeOperator(Client& Ope);
 
     void addInvitee(Client& cli);
     bool isInvitee(Client& cli);

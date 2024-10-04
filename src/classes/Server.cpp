@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/04 17:29:57 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/05 00:25:39 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -219,8 +219,7 @@ void Server:: handleClientMessage(int i)
             case (NICK):
                 nickCommand(i);
                 break;
-            case PASS:case USER:case PONG:case QUIT:
-                break;
+            case PASS: case USER: case PING: case PONG :case QUIT: break;
             default:
                 this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(_clients[i].getNickName()));
             }

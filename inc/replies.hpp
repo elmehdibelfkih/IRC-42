@@ -31,7 +31,7 @@
 #define ERR_NOTEXTTOSEND(client) (SERVERNAME + " 412 " + client + " :No text to send\r\n")
 #define ERR_CANNOTSENDTOCHAN(client, channel) (SERVERNAME + " 404 " + client + " " + channel + " :Cannot send to channel\r\n")
 #define ERR_NOORIGIN(client) (SERVERNAME + " 409 " + client + " :No origin specified\r\n")
-#define ERR_UNKNOWNMODE(client, modechar) (SERVERNAME + " 472 " + client + " " + modechar + " :Unknown mode\r\n")
+#define ERR_UNKNOWNMODE(client, modechar) (SERVERNAME + " 472 " + client + " " + modechar + " :is an unknown mode char to me\r\n")
 #define ERR_UNKNOWNCOMMAND(nick) (SERVERNAME + " 421 " + nick + " " + " :Unknown command\r\n")
 #define RPL_CREATIONTIME(client, channel, creation_time) (SERVERNAME + " 329 " + client + " " + channel + " " + creation_time + "\r\n")
 

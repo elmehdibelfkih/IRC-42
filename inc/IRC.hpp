@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/21 09:49:55 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/10/02 21:35:32 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/05 00:24:17 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,9 @@ enum commands
     LIST, // Lists all channels on the server.
     INVITE, // Invites a user to join a channel.
     KICK, // Kicks a user from a channel.
-    OPER, // Authenticates as an IRC operator.
     KILL, // Disconnects a user from the server.
     PING, // Checks if the server is still alive.
     PONG, // Responds to a PING message from the server.
-    UNKNOWN // unknown command.
 };
 
 #define ES_GREEN "\033[32m"
@@ -52,7 +50,7 @@ enum commands
 #define NICKLEN 17
 #define CHANNELNAMELEN 18
 #define LIMITCHANNELS  11
-
+#define VALIDMODES "+-itlkopsnmrbveqfcCz"
 #define SERVERNAME std::string(":ircserver")
 
 

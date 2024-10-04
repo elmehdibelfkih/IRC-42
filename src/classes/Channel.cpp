@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/04 18:32:06 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/05 00:22:23 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,8 @@ void Channel::addClient(Client &cli)
     cli.setnbrChannels('+');
     this->_clients.insert(std::pair<std::string, Client *>(cli.getNickName(), &cli));
     if (this->_clients.size() == 1)
-          this->_operators.push_back(cli.getNickName());
+        this->addOperator(cli);
+        
     this->broadcastMessage(reply_join(cli, *this));
     if(!this->getTopic().empty())
     {
@@ -182,15 +183,34 @@ void Channel::removeClient(Client &cli, int indexcmd)
         this->broadcastMessage(":" + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
 
     if (this->hasPermission(cli))
-    {
-        std::vector<std::string> ::iterator it = std::find(this->_operators.begin(), this->_operators.end(), cli.getNickName());
-        if(it != _operators.end())
-            this->_operators.erase(it);
-    }
+        removeOperator(cli);
+
     this->_clients.erase(cli.getNickName());
     refrechChannel(cli);
 
 }
+
+
+void Channel::addOperator(Client &Ope)
+{
+   if(this->hasPermission(Ope))
+        return;
+    this->_operators.push_back(Ope.getNickName());
+    this->refrechChannel(Ope);
+
+}
+
+void Channel::removeOperator(Client &Ope)
+{
+        
+    std::vector<std::string> ::iterator it = std::find(this->_operators.begin(), this->_operators.end(), Ope.getNickName());
+        if(it != this->_operators.end())
+            {
+                this->_operators.erase(it);
+                this->refrechChannel(Ope);
+            }
+}
+
 
 void Channel::setTopic(std::string newTopic, Client setter)
 {
