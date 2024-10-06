@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:19:10 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/03 18:33:25 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/06 04:29:37 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,18 +54,18 @@ public:
     bool                        authenticateUser(int i); 
     void                        handleClientConnection(); 
     void                        handleClientMessage(int i); 
+    
+    
     bool                        checkNickName(std::string nickname);
     bool                        checkUserName(std::string username);
- 
-    void                        applyModes(const std::string &modes, const std::vector<std::string> &argsVec, int clientIdx);
-
+    bool                        isValidChannelName(std::string &channelName);
+    bool                        isValidChannelKey(std::string &keys);
     void                        createChannel(std::string &channelName, std::string key);
     bool                        findChannelName(std::string &channelName);
     bool                        is_memberInChannel(std::string &channelName, Client cl);
-    bool                        isValidChannelName(std::string &channelName);
-    bool                        isValidChannelKey(std::string &keys);
     Client                      *getClientByNickName(std::string nick);
-
+    void                        disconnect(Client &cl);
+    
     void                        passCommand(int i);
     void                        nickCommand(int i);
     void                        userCommand(int i);
@@ -77,6 +77,7 @@ public:
     void                        inviteCommand(int i);
     void                        kickCommand(int i);
     void                        modeCommand(int i);
+    void                        applyModes(const std::string &modes, const std::vector<std::string> &argsVec, int clientIdx);
 };
 
 #endif

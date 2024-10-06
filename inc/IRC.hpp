@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/21 09:49:55 by ybouchra          #+#    #+#             */
-/*   Updated: 2024/10/05 00:24:17 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/06 03:09:50 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ enum commands
     KILL, // Disconnects a user from the server.
     PING, // Checks if the server is still alive.
     PONG, // Responds to a PING message from the server.
+    UNKNOWN
 };
 
 #define ES_GREEN "\033[32m"

@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:16:50 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/05 00:04:13 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/06 06:14:00 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ public:
     bool isInvitee(Client& cli);
     bool hasPermission(Client &cli);
     void refrechChannel(Client &cli);
-    void broadcastMessage(std::string msg);
+    void broadcastMessage(Client sender, std::string msg, bool all);
 };
 
 #endif

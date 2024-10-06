@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/05 00:25:39 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/06 05:08:16 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,13 +157,8 @@ void Server::handleClientConnection()
                 bytesReceived = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
                 if (bytesReceived == 0)
                 {
-                    std::cout << "Client disconnected" << std::endl;
-                    // this->_clients[this->_fds[i].fd].disconnect();
-                    if (this->_clients[this->_fds[i].fd].getAuthenticate())
-                    {
-                        for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
-                        (*it).second.removeClient(_clients[this->_fds[i].fd], -1); 
-                    }
+                    
+                    this->disconnect(this->_clients[this->_fds[i].fd]);
                     close(this->_fds[i].fd);
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
@@ -185,6 +180,7 @@ void Server::handleClientConnection()
 
     }
 }
+
 
 void Server:: handleClientMessage(int i)
 {
@@ -332,3 +328,17 @@ bool Server::isValidChannelName(std::string &channelName)
 }
 
 
+
+void Server::disconnect(Client &cl)
+{
+  if (cl.getAuthenticate())
+    {
+        for ( std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+        {
+            std::string channelname = it->second.getChannelName();
+            if (is_memberInChannel(channelname, cl) )
+                (*it).second.removeClient(cl, -1);
+        }
+    } 
+      std::cout << "Client disconnected:  " << cl.getIP() << std::endl;
+}

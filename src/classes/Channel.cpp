@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:09 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/05 00:22:23 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/06 07:28:53 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,7 @@ void Channel::addClient(Client &cli)
     if (this->_clients.size() == 1)
         this->addOperator(cli);
         
-    this->broadcastMessage(reply_join(cli, *this));
+    this->broadcastMessage(cli, reply_join(cli, *this), true);
     if(!this->getTopic().empty())
     {
         cli.sendMsg(RPL_TOPIC(cli.getNickName(), this->getChannelName(), this->getTopic()));
@@ -178,13 +178,12 @@ void Channel::removeClient(Client &cli, int indexcmd)
     cli.setnbrChannels('-');
 
     if (indexcmd == KICK)
-        this->broadcastMessage(":" + cli.getNickName() + " has been kicked from " + this->getChannelName() + "\r\n");
+        this->broadcastMessage(cli, ":" + cli.getNickName() + " has been kicked from " + this->getChannelName() + "\r\n", true);
     else if (indexcmd == PART)
-        this->broadcastMessage(":" + cli.getNickName() + " has left " + this->getChannelName() + "\r\n");
+        this->broadcastMessage(cli, ":" + cli.getNickName() + " has left " + this->getChannelName() + "\r\n", true);
 
     if (this->hasPermission(cli))
         removeOperator(cli);
-
     this->_clients.erase(cli.getNickName());
     refrechChannel(cli);
 
@@ -222,7 +221,7 @@ void Channel::setTopic(std::string newTopic, Client setter)
     this->_setterCl.time     = this->getTime();
 
 
-    this->broadcastMessage(":" + setter.getNickName() + "!" + setter.getUserName() + "@" + setter.getIP() + " TOPIC " + this->getChannelName() + " :" + this->getTopic() + "\r\n");
+    this->broadcastMessage(setter, ":" + setter.getNickName() + "!" + setter.getUserName() + "@" + setter.getIP() + " TOPIC " + this->getChannelName() + " :" + this->getTopic() + "\r\n", true);
 
         setter.sendMsg(RPL_TOPIC(setter.getNickName(), this->getChannelName(), this->getTopic()));
         std::string setterInfo = _setterCl.nickName + "!~" + _setterCl.userName + "@" +_setterCl.ip;
@@ -235,12 +234,14 @@ bool Channel::hasPermission(Client &cli)
 return std::find(this->_operators.begin(), this->_operators.end(), cli.getNickName()) != this->_operators.end();
 }
 
-void Channel::broadcastMessage(std::string msg)
+void Channel::broadcastMessage(Client sender, std::string msg, bool all)
 {
     std::map<std::string, Client *>::iterator it = this->_clients.begin();
 
     for (; it != this->_clients.end(); it++)
     {
+        if(!all && sender.getNickName() == it->second->getNickName())
+            continue;
         it->second->sendMsg(msg);
     }
 }

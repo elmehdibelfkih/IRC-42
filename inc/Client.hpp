@@ -6,7 +6,7 @@
 /*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:18:23 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/10/04 17:30:30 by ybouchra         ###   ########.fr       */
+/*   Updated: 2024/10/06 05:51:44 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,23 +58,7 @@ public:
     int         getnbrChannels();
 
 
-    void writeMessageToSocket() {
-        while (!stream.empty()) {
-            ssize_t n = send(this->_clientFdSocket, stream.c_str(), stream.size(), 0);
-            
-            if (n == -1) {
-                std::cerr << "Failed to send message to client" << std::endl;
-                break;  // Handle error appropriately, possibly with retry logic
-            }
-            
-            
-            if (n < (ssize_t)stream.size()) {
-                stream.erase(0, n);  // Erase the sent portion
-            } else {
-                stream.clear();  // Clear the stream if all data is sent
-            }
-        }
-    }
+
     
     
     // setters
@@ -90,12 +74,11 @@ public:
     
     
     // utils
-    void disconnect();
+
     void sendMsg(std::string str);
+    void consume_message(const std::string& s);
+    void writeMessageToSocket();
     
-    void consume_message(const std::string& s) {
-        this->_msg.consume_buffer(s);
-    }
 };
 
 #endif
