@@ -152,6 +152,15 @@ void Server::handleClientConnection()
             }
             if (this->_clients[this->_fds[i].fd].getMessage().IsReady()) {
                 this->handleClientMessage(this->_fds[i].fd);
+                }
+                else if (bytesReceived < 0)
+                    std::cerr << "recv() failed" << std::endl;
+                else
+                {
+                    msg = msg + buffer;
+                    this->_clients[this->_fds[i].fd].setMessage(msg);
+                    this->handleClientMessage(this->_fds[i].fd);
+                }
             }
             if (this->_fds[i].revents & POLLOUT)
                 this->_clients[this->_fds[i].fd].writeMessageToSocket();
