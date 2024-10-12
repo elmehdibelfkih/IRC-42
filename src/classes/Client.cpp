@@ -6,7 +6,7 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:14 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/23 12:42:22 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/09/29 04:55:26 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,32 +15,32 @@
 Client::Client()
 {
     this->_clientFdSocket = -1;
+    this->_nbrchannels = 0;
     this->_authenticate = false;
-    this->_currentChannel = "";
+    this->_pass = false;
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
-    this->_pass = false;
 }
 
-Client::Client(const Client& obj)
+Client::Client(const Client &obj)
 {
     *this = obj;
 }
 
-Client& Client::operator=(const Client& obj)
+Client &Client::operator=(const Client &obj)
 {
     if (this != &obj)
     {
         this->_clientFdSocket = obj._clientFdSocket;
         this->_authenticate = obj._authenticate;
-        this->_currentChannel = obj._currentChannel;
+        this->_pass = obj._pass;
         this->_userName = obj._userName;
         this->_nickName = obj._nickName;
         this->_IP = obj._IP;
-        this->_channels = obj._channels;
+        this->_nbrchannels = obj._nbrchannels;
         this->_msg = obj._msg;
-        this->_pass = obj._pass;
+        this->stream = obj.stream;
     }
     return *this;
 }
@@ -50,23 +50,17 @@ Client::~Client()
     this->_userName.clear();
     this->_nickName.clear();
     this->_IP.clear();
-    this->_channels.clear();
 }
 
-
-
-/////////////////////////////////////////////////////////////////
-
-
-
-Client::Client(int clientFdSocket, bool authenticate) :  _authenticate(authenticate)
+Client::Client(int clientFdSocket, bool authenticate) : _authenticate(authenticate)
 {
-    this->_currentChannel = "";
+
     this->_userName = "";
     this->_nickName = "";
     this->_IP = "";
     this->_pass = false;
     this->_clientFdSocket = clientFdSocket;
+    this->_nbrchannels = 0;
 }
 
 int Client::getClientFdSocket() const
@@ -77,11 +71,6 @@ int Client::getClientFdSocket() const
 bool Client::getAuthenticate() const
 {
     return this->_authenticate;
-}
-
-std::string Client::getCurrentChannel() const
-{
-    return this->_currentChannel;
 }
 
 std::string Client::getUserName() const
@@ -99,11 +88,10 @@ std::string Client::getIP() const
     return this->_IP;
 }
 
-Message& Client::getMessage()
+Message &Client::getMessage()
 {
     return this->_msg;
 }
-
 
 void Client::setClientFdSocket(int fd)
 {
@@ -113,11 +101,6 @@ void Client::setClientFdSocket(int fd)
 void Client::setAuthenticate(bool au)
 {
     this->_authenticate = au;
-}
-
-void Client::setCurrentChannel(std::string channelName)
-{
-    this->_currentChannel = channelName;
 }
 
 void Client::setUserName(std::string userName)
@@ -145,21 +128,43 @@ void Client::setPass(bool b)
     this->_pass = b;
 }
 
-void Client::disconnect()
-{
-    if (this->_authenticate)
-    {
-        for (std::vector<Channel>::iterator it = this->_channels.begin(); it < this->_channels.end(); it++)
-            (*it).removeClient(this->_clientFdSocket);        
-    }
-}
+// void Client::disconnect()
+// {
+//     if (this->_authenticate)
+//     {
+//         std::vector<Channel>::iterator it = this->_channels.begin();
+//         for (; it != this->_channels.end(); it++)
+//             (*it).removeClient(*this);
+//     }
 
-void  Client::sendMsg(std::string str)
+// }
+
+void Client::sendMsg(std::string str)
 {
-    send(this->_clientFdSocket, str.c_str(), str.size(), 0);
+    stream += str;
 }
 
 bool Client::getPass() const
 {
     return this->_pass;
+}
+
+int Client::getnbrChannels()
+{
+    return (this->_nbrchannels);
+}
+void Client::setnbrChannels(char sign)
+{
+    if (sign == '+')
+        this->_nbrchannels++;
+    else
+        this->_nbrchannels--;
+}
+
+std::string Client::getTime() const {
+    std::time_t currentTime = std::time(0);  // no std:: prefix
+    std::tm *localTime = std::localtime(&currentTime);  // no std:: prefix
+    char buffer[80];
+    std::strftime(buffer, sizeof(buffer), "%b %d, %Y at %I:%M %p", localTime);  // no std:: prefix
+    return std::string(buffer);
 }

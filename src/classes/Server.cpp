@@ -1,3 +1,4 @@
+
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
@@ -6,35 +7,11 @@
 /*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/07 20:17:33 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/05/11 19:14:45 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/09/28 10:16:51 by ebelfkih         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../inc/Server.hpp"
-
-Server::Server()
-{
-    this->_passWord = "";
-    this->_port = -1;
-}
-
-Server& Server::operator=(const Server& obj)
-{
-    if (this != &obj)
-    {
-        this->_port = obj._port;
-        this->_passWord = obj._passWord;
-        this->_fds = obj._fds;
-        this->_clients = obj._clients;
-        this->_channels = obj._channels;
-    }
-    return *this;
-}
-
-Server::Server(const Server& obj)
-{
-    *this = obj;
-}
 
 Server::~Server()
 {
@@ -43,8 +20,7 @@ Server::~Server()
     this->_clients.clear();
     this->_channels.clear();
 }
- 
-///////////////////////////////////////////////////////////////////////////////////
+
 
 Server::Server(std::string port, std::string password) : _passWord(password)
 {
@@ -52,13 +28,12 @@ Server::Server(std::string port, std::string password) : _passWord(password)
     char *end;
 
     p = strtod(port.c_str(), &end);
-    if (!port.find('.')  || strcmp("", end) || !(1024 < p && p < 49151))
+    if (!port.find('.') || strcmp("", end) || !(1024 < p && p < 49151))
     {
         std::cerr << "ERROR: bad input" << std::endl;
         exit(EXIT_FAILURE);
     }
     this->_port = htons(p);
-    
 }
 
 void Server::startServer()
@@ -73,16 +48,27 @@ void Server::startServer()
         exit(EXIT_FAILURE);
     }
     memset(&serverAddr, 0, sizeof(serverAddr));
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_port = this->_port;
-    serverAddr.sin_family = AF_INET;
-    if (bind(fdSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
-    {
-        std::cerr << "Error binding socket" << std::endl;
+    int opt = 1;
+	if (setsockopt(fdSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1) {
+        std::cerr << "error set server socket to reuseaddress" << std::endl;
+        close(fdSocket);
+        exit(EXIT_FAILURE);        
+    }
+    if (fcntl(fdSocket, F_SETFL, O_NONBLOCK) == -1) {
+        std::cerr << "error set server socket to non-blocking" << std::endl;
         close(fdSocket);
         exit(EXIT_FAILURE);
     }
-    
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_port = this->_port;
+    serverAddr.sin_family = AF_INET;
+    if (bind(fdSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) < 0)
+    {
+        std::cerr << "Error binding socket, maybe the port was already used" << std::endl;
+        close(fdSocket);
+        exit(EXIT_FAILURE);
+    }
+
     if (listen(fdSocket, SOMAXCONN) < 0)
     {
         std::cerr << "listen() failed" << std::endl;
@@ -101,85 +87,138 @@ void Server::handleClientConnection()
     while (true)
     {
         int NReady = poll(&(this->_fds[0]), this->_fds.size(), -1);
-        if (NReady < 0){
+        if (NReady < 0)
+        {
             std::cerr << "poll() failed" << std::endl;
             exit(EXIT_FAILURE);
         }
         // Check for new connections
-        if (this->_fds[0].revents & POLLIN){
-            int clientFdSocket = accept(this->_fds[0].fd, NULL, NULL);
-            if (clientFdSocket < 0)
-            std::cerr << "accept() failed" << std::endl;
-            else {
-                std::cout << "New client connected" << std::endl;
-                pollfd tmp;
-                tmp.fd = clientFdSocket;
-                tmp.events = POLLIN;
-                this->_fds.push_back(tmp);
-                Client Ctmp(clientFdSocket, false);
-                this->_clients[clientFdSocket] = Ctmp;
+        if (this->_fds[0].revents & POLLIN)
+        {
+            struct sockaddr_in clientAddr;
+            socklen_t addrLen = sizeof(clientAddr);
+            int clientFdSocket = accept(this->_fds[0].fd, (struct sockaddr *)&clientAddr, &addrLen);
+            if (clientFdSocket < 0) {
+                std::cerr << "accept() failed" << std::endl;
+                continue;
             }
+            if (fcntl(clientFdSocket, F_SETFL, O_NONBLOCK) == -1) {
+                std::cerr << "failed set client socket to non-blocking" << std::endl;
+                close(clientFdSocket);
+                continue;
+            }
+            std::string clientIP = inet_ntoa(clientAddr.sin_addr);
+            logToFile("New client connected");
+            // << "New client connected: " << clientIP << std::endl;
+
+            pollfd tmp;
+            tmp.fd = clientFdSocket;
+            tmp.events = POLLIN | POLLOUT;
+
+            this->_fds.push_back(tmp);
+            Client Ctmp(clientFdSocket, false);
+            Ctmp.setIP(clientIP);
+            this->_clients[clientFdSocket] = Ctmp;
         }
-        
+
         // Check for data on client sockets
-        for (size_t i = 1; i < this->_fds.size(); i++){
+        for (size_t i = 1; i < this->_fds.size(); i++)
+        {
             if (this->_fds[i].revents & POLLIN)
             {
-                Message msg;
+                // Message 
                 int bytesReceived;
-                char buffer[4096];
-                memset(buffer, 0, 4096);
+                char buffer[1024];
+                memset(buffer, 0, 1024);
                 bytesReceived = recv(this->_fds[i].fd, buffer, sizeof(buffer), 0);
                 if (bytesReceived == 0)
                 {
-                    std::cout << "Client disconnected" << std::endl;
+                    std::cout << "Client disconnected : " << i << std::endl;
+                    if (this->_clients[this->_fds[i].fd].getAuthenticate())
+                    {
+                        for (std::map<std::string, Channel>::iterator it = this->_channels.begin(); it != this->_channels.end(); it++)
+                            (*it).second.removeClient(_clients[this->_fds[i].fd], -1); 
+                    }
                     close(this->_fds[i].fd);
-                    this->_clients[this->_fds[i].fd].disconnect();
                     this->_clients.erase(this->_fds[i].fd);
                     this->_fds.erase(this->_fds.begin() + i);
-                    break;
+                    continue;
                 }
-                if (bytesReceived < 0)
+                if (bytesReceived < 0) {
                     std::cerr << "recv() failed" << std::endl;
-                else
-                {
-                    msg = msg + buffer;
-                    this->_clients[this->_fds[i].fd].setMessage(msg);
-                    this->handleClientMessage(this->_fds[i].fd);
+                    continue;
                 }
+                this->_clients[this->_fds[i].fd].consume_message(buffer);
             }
+            if (this->_clients[this->_fds[i].fd].getMessage().IsReady()) {
+                this->handleClientMessage(this->_fds[i].fd);
+            }
+            if (this->_fds[i].revents & POLLOUT)
+                this->_clients[this->_fds[i].fd].writeMessageToSocket();
         }
     }
 }
 
-void Server::handleClientMessage(int i)
+void Server:: handleClientMessage(int i)
 {
-    if (this->_clients[i].getMessage().IsReady())
-    {
+        logToFile(this->_clients[i].getMessage().getBuffer());
         if (this->authenticateUser(i))
         {
-            std::cout << "mrhbabik\n";
-            // (.............) << youssef
-           
+            switch (this->_clients[i].getMessage().getCommand())
+            {
+            case (JOIN):
+                joinCommand(i);
+                break;
+            case (LIST):
+                listCommand(i);
+                break;
+            case (PART):
+                partCommand(i);
+                break;
+            case (TOPIC):
+                topicCommand(i);
+                break;
+            case (PRIVMSG):
+                privmsgCommand(i);
+                break;
+            case (INVITE):
+                inviteCommand(i);
+                break;
+            case (KICK):
+                kickCommand(i);
+                break;
+            case (MODE):
+                modeCommand(i);
+                break;
+            case (NICK):
+                nickCommand(i);
+                break;
+            case PASS:case USER:case PONG:case QUIT:
+                break;
+            default:
+                this->_clients[i].sendMsg(ERR_UNKNOWNCOMMAND(_clients[i].getNickName()));
+            }
         }
-        this->_clients[i].getMessage().clearBuffer();
-    }
 }
 
 bool Server::authenticateUser(int i)
 {
+
     if (this->_clients[i].getAuthenticate())
         return true;
-    else if (!this->_clients[i].getPass() || this->_clients[i].getMessage().getCommand() == PASS)
+    else if (this->_clients[i].getMessage().getCommand() == PASS)
         this->passCommand(i);
-    else if (this->_clients[i].getNickName().size() == 0 || this->_clients[i].getMessage().getCommand() == NICK)
+    else if (this->_clients[i].getMessage().getCommand() == NICK)
         this->nickCommand(i);
-    else if (this->_clients[i].getUserName().size() == 0 || this->_clients[i].getMessage().getCommand() == USER)
+    else if (!this->_clients[i].getNickName().empty() && this->_clients[i].getMessage().getCommand() == USER)
         this->userCommand(i);
+    else
+        this->_clients[i].sendMsg(ERR_NOTREGISTERED("*"));
+
     return false;
 }
 
-Client* Server::getClientByNickName(std::string nick)
+Client *Server::getClientByNickName(std::string nick)
 {
     for (std::map<int, Client>::iterator it = this->_clients.begin(); it != this->_clients.end(); it++)
     {
@@ -189,76 +228,74 @@ Client* Server::getClientByNickName(std::string nick)
     return NULL;
 }
 
-bool Server::checkNickName(int i)
+bool Server::checkUserName(std::string username)
 {
-    if (this->_clients[i].getMessage().getToken().find(' ') != std::string::npos || this->_clients[i].getMessage().getToken().find(',') != std::string::npos 
-            || this->_clients[i].getMessage().getToken().find('*') != std::string::npos ||  this->_clients[i].getMessage().getToken().find('!') != std::string::npos 
-            || this->_clients[i].getMessage().getToken().find('?') != std::string::npos || this->_clients[i].getMessage().getToken().find('@') != std::string::npos 
-            || this->_clients[i].getMessage().getToken().find('.') != std::string::npos)
+    if(username.empty())
         return false;
-    if (*(this->_clients[i].getMessage().getToken().begin()) == ':' || *(this->_clients[i].getMessage().getToken().begin()) == '$')
-        return false;
-    this->_clients[i].setNickName(this->_clients[i].getMessage().getToken());
+    for (size_t i = 0; i < username.size(); ++i)
+    {
+        char c = username[i];
+        if (!(isalpha(c) || isdigit(c)))
+            return false;
+    }
     return true;
 }
 
-bool Server::checkUserName(int i)
+bool Server::checkNickName(std::string nickname)
 {
-    (void)i;
+    char c = nickname.at(0);
+    if (!(isalpha(c)))
+        return false;
     return true;
 }
 
-void Server::passCommand(int i)
+void Server::createChannel(std::string &channelName, std::string key, t_Mode mode)
 {
-    if (this->_clients[i].getMessage().getCommand() == PASS)
-    {
-        if (this->_clients[i].getMessage().getToken().size() == 0)
-            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"pass"));
-        else if (this->_clients[i].getPass() == true)
-            this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-        else if (this->_clients[i].getMessage().getToken() == this->_passWord)
-            this->_clients[i].setPass(true);
-        else
-            this->_clients[i].sendMsg(ERR_PASSWDMISMATCH((std::string)"x"));
-    }
-    else
-         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+    this->_channels[channelName] = Channel(channelName, key, mode);
 }
 
-void Server::nickCommand(int i)
+bool Server::findChannelName(std::string &channelName)
 {
-    if (this->_clients[i].getMessage().getCommand() == NICK)
-    {
-        if (this->_clients[i].getMessage().getToken().size() == 0)
-            this->_clients[i].sendMsg(ERR_NONICKNAMEGIVEN((std::string)"x"));
-        else if (this->getClientByNickName(this->_clients[i].getMessage().getToken()) != NULL)
-            this->_clients[i].sendMsg(ERR_NICKNAMEINUSE((std::string)"x",this->_clients[i].getMessage().getToken()));
-        else if (!this->checkNickName(i))
-            this->_clients[i].sendMsg(ERR_ERRONEUSNICKNAME((std::string)"x",this->_clients[i].getMessage().getToken()));
-    }
-    else
-         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));    
+    if (this->_channels.empty() || channelName.empty())
+        return (false);
+    std::map<std::string, Channel>::iterator it = this->_channels.find(channelName);  
+    return (it != this->_channels.end() );
+
 }
 
-void Server::userCommand(int i)
+bool Server::is_memberInChannel(std::string &channelName, Client cl)
 {
-    if (this->_clients[i].getMessage().getCommand() == USER)
-    {
-        std::cout << "mehdi" << std::endl;
-        if (this->_clients[i].getMessage().getToken().size() == 0)
-            this->_clients[i].sendMsg(ERR_NEEDMOREPARAMS((std::string)"x",(std::string)"user"));
-        // else if (this->_clients[i].getUserName().size() == 0)
-        //     this->_clients[i].sendMsg(ERR_ALREADYREGISTERED((std::string)"x"));
-        else
-        {
-            this->_clients[i].setUserName("mehdi");
-            this->_clients[i].setAuthenticate(true);
-        }
-            
-        // else if ()
-            
-    }
-    else
-         this->_clients[i].sendMsg(ERR_NOTREGISTERED((std::string)"x"));
+    std::map<std::string, Client*>::iterator it = this->_channels[channelName]._clients.find(cl.getNickName());
+    if (it != _channels[channelName]._clients.end() && it->first == cl.getNickName())
+        return (true);
+    return (false);
 }
 
+bool Server::isValidChannelKey(std::string &key)
+{
+    if (key.empty())
+        return (false);
+    if (key.size() < 4 || key.size() >= 32)
+        return (false);
+    for (size_t i = 0; key.size() > i; i++)
+    {
+        if (key[i] == ' ' || (key.at(i) >= 9 && key.at(i) <= 13))
+            return (false);
+    }
+    return (true);
+}
+
+bool Server::isValidChannelName(std::string &channelName)
+{
+    if (channelName.empty())
+        return (false);
+    if (channelName.at(0) != '#')
+        return (false);
+    if (!(channelName.size() >= 2 && channelName.size() <= CHANNELNAMELEN))
+        return (false);
+    size_t pos = channelName.find_first_of(",:?*!@ ");
+    if (pos != std::string::npos) {
+        return (false);
+    }
+    return (true);
+}

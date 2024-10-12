@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Message.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ebelfkih <ebelfkih@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ybouchra <ybouchra@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/13 17:46:19 by ebelfkih          #+#    #+#             */
-/*   Updated: 2024/04/24 08:37:56 by ebelfkih         ###   ########.fr       */
+/*   Updated: 2024/09/25 00:30:43 by ybouchra         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,36 @@ void Message::myAppend(Message msg)
 
 bool Message::IsReady()
 {
-    if (strchr(this->_buffer.c_str(), '\n'))
-    {
-        this->parsBuffer();
-        return true;
+
+    // check first for "\r\n" delemeter
+    // if not exist check then for "\n"
+
+    int i = 2;
+    size_t pos = ss.find("\r\n");
+    if (pos == std::string::npos) {
+        pos = ss.find("\n");
+        i--;
     }
-    return false;
+
+    // check first for "\r\n" delemeter 
+    if (pos == std::string::npos)
+        return false;
+
+    _buffer = ss.substr(0, pos + i);
+    ss.erase(0, pos + i);
+    this->parsBuffer();
+    return true;
+
+    // if (strchr(this->_buffer.c_str(), '\n'))
+    // {
+    //     // std::string buff;
+    //     // size_t pos = _buffer.find('\n');
+    //     // buff = _buffer.substr(0, pos);
+    //     // _buffer.erase(0, pos + 1);
+    //     this->parsBuffer();
+    //     return true;
+    // }
+    // return false;
 }
 
 void Message::setBuffer(std::string str)
@@ -97,12 +121,16 @@ void Message::clearBuffer()
 }
 
 void Message::parsBuffer()
-{   
+{
+    
     this->_tokens.clear();
     std::string::size_type start = 0;
     std::string::size_type end = this->_buffer.find(' ');
     std::string cmd;
     std::string tmp;
+
+
+    // "PASS uuuu\r\nssdsdsd sjfdsf idgsfb"
 
     if (end != std::string::npos)
     {
